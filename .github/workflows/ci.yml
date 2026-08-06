@@ -22,7 +22,7 @@ env:
   # the latest release; 0.0.103 adds the mcpplibs index org migration +
   # per-repo artifact adoption (mcpp#267/#269) — no manifest-grammar change,
   # the package floor stays 0.0.102.
-  MCPP_VERSION: "0.0.103"
+  MCPP_VERSION: "2026.8.5.4"
 
 jobs:
   # ── Platform × toolchain matrix ─────────────────────────────────────────

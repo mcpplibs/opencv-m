@@ -42,8 +42,8 @@ mcpp new myvision --template opencv && cd myvision && mcpp run -- input.png    #
 Or declare the dependency in an existing project:
 
 ```toml
-[dependencies]
-opencv = "0.0.10"
+[dependencies.opencv]
+opencv = "5.0.0"
 ```
 
 ```cpp
@@ -86,8 +86,8 @@ spelling of a function-like macro (`CV_Assert`, the version macros) should inclu
 | `unifont` | embeds the WenQuanYi Micro Hei font, enabling `putText` for Unicode and CJK text through `FontFace("uni")` |
 
 ```toml
-[dependencies]
-opencv = { version = "0.0.10", features = ["dnn"] }
+[dependencies.opencv]
+opencv = { version = "5.0.0", features = ["dnn"] }
 ```
 
 The dnn layer adds over 300 translation units, is built only for consumers that enable it

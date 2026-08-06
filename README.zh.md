@@ -37,8 +37,8 @@ mcpp new myvision --template opencv && cd myvision && mcpp run -- input.png    #
 或在既有项目中声明依赖:
 
 ```toml
-[dependencies]
-opencv = "0.0.10"
+[dependencies.opencv]
+opencv = "5.0.0"
 ```
 
 ```cpp
@@ -79,8 +79,8 @@ int main() {
 | `unifont` | 内嵌 WenQuanYi Micro Hei 字体,经 `FontFace("uni")` 支持 Unicode 与中日韩字符的 `putText` |
 
 ```toml
-[dependencies]
-opencv = { version = "0.0.10", features = ["dnn"] }
+[dependencies.opencv]
+opencv = { version = "5.0.0", features = ["dnn"] }
 ```
 
 dnn 底层多出 300 余个翻译单元,仅对显式启用者构建,且默认不进入 `opencv.cv` 聚合模块。

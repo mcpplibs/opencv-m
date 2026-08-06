@@ -1,6 +1,15 @@
+# The namespace names whose library this is, not who packaged it; the version
+# says which upstream you are getting. `mcpplibs` is mcpp's DEFAULT namespace
+# (kDefaultNamespace), not an answer to "whose library" — OpenCV is opencv's,
+# and this repository adds the C++23 module layer plus the vendored build. And
+# `0.0.10` said nothing about the OpenCV inside; the description right below has
+# been carrying that answer all along.
+#
+# Rule and full migration table: mcpp-index#163.
 [package]
+namespace   = "opencv"
 name        = "opencv"
-version     = "0.0.10"
+version     = "5.0.0"
 description = "OpenCV 5.0.0 vendored + C++23 module layer — import opencv.cv; (API and habits unchanged, just no headers). Single repo: full source build carried by this manifest, frozen per-OS config snapshots in gen/, no compat.opencv dependency."
 license     = "MIT"
 
