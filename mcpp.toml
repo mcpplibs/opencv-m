@@ -113,35 +113,35 @@ cxxflags = ["-fvisibility=hidden"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/calib/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/features/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/objdetect/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/photo/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/ptcloud/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/stereo/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/stitching/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(unix)".build.flags]]
 glob = "**/modules/video/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [target."cfg(linux)"]
 
@@ -353,35 +353,35 @@ defines = ["CV_CPU_COMPILE_AVX2=1", "CV_CPU_DISPATCH_MODE=AVX2"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/calib/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/features/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/objdetect/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/photo/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/ptcloud/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/stereo/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/stitching/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [[target."cfg(windows)".build.flags]]
 glob = "**/modules/video/**"
-defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
 
 [target.x86_64-linux-musl]
 linkage = "static"
@@ -636,12 +636,21 @@ implies = ["highgui"]
 [features.highgui-cocoa]
 implies = ["highgui"]
 
+[features.dnn-onnxruntime]
+implies = ["dnn"]
+defines = ["HAVE_ONNXRUNTIME=1"]
+
 [feature-deps]
 
 [feature-deps.videoio-ffmpeg]
 
 [feature-deps.videoio-ffmpeg.compat]
 ffmpeg = "8.1.2"
+
+[feature-deps.dnn-onnxruntime]
+
+[feature-deps.dnn-onnxruntime."mcpplibs.mwrap"]
+onnxruntime = "1.25.1"
 
 [targets]
 

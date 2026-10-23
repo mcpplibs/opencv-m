@@ -1,7 +1,9 @@
-# OpenCV 5.0.0 全面支持、ORT 与 mwrap 索引迁移设计（评审稿）
+# OpenCV 5.0.0 全面支持、ORT 与 mwrap 索引迁移设计（实施基线）
 
 状态：Implementation，用户已授权实现、测试、每仓库一个 PR 与 checkpoint commits。日期：2026-10-24。
-规范：[mwrap 仓库与模块规范](2026-10-24-mwrap-repository-and-module-standard.md)。
+规范：mcpp-index 的 `docs/zh/mwrap.md`，候选规范见 [索引 PR #564](https://github.com/mcpplibs/mcpp-index/pull/564)。
+实施进度、命令证据与剩余门槛见 [验收记录](2026-10-24-readiness-audit.md)。
+第 1 节保留设计评审时的历史基线；随后已获授权实施。mcpp 引擎源码只读，文档 PR #836 不合入，也不作为库项目的前置条件。
 已确认：版本跟随上游，最多追加一个数字封装修订尾号，例如 5.0.0 → 5.0.0.1。
 
 ## 1. 本轮交付与后续实施边界

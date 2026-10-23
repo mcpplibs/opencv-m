@@ -155,6 +155,7 @@ def generate():
         "highgui-gtk3": {"implies": ["highgui", "imgcodecs"]},
         "highgui-win32": {"implies": ["highgui"]},
         "highgui-cocoa": {"implies": ["highgui"]},
+        "dnn-onnxruntime": {"implies": ["dnn"], "defines": ["HAVE_ONNXRUNTIME=1"]},
     })
     # GTK's pthread compiler mode is private to its implementation TU. Baking
     # it into a public BMI would require every consumer to use -pthread too.
@@ -168,10 +169,12 @@ def generate():
     for name in added_modules:
         build["include_dirs"].append(f"upstream/opencv/modules/{name}/include")
         # These are upstream implementation flags, never public BMI flags.
+        private_defines = ["__OPENCV_BUILD=1", "NDEBUG", "_USE_MATH_DEFINES",
+                           "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
         targets["cfg(unix)"]["build"]["flags"].append({
-            "glob": f"**/modules/{name}/**", "defines": ["__OPENCV_BUILD=1", "NDEBUG"]})
+            "glob": f"**/modules/{name}/**", "defines": private_defines})
         targets["cfg(windows)"]["build"]["flags"].append({
-            "glob": f"**/modules/{name}/**", "defines": ["__OPENCV_BUILD=1", "NDEBUG"]})
+            "glob": f"**/modules/{name}/**", "defines": private_defines})
     # The bundled zlib is an implementation detail, not another provider of
     # the public zlib ABI used by GUI SDKs and other dependencies.
     build.setdefault("defines", []).append("Z_PREFIX")
@@ -186,7 +189,8 @@ def generate():
         "build": build, "target": targets,
         "dev-dependencies": {"compat": {"gtest": "1.15.2"}},
         "features": features,
-        "feature-deps": {"videoio-ffmpeg": {"compat": {"ffmpeg": "8.1.2"}}},
+        "feature-deps": {"videoio-ffmpeg": {"compat": {"ffmpeg": "8.1.2"}},
+                         "dnn-onnxruntime": {"mcpplibs.mwrap": {"onnxruntime": "1.25.1"}}},
         "targets": {"opencv": {"kind": "lib"}},
     }
     (ROOT / "mcpp.toml").write_text(

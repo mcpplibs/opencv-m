@@ -231,6 +231,14 @@ int main() try {
     fs::path out = mcpp::out_dir();
     mcpp::include_dir(out.string().c_str());
     const std::string gui = configure_highgui(out, os);
+    if (mcpp::has_feature("dnn-onnxruntime")) {
+        const std::string arch = mcpp::target_arch();
+        const std::string env = mcpp::target_env();
+        if (!((os == "linux" && arch == "x86_64" && env == "gnu") ||
+              (os == "windows" && arch == "x86_64" && env == "msvc") ||
+              (os == "macosx" && arch == "aarch64")))
+            throw std::runtime_error("dnn-onnxruntime supplies CPU SDKs for Linux x86_64 glibc, Windows x86_64 MSVC ABI and macOS arm64 only");
+    }
     // Newly integrated modules use the upstream baseline dispatch path.
     // Their optional OpenCL backends remain unavailable until actual kernel
     // embeddings and runtime validation are provided; never fake that flag.
@@ -260,6 +268,8 @@ int main() try {
     // included headers). Generate the complete selected interface before
     // mcpp scans it; there are no conditional imports for its scanner to guess.
     std::ostringstream imports;
+    if (mcpp::has_feature("dnn-onnxruntime"))
+        imports << "export import mcpplibs.mwrap.onnxruntime;\n";
     for (const auto& name : modules)
         if (name != "core") imports << "export import mcpplibs.mwrap.opencv." << name << ";\n";
     std::string aggregate = slurp(man / "src/selected.cppm.in");
@@ -294,6 +304,7 @@ int main() try {
            << "\nPNG: " << (mcpp::has_feature("imgcodecs-png") ? "YES" : "NO")
            << "\nFFmpeg: " << (mcpp::has_feature("videoio-ffmpeg") ? "YES" : "NO") << "\n";
     report << "Window backend: " << gui << "\n";
+    report << "DNN ONNX Runtime: " << (mcpp::has_feature("dnn-onnxruntime") ? "CPU (1.25.1)" : "NO") << "\n";
     spew(out / "version_string.inc", c_string(report.str()) + "\n");
 
     // windows compiles through the generated/windows/tu/w*/ stub namespace (see
@@ -317,6 +328,23 @@ int main() try {
 
     // 2. per-OS dnn sources (feature-gated)
     if (mcpp::has_feature("dnn")) {
+        fs::path ort_backend;
+        if (os == "windows" && mcpp::has_feature("dnn-onnxruntime")) {
+            // Keep the vendor byte-faithful. ORT expects a native wide path
+            // on Windows; upstream's model path handles this but its profile
+            // call currently passes char*. Generate a private adapted TU.
+            const auto original = "upstream/opencv/modules/dnn/src/net_impl_backend.cpp";
+            std::string text = slurp(man / original);
+            const std::string call = "opts.EnableProfiling(ort_profile_path_prefix.c_str());";
+            const auto at = text.find(call);
+            if (at == std::string::npos || text.find(call, at + 1) != std::string::npos)
+                throw std::runtime_error("upstream ORT profiling call changed; review the Windows path adapter");
+            text.replace(at, call.size(), "opts.EnableProfiling(mwrap_opencv_port::ort_profile_path(ort_profile_path_prefix).c_str());");
+            ort_backend = out / "port/modules/dnn/src/net_impl_backend.cpp";
+            spew(ort_backend, "#include <mwrap/opencv/ort_profile_path.hpp>\n" + text);
+            mcpp::include_dir("upstream/opencv/modules/dnn/src");
+            mcpp::rerun_if_changed(original);
+        }
         std::string dnnrel = "generated/" + os + "/DNN_SOURCES.txt";
         std::ifstream dl(man / dnnrel);
         if (dl) {
@@ -326,7 +354,9 @@ int main() try {
                 while (!dline.empty() && (dline.back() == '\r' || dline.back() == ' ')) dline.pop_back();
                 if (dline.empty() || dline[0] == '#') continue;
                 for (const std::string& one : expand_glob_line(man, dline)) {
-                    mcpp::source(one.c_str());
+                    if (!ort_backend.empty() && one.ends_with("net_impl_backend.cpp"))
+                        mcpp::source(ort_backend.string().c_str());
+                    else mcpp::source(one.c_str());
                     injected++;
                 }
             }

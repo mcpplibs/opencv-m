@@ -1,0 +1,10 @@
+[package]
+name = "{{project.name}}"
+version = "0.1.0"
+description = "OpenCV ONNX Runtime CPU inference"
+
+[dependencies]
+"{{self.name}}" = { version = "{{self.version}}", features = ["dnn-onnxruntime"] }
+
+[target.x86_64-linux-gnu]
+cxx_runtime = "toolchain-coupled"

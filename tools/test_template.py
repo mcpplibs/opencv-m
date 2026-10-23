@@ -16,6 +16,7 @@ def main():
     parser.add_argument("--toolchain", default="llvm@23.1.3")
     parser.add_argument("--template", help="named template; omit for the package default")
     parser.add_argument("--run-arg", action="append", default=[])
+    parser.add_argument("--index", type=Path, help="candidate SDK/wrapper index for unpublished feature dependencies")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     metadata = tomllib.loads((root / "mcpp.toml").read_text())["package"]
@@ -26,7 +27,7 @@ def main():
         home = temporary / "home"
         package = home / "registry/data/xpkgs" / (namespace + "-x-" + name) / version / (name + "-" + version)
         shutil.copytree(root, package, ignore=shutil.ignore_patterns(
-            ".git", "target", ".mcpp", ".xlings", "__pycache__", "mcpp.lock", "compile_commands.json", "mcpp-2026.*"))
+            ".git", "target", ".mcpp", ".xlings", ".candidate-index", "__pycache__", "mcpp.lock", "compile_commands.json", "mcpp-2026.*"))
         index = home / "indices/mcpplibs/pkgs/mwrap"
         index.mkdir(parents=True)
         entry = '{url="https://example.invalid/candidate.tar.gz",sha256="fixture"}'
@@ -56,6 +57,15 @@ def main():
         assert len(matches) == 1, "Expected exactly one qualified dependency from self.name"
         lines[matches[0]] = json.dumps(identity) + " = " + replacement
         manifest.write_text("\n".join(lines) + "\n")
+        if args.index:
+            candidate_index = args.index.resolve()
+            subprocess.run([os.sys.executable, str(candidate_index / "tests/prepare_mwrap_indices.py")],
+                           cwd=candidate_index, check=True)
+            with manifest.open("a") as out:
+                out.write("\n[indices]\n")
+                for namespace in ("compat", "mcpplibs.mwrap"):
+                    view = candidate_index / "tests/mwrap/.indices" / namespace
+                    out.write(json.dumps(namespace) + ' = { path = ' + json.dumps(view.as_posix()) + ' }\n')
         command = [args.mcpp, "build", "--toolchain", args.toolchain, "--strict"]
         print("+", " ".join(command), flush=True)
         subprocess.run(command, cwd=project, check=True)

@@ -7,12 +7,12 @@ The candidate package is **5.0.0.1**: upstream 5.0.0 plus wrapper revision 1.
 
 This branch is an implementation checkpoint. All sixteen main modules are integrated and have passed local Linux GCC/LLVM tests.
 The native GTK3 window backend has passed local Linux tests and Cocoa passed
-native macOS CI; Win32 validation is pending. Public API coverage auditing and the ONNX Runtime bridge are
-still being implemented. Passing the current CI does not establish full OpenCV support.
+native macOS CI; Win32 validation is pending. Public API coverage auditing and additional video/codec backends are
+still being implemented; the ORT CPU bridge has passed Linux validation. Passing the current CI does not establish full OpenCV support.
 
 ## Build the checkout
 
-Use mcpp **2026.10.21.1**, pinned in .xlings.json and CI:
+Use mcpp **2026.10.24.1**, pinned in .xlings.json and CI:
 
 ```sh
 mcpp test
@@ -53,6 +53,21 @@ Linux requires a graphical session and the `pkg-config` executable. The GTK3
 headers and libraries come from declared SDK dependencies. Headless CI uses Xvfb
 and `mcpp run -- --smoke-test` to close the window automatically.
 
+The named `onnxruntime` template runs a generated ONNX Add model through
+OpenCV's ENGINE_ORT and also imports the standalone ORT module:
+
+```sh
+mcpp new inference --template mcpplibs.mwrap.opencv@5.0.0.1:onnxruntime
+cd inference
+mcpp run
+```
+
+It declares the Linux toolchain-coupled C++ runtime needed by the shared SDK.
+The bridge's tests require ORT's real CPU session profile, so a native-engine
+fallback cannot satisfy them. Enabling dnn-onnxruntime also re-exports the ORT
+module through the selected aggregate, keeping cross-package BMI paths consistent
+for GCC. `cv::` and `Ort::` retain their upstream names.
+
 The installed-template fixture used during development stages candidate sources;
 it is separate from the still-required published archive/index installation test.
 
@@ -79,12 +94,15 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | highgui | GUI API only; current window backend is NONE |
 | highgui-native | Select GTK3 on Linux x86_64 glibc, Win32 on Windows, or Cocoa on macOS |
 | highgui-gtk3, highgui-win32, highgui-cocoa | Explicit native backend; mismatched targets are refused |
-| dnn | OpenCV's existing native DNN implementation; does not enable ORT |
+| dnn | OpenCV's native DNN implementation; does not enable ORT |
+| dnn-onnxruntime | Adds dnn and the official ORT 1.25.1 CPU SDK through mcpplibs.mwrap.onnxruntime |
 | unifont | Unicode/CJK font rendering, implying imgproc |
 
 There is no current full/all-modules promise. GTK3 window creation, image display,
 event processing and destruction have passed locally; Cocoa passed native CI.
-Win32 validation is pending. dnn-onnxruntime remains planned. Calling imshow with only the API-only
+Win32 validation is pending. ORT CPU inference and actual ORT session profiling
+have passed Linux GCC/LLVM; native Windows/macOS validation is pending.
+Calling imshow with only the API-only
 highgui feature still reports missing window backend support; enable a backend.
 
 ## Modules, API and macros

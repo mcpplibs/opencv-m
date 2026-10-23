@@ -6,12 +6,12 @@
 [English](README.md) · **中文**
 
 本分支是实现 checkpoint。目前已接入全部十六个主模块，并通过 Linux GCC/LLVM 本地测试；GTK3 原生窗口也已通过本地测试，
-Cocoa 已通过原生 CI，Win32 尚待结果；公共 API 覆盖审计和 ORT 桥接仍在实施。
+Cocoa 已通过原生 CI，Win32 尚待结果；公共 API 覆盖审计、更多视频/codec 后端仍在实施；ORT CPU 桥接已通过 Linux 验证。
 当前 CI 通过不代表已经完整支持 OpenCV。
 
 ## 构建本地 checkout
 
-使用 .xlings.json 和 CI 固定的 mcpp **2026.10.21.1**：
+使用 .xlings.json 和 CI 固定的 mcpp **2026.10.24.1**：
 
 ```sh
 mcpp test
@@ -49,6 +49,20 @@ mcpp run
 Linux 需要图形会话与 `pkg-config` 命令；GTK3 头文件与库由声明的 SDK 依赖提供。
 无桌面的 CI 使用 Xvfb，并通过 `mcpp run -- --smoke-test` 自动关闭窗口。
 
+命名模板 `onnxruntime` 通过 OpenCV 的 ENGINE_ORT 运行生成的 ONNX Add 模型，
+并同时导入独立 ORT 模块：
+
+```sh
+mcpp new inference --template mcpplibs.mwrap.opencv@5.0.0.1:onnxruntime
+cd inference
+mcpp run
+```
+
+模板显式声明 Linux 共享 SDK 所需的 toolchain-coupled C++ runtime。
+桥接测试必须读到 ORT 实际生成的 CPU session profile，原生引擎回退不能通过验收。
+启用 dnn-onnxruntime 后，选择聚合模块也会转导出 ORT 模块，使 GCC 的跨包 BMI 路径保持一致；
+`cv::` 与 `Ort::` 名称不变。
+
 开发用安装模板 fixture 会预置候选源码；它不能替代尚待执行的正式归档与索引安装验收。
 
 ## 依赖与 feature
@@ -74,11 +88,13 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | highgui | 只有 GUI API，当前窗口后端为 NONE |
 | highgui-native | Linux x86_64 glibc 选择 GTK3，Windows 选择 Win32，macOS 选择 Cocoa |
 | highgui-gtk3、highgui-win32、highgui-cocoa | 显式选择原生后端，目标不匹配时拒绝构建 |
-| dnn | 现有 OpenCV 原生 DNN 实现，不代表启用 ORT |
+| dnn | OpenCV 原生 DNN 实现，不代表启用 ORT |
+| dnn-onnxruntime | 启用 dnn，并通过 mcpplibs.mwrap.onnxruntime 引入官方 ORT 1.25.1 CPU SDK |
 | unifont | Unicode/CJK 字体渲染，包含 imgproc |
 
 当前没有 full/all-modules 的完整功能承诺。GTK3 创建窗口、显示图像、处理事件和销毁窗口
-已在本地通过，Cocoa 已通过原生 CI，Win32 验证尚未完成；dnn-onnxruntime 仍待实现。
+已在本地通过，Cocoa 已通过原生 CI，Win32 验证尚未完成；ORT CPU 推理和真实 session profile 已通过 Linux GCC/LLVM，
+Windows/macOS 验证仍待 CI。
 只启用 highgui API 调用 imshow 仍会报告缺少窗口后端，需要同时选择后端 feature。
 
 ## 模块、API 与宏
