@@ -11,7 +11,7 @@
 
 opencv-m 要同时满足三项要求,而这三项在既有方案中相互冲突:
 
-1. **消费端以模块方式使用 OpenCV**:`import opencv.cv;` 取代 `#include <opencv2/opencv.hpp>`,
+1. **消费端以模块方式使用 OpenCV**:`import mcpplibs.mwrap.opencv;` 取代 `#include <opencv2/opencv.hpp>`,
    同时 API 拼写保持不变(仍是 `cv::Mat`、`cv::cvtColor`)。
 2. **消费端不需要安装 OpenCV,也不需要执行 CMake**:依赖声明后由 mcpp 完成全部构建。
 3. **功能不缩水**:imgcodecs(PNG/JPEG)、videoio(FFmpeg 后端)、dnn 在 Linux、macOS、
@@ -28,17 +28,17 @@ opencv-m 要同时满足三项要求,而这三项在既有方案中相互冲突:
 
 ```
 消费者项目
-  └─ import opencv.cv;                     ← 模块接口层
+  └─ import mcpplibs.mwrap.opencv;                     ← 模块接口层
         └─ src/*.cppm  +  src/*.inc        ← 导出面(生成 + 手写替换层)
-              └─ third_party/opencv-5.0.0  ← vendored 上游源码(零补丁)
-                   +  gen/                 ← 冻结的构建配置快照(替代 CMake)
+              └─ upstream/opencv  ← vendored 上游源码(零补丁)
+                   +  generated/                 ← 冻结的构建配置快照(替代 CMake)
                    +  mcpp.toml / build.mcpp ← 构建描述(替代 CMakeLists)
                    +  compat.ffmpeg        ← 唯一外部依赖(videoio 后端)
 ```
 
 各层职责如下。
 
-### 2.1 vendored 上游源码 —— `third_party/opencv-5.0.0/`
+### 2.1 vendored 上游源码 —— `upstream/opencv/`
 
 OpenCV 5.0.0 官方 tag tarball 的裁剪导入,sha256 锁定,**不含任何补丁**。保留 8 个模块
 (core、imgproc、imgcodecs、highgui、videoio、dnn、flann、geometry)与 7 个第三方组件
@@ -47,16 +47,16 @@ OpenCV 5.0.0 官方 tag tarball 的裁剪导入,sha256 锁定,**不含任何补�
 裁剪后为 1969 个文件、48 MB。
 
 零补丁是刻意的约束:上游版本升级时,`tools/vendor/import_opencv.sh` 重新导入即可,
-无需重放补丁集合。所有平台差异都被推到 `gen/` 与 `mcpp.toml` 中表达。
+无需重放补丁集合。所有平台差异都被推到 `generated/` 与 `mcpp.toml` 中表达。
 
-### 2.2 冻结配置快照 —— `gen/`
+### 2.2 冻结配置快照 —— `generated/`
 
 CMake 在配置阶段生成的头文件与派生 TU,在本仓库中以**已生成的真实文件**形式提交:
 
 | 目录 | 内容 | 规模 |
 |---|---|---|
-| `gen/common/` | 三平台逐字节相同的产物(SIMD dispatch 包装 TU、`opencv_modules.hpp` 等)与 `gen/common/synth/`(字体、OpenCL kernel 等合成资源) | 257 文件 |
-| `gen/linux/`、`gen/macosx/`、`gen/windows/` | 平台相关的 `cvconfig.h`、`cv_cpu_config.h` 等,附 `INCLUDE_DIRS.txt` 与 `DNN_SOURCES.txt` | 各 43–45 文件 |
+| `generated/common/` | 三平台逐字节相同的产物(SIMD dispatch 包装 TU、`opencv_modules.hpp` 等)与 `generated/common/synth/`(字体、OpenCL kernel 等合成资源) | 257 文件 |
+| `generated/linux/`、`generated/macosx/`、`generated/windows/` | 平台相关的 `cvconfig.h`、`cv_cpu_config.h` 等,附 `INCLUDE_DIRS.txt` 与 `DNN_SOURCES.txt` | 各 43–45 文件 |
 
 这些快照由 `tools/vendor/port_descriptor.py` 一次性移植自已退役的 `compat.opencv` 描述符,
 移植过程包含跨平台去重、冲突检测与逐字节校验。提交生成物而非在构建期运行 CMake,是使
@@ -70,9 +70,9 @@ CMake 在配置阶段生成的头文件与派生 TU,在本仓库中以**已生�
 
 `build.mcpp` 只承担清单语法**无法表达**的三件事,不多做:
 
-1. 按目标平台读取 `gen/<os>/INCLUDE_DIRS.txt`,发出私有 include 目录(清单没有平台条件的
+1. 按目标平台读取 `generated/<os>/INCLUDE_DIRS.txt`,发出私有 include 目录(清单没有平台条件的
    `include_dirs` 键);
-2. `dnn` 特性开启时,注入 `gen/<os>/DNN_SOURCES.txt` 列出的平台相关源文件(清单没有
+2. `dnn` 特性开启时,注入 `generated/<os>/DNN_SOURCES.txt` 列出的平台相关源文件(清单没有
    "平台 × 特性"的交叉维度);
 3. `unifont` 特性开启时,将 `assets/WenQuanYiMicroHei.ttf.gz` 以十六进制嵌入生成头文件
    (等价于 CMake 的 `ocv_blob2hdr`)。
@@ -112,7 +112,7 @@ OpenCV 的运算符与部分命名自由函数以 `static inline` 定义在头�
 | `src/matx_ops.inc` | Matx/Vec 代数 |
 | `src/core_fns.inc` | 命名自由函数(`cv::format`、`cv::print` 等按上游语义重实现) |
 
-替换层是 `import opencv.cv;` 能在 clang(macOS/Windows)与 gcc 上同时编译的直接原因。
+替换层是 `import mcpplibs.mwrap.opencv;` 能在 clang(macOS/Windows)与 gcc 上同时编译的直接原因。
 混合 TU(既 include 头文件又 import 模块)中,上游的精确匹配 `static inline` 版本重载
 更特化,因此语义不变。
 
@@ -131,7 +131,7 @@ OpenCV 的运算符与部分命名自由函数以 `static inline` 定义在头�
 
 模块不能导出宏。对象式常量宏(`CV_8U`、`CV_PI`、`CV_MAKETYPE` 等)以保持原拼写的
 `cv::` constexpr 值/函数形式导出;函数式宏(`CV_Assert`、`CV_Error`、版本宏)无法如此处理,
-需要原始拼写的 TU 应在 `import` 之前 `#include <opencv-m/macros.hpp>`。
+需要原始拼写的 TU 应在 `import` 之前 `#include <mwrap/opencv/macros.hpp>`。
 
 ### 3.4 平台条件编译与 Windows 的桩层
 
@@ -144,7 +144,7 @@ x86_64 dispatch TU 与 nasm `.asm` 在 `cfg(linux)`,neon TU 在 `cfg(macos)`,Win
 Windows 与 unix 的差异同时包含**增加与删除**(例如 zlib 组在 unix 下定义
 `HAVE_UNISTD_H=1`,Windows 必须不定义)。条件条目追加在 base 之后、按 GNU last-wins
 生效,删除因此可表达;当前仍沿用**桩命名空间**承载 Windows TU:每个 Windows TU 对应
-`gen/windows/tu/w*/` 下的一行 `#include` 桩文件(共 703 个),为每个 TU 提供稳定的
+`generated/windows/tu/w*/` 下的一行 `#include` 桩文件(共 703 个),为每个 TU 提供稳定的
 独立路径身份。桩层的整体移除(让 Windows 直接编译 `third_party/**` 并按 cfg 撤销 unix
 定义)不再受清单语法阻塞,是一项独立的后续清理。
 
@@ -152,7 +152,7 @@ Windows 与 unix 的差异同时包含**增加与删除**(例如 zlib 组在 uni
 
 | 特性 | 内容 | 理由 |
 |---|---|---|
-| `dnn` | 追加 `import opencv.dnn;` 接口与底层 dnn 源(含 vendored protobuf) | 底层多出 300 余个 TU,仅对显式开启者构建;`opencv.cv` umbrella 默认不含 dnn |
+| `dnn` | 追加 `import mcpplibs.mwrap.opencv.dnn;` 接口与底层 dnn 源(含 vendored protobuf) | 底层多出 300 余个 TU,仅对显式开启者构建;`opencv.cv` umbrella 默认不含 dnn |
 | `unifont` | 内嵌 WenQuanYi Micro Hei 字体,支持 `FontFace("uni")` 的 Unicode/CJK `putText` | 字体资源体积与渲染路径仅对需要者有意义 |
 
 `dnn` 的 gemm 后端按平台选择:Linux 与 macOS 使用 mlas(x86 AVX/AVX2/AVX512、arm NEON);
@@ -189,7 +189,7 @@ CI 为平台 × 工具链矩阵,五条腿全部为必需:
 ## 5. 上游升级流程
 
 1. `tools/vendor/import_opencv.sh` 导入新版本 tarball(脚本自行下载并校验,不依赖宿主机环境)。
-2. 重新生成 `gen/` 快照,核对跨平台差异与冲突。
+2. 重新生成 `generated/` 快照,核对跨平台差异与冲突。
 3. `python3 tools/gen_exports.py` 重生成导出面,`python3 tools/prune_loop.py` 收敛至构建通过。
 4. 五条 CI 腿全绿后发布 Release;包索引侧的薄 `opencv.lua` 更新版本指向。
 
@@ -197,6 +197,6 @@ CI 为平台 × 工具链矩阵,五条腿全部为必需:
 
 | 项 | 移除条件 |
 |---|---|
-| `gen/windows/tu/w*/` 的 703 个桩文件与 `cfg(windows)` 的对应 glob 条目 | 语法阻塞已随 mcpp#258 解除;移除桩层是独立的后续清理(Windows 直接编译 `third_party/**` 并按 cfg 撤销 unix 定义),见 [#17](https://github.com/Sunrisepeak/opencv-m/issues/17) |
+| `generated/windows/tu/w*/` 的 703 个桩文件与 `cfg(windows)` 的对应 glob 条目 | 语法阻塞已随 mcpp#258 解除;移除桩层是独立的后续清理(Windows 直接编译 `third_party/**` 并按 cfg 撤销 unix 定义),见 [#17](https://github.com/Sunrisepeak/opencv-m/issues/17) |
 | llvm CI 腿先安装 gcc 的变通 | mcpp#259(`toolchain install llvm` 未拉取其 glibc 运行时)修复 |
 | `src/matx_ops.inc` 的整类型推导写法 | clang BMI 回归修复后可考虑回退,但当前形式本身无害 |

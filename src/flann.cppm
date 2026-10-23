@@ -2,6 +2,6 @@
 module;
 #include <opencv2/flann.hpp>
 
-export module opencv.flann;
+export module mcpplibs.mwrap.opencv.flann;
 
 #include "gen_exports/flann.inc"

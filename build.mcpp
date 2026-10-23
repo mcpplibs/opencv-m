@@ -2,17 +2,17 @@
 // mcpp.toml manifest grammar cannot express (v0.0.101), nothing more:
 //
 //   1. per-OS generated-config include dirs: the frozen config snapshots live
-//      in gen/<os>/ (cvconfig.h, cv_cpu_config.h, per-ISA dispatch TU headers)
-//      + gen/common/ overlaps; the manifest has no [target.'cfg(os)']
+//      in generated/<os>/ (cvconfig.h, cv_cpu_config.h, per-ISA dispatch TU headers)
+//      + generated/common/ overlaps; the manifest has no [target.'cfg(os)']
 //      include_dirs key, so the per-OS -I list is read from
-//      gen/<os>/INCLUDE_DIRS.txt (written by tools/vendor/port_descriptor.py)
+//      generated/<os>/INCLUDE_DIRS.txt (written by tools/vendor/port_descriptor.py)
 //      and emitted as PRIVATE include dirs — consumers only ever need
-//      gen/common (opencv2/opencv_modules.hpp), which is declarative in
+//      generated/common (opencv2/opencv_modules.hpp), which is declarative in
 //      [build].include_dirs.
 //   2. per-OS dnn sources (feature-gated): [features.dnn] carries only the
 //      OS-neutral subset (no per-OS features in the manifest grammar); the
 //      per-OS remainder — ISA dispatch TUs, mlas, feature stubs — is listed
-//      in gen/<os>/DNN_SOURCES.txt and injected here.
+//      in generated/<os>/DNN_SOURCES.txt and injected here.
 //   3. unifont: when the `unifont` feature is on, hex-embed the vendored
 //      assets/WenQuanYiMicroHei.ttf.gz into $MCPP_OUT_DIR/builtin_font_uni.h
 //      (symbol OcvBuiltinFontUni; byte-faithful port of cmake ocv_blob2hdr —
@@ -126,11 +126,11 @@ int main() {
 
     // 1. per-OS include dirs
     std::string os = mcpp::target_os()[0] ? mcpp::target_os() : "linux";
-    if (os == "macos") os = "macosx";  // gen/ keeps the descriptor-era dir name
-    // windows compiles through the gen/windows/tu/w*/ stub namespace (see
+    if (os == "macos") os = "macosx";  // generated/ keeps the descriptor-era dir name
+    // windows compiles through the generated/windows/tu/w*/ stub namespace (see
     // mcpp.toml header comment; workaround for mcpp-community/mcpp#258) —
     // same INCLUDE_DIRS/DNN_SOURCES machinery as the other OSes from here on.
-    std::string listrel = "gen/" + os + "/INCLUDE_DIRS.txt";
+    std::string listrel = "generated/" + os + "/INCLUDE_DIRS.txt";
     std::ifstream list(man / listrel);
     if (!list) {
         std::printf("opencv-m build.mcpp: %s missing — no frozen snapshot for target OS '%s'\n",
@@ -148,7 +148,7 @@ int main() {
 
     // 2. per-OS dnn sources (feature-gated)
     if (mcpp::has_feature("dnn")) {
-        std::string dnnrel = "gen/" + os + "/DNN_SOURCES.txt";
+        std::string dnnrel = "generated/" + os + "/DNN_SOURCES.txt";
         std::ifstream dl(man / dnnrel);
         if (dl) {
             int injected = 0;

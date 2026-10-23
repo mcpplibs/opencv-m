@@ -13,7 +13,7 @@ header-based C++ library in C++23 modules.
 
 opencv-m must satisfy three requirements simultaneously; in existing approaches these conflict:
 
-1. **Module-based consumption**: `import opencv.cv;` replaces `#include <opencv2/opencv.hpp>`
+1. **Module-based consumption**: `import mcpplibs.mwrap.opencv;` replaces `#include <opencv2/opencv.hpp>`
    while the API spelling remains unchanged (`cv::Mat`, `cv::cvtColor`).
 2. **No OpenCV installation and no CMake on the consumer side**: once the dependency is
    declared, mcpp performs the entire build.
@@ -33,15 +33,15 @@ The architecture of this repository is a systematic response to those two constr
 
 ```
 consumer project
-  └─ import opencv.cv;                     ← module interface layer
+  └─ import mcpplibs.mwrap.opencv;                     ← module interface layer
         └─ src/*.cppm  +  src/*.inc        ← export surface (generated + hand-written replacements)
-              └─ third_party/opencv-5.0.0  ← vendored upstream source (patch-free)
-                   +  gen/                 ← frozen configuration snapshots (CMake substitute)
+              └─ upstream/opencv  ← vendored upstream source (patch-free)
+                   +  generated/                 ← frozen configuration snapshots (CMake substitute)
                    +  mcpp.toml / build.mcpp ← build description (CMakeLists substitute)
                    +  compat.ffmpeg        ← the single external dependency (videoio backend)
 ```
 
-### 2.1 Vendored upstream source — `third_party/opencv-5.0.0/`
+### 2.1 Vendored upstream source — `upstream/opencv/`
 
 A pruned import of the official OpenCV 5.0.0 tag tarball, pinned by sha256 and carrying **no
 patches**. Eight modules are retained (core, imgproc, imgcodecs, highgui, videoio, dnn, flann,
@@ -52,17 +52,17 @@ export-surface generator. The result is 1969 files, 48 MB.
 
 The patch-free property is a deliberate constraint: on an upstream version bump,
 `tools/vendor/import_opencv.sh` re-imports the tree and no patch set has to be replayed. All
-platform differences are pushed outward into `gen/` and `mcpp.toml`.
+platform differences are pushed outward into `generated/` and `mcpp.toml`.
 
-### 2.2 Frozen configuration snapshots — `gen/`
+### 2.2 Frozen configuration snapshots — `generated/`
 
 The headers and derived translation units that CMake emits at configure time are committed here
 as **real, already-generated files**:
 
 | Directory | Contents | Size |
 |---|---|---|
-| `gen/common/` | artefacts byte-identical across all three platforms (SIMD dispatch wrapper TUs, `opencv_modules.hpp`, …) plus `gen/common/synth/` (fonts, OpenCL kernels) | 257 files |
-| `gen/linux/`, `gen/macosx/`, `gen/windows/` | platform-dependent `cvconfig.h`, `cv_cpu_config.h`, …, each with `INCLUDE_DIRS.txt` and `DNN_SOURCES.txt` | 43–45 files each |
+| `generated/common/` | artefacts byte-identical across all three platforms (SIMD dispatch wrapper TUs, `opencv_modules.hpp`, …) plus `generated/common/synth/` (fonts, OpenCL kernels) | 257 files |
+| `generated/linux/`, `generated/macosx/`, `generated/windows/` | platform-dependent `cvconfig.h`, `cv_cpu_config.h`, …, each with `INCLUDE_DIRS.txt` and `DNN_SOURCES.txt` | 43–45 files each |
 
 The snapshots were ported once from the retired `compat.opencv` descriptor by
 `tools/vendor/port_descriptor.py`, a process that included cross-platform de-duplication,
@@ -81,9 +81,9 @@ include directories, 51 per-glob compile-option groups assigned to their OS unde
 `build.mcpp` covers only the three things the manifest grammar **cannot** express, and nothing
 further:
 
-1. reading `gen/<os>/INCLUDE_DIRS.txt` for the target platform and emitting private include
+1. reading `generated/<os>/INCLUDE_DIRS.txt` for the target platform and emitting private include
    directories (the manifest has no platform-conditional `include_dirs` key);
-2. injecting the platform-dependent sources listed in `gen/<os>/DNN_SOURCES.txt` when the `dnn`
+2. injecting the platform-dependent sources listed in `generated/<os>/DNN_SOURCES.txt` when the `dnn`
    feature is active (the manifest has no platform × feature cross dimension);
 3. embedding `assets/WenQuanYiMicroHei.ttf.gz` as a hex header when the `unifont` feature is
    active (equivalent to CMake's `ocv_blob2hdr`).
@@ -128,7 +128,7 @@ three files:
 | `src/matx_ops.inc` | Matx/Vec algebra |
 | `src/core_fns.inc` | named free functions (`cv::format`, `cv::print`, … re-implemented to upstream semantics) |
 
-This layer is the direct reason `import opencv.cv;` compiles under clang (macOS/Windows) and gcc
+This layer is the direct reason `import mcpplibs.mwrap.opencv;` compiles under clang (macOS/Windows) and gcc
 alike. In mixed translation units — those that both include headers and import modules — the
 upstream exact-match `static inline` overloads remain more specialised, so semantics are
 unchanged.
@@ -152,7 +152,7 @@ regression-verified. A minimal reproducer and the analysis are recorded in mcpp#
 A module cannot export a macro. Object-like constant macros (`CV_8U`, `CV_PI`, `CV_MAKETYPE`, …)
 are exported as `cv::` constexpr values or functions retaining the original spelling.
 Function-like macros (`CV_Assert`, `CV_Error`, the version macros) cannot be handled this way;
-a translation unit that needs the original spelling should `#include <opencv-m/macros.hpp>`
+a translation unit that needs the original spelling should `#include <mwrap/opencv/macros.hpp>`
 before the import.
 
 ### 3.4 Platform-conditional compilation and the Windows stub layer
@@ -170,7 +170,7 @@ The Windows/unix difference comprises both **additions and removals** — the zl
 instance, defines `HAVE_UNISTD_H=1` on unix and must leave it undefined on Windows. Conditional
 entries are appended after the base and take effect under GNU last-wins, so removals are now
 expressible; the Windows TUs are still carried by the **stub-namespace** arrangement — every
-Windows translation unit is a one-line `#include` stub under `gen/windows/tu/w*/` (703 stubs in
+Windows translation unit is a one-line `#include` stub under `generated/windows/tu/w*/` (703 stubs in
 total), giving each TU a stable path identity of its own. Removing the stub layer altogether
 (compiling `third_party/**` directly on Windows and undoing the unix defines per cfg) is no
 longer blocked by the manifest grammar and remains a separate, later clean-up.
@@ -179,7 +179,7 @@ longer blocked by the manifest grammar and remains a separate, later clean-up.
 
 | Feature | Contents | Rationale |
 |---|---|---|
-| `dnn` | adds the `import opencv.dnn;` interface and the underlying dnn sources (including vendored protobuf) | over 300 additional translation units, built only for consumers that opt in; the `opencv.cv` umbrella does not include dnn by default |
+| `dnn` | adds the `import mcpplibs.mwrap.opencv.dnn;` interface and the underlying dnn sources (including vendored protobuf) | over 300 additional translation units, built only for consumers that opt in; the `opencv.cv` umbrella does not include dnn by default |
 | `unifont` | embeds the WenQuanYi Micro Hei font, enabling Unicode/CJK `putText` through `FontFace("uni")` | the font payload and the rendering path are only meaningful to consumers that need them |
 
 The gemm backend of `dnn` is selected per platform: Linux and macOS use mlas (x86 AVX/AVX2/AVX512,
@@ -221,7 +221,7 @@ coverage is already contained in `mcpp test`.
 
 1. Import the new tarball with `tools/vendor/import_opencv.sh` (the script downloads and verifies
    it itself and does not depend on the host environment).
-2. Regenerate the `gen/` snapshots and re-check the cross-platform differences and conflicts.
+2. Regenerate the `generated/` snapshots and re-check the cross-platform differences and conflicts.
 3. Regenerate the export surface with `python3 tools/gen_exports.py`, then converge to a green
    build with `python3 tools/prune_loop.py`.
 4. Publish a release once all five CI legs are green, and update the version pointer in the thin
@@ -231,6 +231,6 @@ coverage is already contained in `mcpp test`.
 
 | Item | Removal condition |
 |---|---|
-| the 703 stubs under `gen/windows/tu/w*/` and the corresponding `cfg(windows)` glob entries | no longer grammar-blocked since mcpp#258; removing the stub layer (compiling `third_party/**` directly on Windows, undoing the unix defines per cfg) is a separate, later clean-up — see [#17](https://github.com/Sunrisepeak/opencv-m/issues/17) |
+| the 703 stubs under `generated/windows/tu/w*/` and the corresponding `cfg(windows)` glob entries | no longer grammar-blocked since mcpp#258; removing the stub layer (compiling `third_party/**` directly on Windows, undoing the unix defines per cfg) is a separate, later clean-up — see [#17](https://github.com/Sunrisepeak/opencv-m/issues/17) |
 | the llvm CI leg installing gcc first | mcpp#259 (`toolchain install llvm` does not pull its glibc runtime) is fixed |
 | the whole-type deduction form in `src/matx_ops.inc` | may be reconsidered once the clang BMI regression is fixed, though the present form is harmless in itself |

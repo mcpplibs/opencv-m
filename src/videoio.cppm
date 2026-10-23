@@ -3,6 +3,6 @@ module;
 #include <opencv2/videoio.hpp>
 #include <opencv2/videoio/registry.hpp>
 
-export module opencv.videoio;
+export module mcpplibs.mwrap.opencv.videoio;
 
 #include "gen_exports/videoio.inc"

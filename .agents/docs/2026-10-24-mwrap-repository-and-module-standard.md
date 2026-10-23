@@ -165,7 +165,8 @@ feature 使用小写 kebab-case，优先复用上游模块、后端、依赖的�
 native 可作为有精确 target 映射表的便利开关，如 highgui-native；显式 backend 名仍保留。
 未支持的目标、缺失供应者和互斥后端组合在配置阶段给出明确错误，不静默忽略用户选择。
 default 的展开写入版本化清单；不把 desktop/full 等没有唯一含义的名称作为基础能力分类。
-当前 pinned mcpp 不支持消费者关闭依赖的 default features，因此默认集合应最小化，不能无条件绑定可替换后端或大体积 SDK。
+已通过 E2E 126/127 核实：当前 pinned mcpp 支持依赖边的 default-features=false，显式 features 仍激活；
+不支持的是根项目 --no-default-features CLI。其他依赖边仍可请求默认项。最小默认集合是本规范的产品选择，不是客户端限制。
 OpenCV 新包建议 default=[]、core 为必需基础，其余模块与实现显式启用；常用体验由模板列出所需 features。
 同名 feature 不得在不同修订中无说明地改成其他执行后端。
 
@@ -197,7 +198,7 @@ CI 的编译、链接、功能执行和安装后消费分别报告；桌面/设�
 模板通过完整包身份调用，例如 `mcpp new vision --template mcpplibs.mwrap.opencv@5.0.0`。
 多个模板使用 `:<template>` 选择，并通过 `mcpp new --list-templates <package>@<version>` 列出。
 模板保持纯数据，使用 mcpp 支持的 placeholder，不运行脚本或隐藏下载步骤。
-依赖版本取 self.version，包 namespace 显式写出；生成项目明确列出所需 features。
+依赖版本取 self.version；当前 self.name 已是完整包选择器，使用带引号的单个 key，不再额外套 namespace 表；生成项目明确列出所需 features。
 默认模板不要求摄像头、GPU、桌面或用户另行下载模型；可选高级模板单独提供。
 模板必须经过真实 mcpp new、build、run/test 验证，发布归档必须包含 templates/；静态 placeholder 检查不代替运行。
 
@@ -256,7 +257,7 @@ metadata 与 sources.lock 仍明确固定上游版本、commit/hash；尾号仅�
 - [mcpp build.mcpp](https://github.com/mcpp-community/mcpp/blob/v2026.10.21.1/docs/30-build-mcpp.md)
 - [mcpp 描述符发现与 path 索引](https://github.com/mcpp-community/mcpp/blob/v2026.10.21.1/src/pm/package_fetcher.cppm)
 - [openkal-musl](https://github.com/mcpplibs/openkal-musl)：本地核查 musl/、port/、musl-generated/ 和补丁记录。
-- 当前仓库实际模块导出与宏实现：src/core.cppm、tools/gen_exports.py、include/opencv-m/macros.hpp。
+- 当前仓库实际模块导出与宏实现：src/core.cppm、tools/gen_exports.py、include/mwrap/opencv/macros.hpp。
 
 ## 11. 需要 review 的决策
 

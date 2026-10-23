@@ -1,6 +1,6 @@
 # opencv
 
-> A C++23 module wrapper over OpenCV 5. `import opencv.cv;` replaces header inclusion while the
+> A C++23 module wrapper over OpenCV 5. `import mcpplibs.mwrap.opencv;` replaces header inclusion while the
 > API spelling remains unchanged; the build is fully featured on three platforms, with dnn and
 > unifont available as opt-in features.
 
@@ -18,11 +18,11 @@
 ## Characteristics
 
 - **Module-based import.** Consumer code obtains the OpenCV interface through
-  `import opencv.cv;` without header inclusion, while the API and its usage remain those of
+  `import mcpplibs.mwrap.opencv;` without header inclusion, while the API and its usage remain those of
   upstream OpenCV.
 - **Built from source, with no CMake on the consumer side.** The OpenCV 5.0.0 sources are
   vendored under `third_party/`, the configure-time artefacts are committed as real generated
-  files under `gen/`, and mcpp compiles the whole of OpenCV — NASM SIMD included, with runtime
+  files under `generated/`, and mcpp compiles the whole of OpenCV — NASM SIMD included, with runtime
   dispatch preserved — from this repository's `mcpp.toml`. The FFmpeg backend of videoio is
   supplied by `compat.ffmpeg`. A single repository carries both the module layer and the
   complete build.
@@ -30,7 +30,7 @@
   CI and each provide imgcodecs (PNG and JPEG), videoio (FFmpeg `cap_ffmpeg`) and optional dnn.
   The gemm backend of dnn is selected per platform (x86 mlas/AVX, arm mlas/NEON, built-in
   fast_gemm on Windows).
-- **Opt-in features.** `dnn` enables the `import opencv.dnn;` deep-learning module; `unifont`
+- **Opt-in features.** `dnn` enables the `import mcpplibs.mwrap.opencv.dnn;` deep-learning module; `unifont`
   enables `putText` rendering for Unicode and CJK text.
 
 ## Getting started
@@ -42,12 +42,12 @@ mcpp new myvision --template opencv && cd myvision && mcpp run -- input.png    #
 Or declare the dependency in an existing project:
 
 ```toml
-[dependencies.opencv]
-opencv = "5.0.0"
+[dependencies."mcpplibs.mwrap"]
+opencv = "5.0.0.1"
 ```
 
 ```cpp
-import opencv.cv;   // or per module: import opencv.core; import opencv.imgproc; …
+import mcpplibs.mwrap.opencv;   // or per module: import mcpplibs.mwrap.opencv.core; import mcpplibs.mwrap.opencv.imgproc; …
 
 int main() {
     cv::Mat img = cv::imread("in.png", cv::IMREAD_COLOR);
@@ -76,18 +76,18 @@ the modules do not import one another, and `opencv.cv` aggregates them through `
 Object-like constant macros (`CV_8UC3`, `CV_PI`, `CV_MAKETYPE`, …) are exported as `cv::`
 constexpr entities retaining the original spelling. A translation unit that needs the original
 spelling of a function-like macro (`CV_Assert`, the version macros) should include
-`<opencv-m/macros.hpp>` before the import.
+`<mwrap/opencv/macros.hpp>` before the import.
 
 ## Features
 
 | Feature | Description |
 |---|---|
-| `dnn` | adds the `import opencv.dnn;` interface (`Net`, `blobFromImage`, `readNet`, …) and builds the underlying dnn together with the vendored protobuf. Available on all three platforms (per-OS features, mcpp#253): Linux and macOS use mlas (x86 AVX/AVX2/AVX512, arm NEON), while Windows uses OpenCV's built-in `fast_gemm` — upstream mlas x86 assembly is GAS/ELF syntax from which clang-cl cannot emit COFF, so the upstream path of falling back to fast_gemm in the absence of assembly is followed |
+| `dnn` | adds the `import mcpplibs.mwrap.opencv.dnn;` interface (`Net`, `blobFromImage`, `readNet`, …) and builds the underlying dnn together with the vendored protobuf. Available on all three platforms (per-OS features, mcpp#253): Linux and macOS use mlas (x86 AVX/AVX2/AVX512, arm NEON), while Windows uses OpenCV's built-in `fast_gemm` — upstream mlas x86 assembly is GAS/ELF syntax from which clang-cl cannot emit COFF, so the upstream path of falling back to fast_gemm in the absence of assembly is followed |
 | `unifont` | embeds the WenQuanYi Micro Hei font, enabling `putText` for Unicode and CJK text through `FontFace("uni")` |
 
 ```toml
-[dependencies.opencv]
-opencv = { version = "5.0.0", features = ["dnn"] }
+[dependencies."mcpplibs.mwrap"]
+opencv = { version = "5.0.0.1", features = ["dnn"] }
 ```
 
 The dnn layer adds over 300 translation units, is built only for consumers that enable it
@@ -113,10 +113,10 @@ The package does not pin a toolchain; mcpp resolves the environment default. CI 
 combinations: Linux/gcc 16, Linux/llvm 22, Linux/gcc `--target x86_64-linux-musl` (statically
 linked), macOS/llvm (arm64) and Windows/llvm.
 
-The upstream OpenCV 5.0.0 sources are vendored under `third_party/opencv-5.0.0/` as a pruned
+The upstream OpenCV 5.0.0 sources are vendored under `upstream/opencv/` as a pruned
 import of the official tag tarball, pinned by sha256 and free of patches; the process is
 reproducible through `tools/vendor/import_opencv.sh`. The platform-dependent configure-time
-snapshots live in `gen/` and were ported once from the retired compat.opencv descriptor by
+snapshots live in `generated/` and were ported once from the retired compat.opencv descriptor by
 `tools/vendor/port_descriptor.py`. On the package-index side only a thin `opencv.lua` pointing at
 this repository's releases remains.
 
@@ -125,7 +125,7 @@ entities have internal linkage and cannot be re-exported through `export using` 
 this outright, gcc merely tolerates it. This repository replaces that surface with equivalent
 external-linkage definitions across `src/core_ops.inc` (saturate_cast, Point/Size/Rect/Range/
 Scalar, Mat/MatExpr), `src/matx_ops.inc` (Matx/Vec algebra) and `src/core_fns.inc` (named free
-functions). This is the reason `import opencv.cv;` compiles under both clang and gcc.
+functions). This is the reason `import mcpplibs.mwrap.opencv;` compiles under both clang and gcc.
 
 The overall structure, the responsibility of each layer and the reasoning behind the design are
 documented in the [architecture description](docs/architecture.en.md).
@@ -136,5 +136,5 @@ documented in the [architecture description](docs/architecture.en.md).
 
 ## License
 
-The wrapper code is MIT-licensed. The vendored OpenCV itself (`third_party/opencv-5.0.0/`) is
+The wrapper code is MIT-licensed. The vendored OpenCV itself (`upstream/opencv/`) is
 Apache-2.0, with each third-party component retaining its own original license.

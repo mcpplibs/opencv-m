@@ -2,7 +2,7 @@
 // resize, grayscale, write a PNG next to it.
 #include <cstdio>
 import std;
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
 int main(int argc, char** argv) {
     cv::Mat img;

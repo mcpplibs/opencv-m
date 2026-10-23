@@ -61,7 +61,7 @@ mcpp main 的版本字段已是 2026.10.22.1；本轮 GitHub Releases API latest
 | DNN | 可选 dnn，含 ONNX 导入、ENGINE_ORT 导出 | ORT 未启用，必须接入真实运行库 |
 | 宏 | 部分常量被放入 cv::，另有宏兼容头 | 独立 .macros 模块与宏映射 namespace |
 | 导出生成 | Python 标记 + curated，跳过部分头/namespace | 完整 C++ API 清单审计，不能静默 prune 成“完整” |
-| 构建配置 | 固定 gen/<os> 快照，build.mcpp 注入部分文件 | 由 feature 与 target 生成配置，移除过时语法限制 workaround |
+| 构建配置 | 固定 generated/<os> 快照，build.mcpp 注入部分文件 | 由 feature 与 target 生成配置，移除过时语法限制 workaround |
 | 索引 | pkgs/o/opencv.opencv.lua；tests/examples/opencv-module* | mwrap 分类与配套 CI/发布发现迁移 |
 
 已对照官方 5.0.0 tag 的 modules 目录；不能用 OpenCV 4 的 calib3d/features2d 等名称直接作为本次模块清单。
@@ -195,7 +195,8 @@ highgui-native 的 native 表示本包的平台默认实现，不表示 GTK 属�
 提供以下可审计集合：
 
 - `default = []`：core 为必需基础，其他模块与外部后端均显式启用。
-  原因是 pinned mcpp 的 feature 是加法并集，消费者不能关闭依赖包的默认集合；不得承诺不存在的 default-features=false。
+  这是可预测、低依赖的产品默认选择。已运行 E2E 126/127 确认 pinned mcpp 支持依赖边 default-features=false，
+  与根项目没有 --no-default-features CLI 不同。
   imgproc、imgcodecs、flann、geometry、videoio 等作为模块 feature，依赖闭包自动包含 core。
   常用模板替用户列出 imgproc、imgcodecs-jpeg、imgcodecs-png；视频模板再增加 videoio-ffmpeg。
   这是新包身份下有意的最小默认策略，与旧包的默认能力不同，需要迁移表。
@@ -215,7 +216,8 @@ highgui-native 的 native 表示本包的平台默认实现，不表示 GTK 属�
 opencv = { version = "5.0.0", features = ["imgproc", "imgcodecs-png", "highgui-native", "dnn-onnxruntime", "imgcodecs-tiff"] }
 ```
 
-不使用 no-default-features/default-features=false 设计依赖接口。最小消费者不选择可选 feature；发布案例逐项声明所需模块和后端。
+最小消费者不选择可选 feature；其他默认集合的包允许通过依赖边 default-features=false 关闭该边默认项。
+根项目不提供 --no-default-features CLI。发布案例逐项声明所需模块与后端，其他依赖边仍可要求默认项。
 多个依赖请求按 feature 并集合并，禁止基于调用依赖路径生成两套相同包身份的不同公共 ABI。
 未支持的目标、缺 SDK、缺 provider 产物、互斥后端在配置阶段明确报错，不静默降级。
 所有 feature 的展开清单与能力报告一起版本化，改动进入封装修订说明。
@@ -457,7 +459,7 @@ review 确定后，在 mcpp-index 的 docs/mwrap.md 发布正式 mwrap 规范，
 | 包管理维护者 | 根目录 mwrap/o 不在现有 mcpp 扫描范围，先前 staging 增加双布局成本 | 改 pkgs/mwrap 平铺；发布原样复制；不要求改客户端协议 |
 | 配方开发者 | 最新代码可走 fallback，不代表 path/Git/provider 搜索全部自动正确 | Linux 最小 fixture 覆盖解析、搜索、安装、lockfile 与链接；其他平台 CI |
 | 普通 OpenCV 用户 | gui、codec、ort 与上游名称不一致；full/desktop 无精确边界 | highgui-*、imgcodecs-*、videoio-*、dnn-onnxruntime；移除模糊聚合 |
-| 精简构建用户 | 原方案默认 FFmpeg 且假定用户能关闭 default | 查到 pinned mcpp 不支持该操作，改 default=[]、core-only；模板显式列常用功能 |
+| 精简构建用户 | 旧 features 文档把根 CLI 与依赖边 opt-out 混淆 | 实现与 E2E 126/127 证明依赖 default-features=false 可用；core-only 保留为产品选择，模板显式列功能 |
 | GUI 使用者 | highgui API 或 all-modules 不等于存在实际窗口后端 | 分清模块/后端；摘要输出 NONE；窗口示例必须选具体后端或 highgui-native |
 | 后端集成者 | GTK/Qt 共存或 native 覆盖规则不能凭注册表推断 | native 只增加；按上游能力验证共存；冲突在配置阶段拒绝 |
 | 推理用户 | DNN 枚举可见、模型成功加载都不能证明用了 ORT | 直接 ORT 和 OpenCV bridge 分别执行，提供无回退证据 |
@@ -483,3 +485,13 @@ all-modules 的模块全集语义，以及 Linux 本地/其他平台 CI 的验�
 各仓库使用一个功能分支和一个 PR，保留独立 checkpoint commits，不 squash 或 force-push 丢弃进度。
 每次 checkpoint 记录实际已验证范围；最终按计划要求逐项审计，并等待全部相关 CI 通过。
 远端权限不足期间继续本地实施，不能把仅本地完成当作 PR/CI 完成。
+
+## 14. Feature opt-out 证据修正
+
+mcpp parser 的 DependencySpec.defaultFeatures、prepare 图的 feature 合并，以及 E2E
+126_default_features_opt_out.sh / 127_transitive_default_features_optout.sh 在已发布 2026.10.21.1 上均验证通过。
+因此撤回先前“消费者不能关闭默认项”的判断；该判断来自过时且表述混淆的 features 文档。
+已在 mcpp PR #836 修正中英功能文档和使用技能，同时修正索引规范。
+
+组织权限已通过现有 Sunrisepeak 授权解决，mcpplibs/opencv-m fork 与 onnxruntime-m 仓库均已创建。
+使用单次命令的授权，不改变本机默认 GitHub account。

@@ -2,6 +2,6 @@
 module;
 #include <opencv2/imgcodecs.hpp>
 
-export module opencv.imgcodecs;
+export module mcpplibs.mwrap.opencv.imgcodecs;
 
 #include "gen_exports/imgcodecs.inc"

@@ -5,12 +5,12 @@
 
 #include <vector>
 
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
 namespace {
 
 cv::Mat make_test_image() {
-    cv::Mat img(64, 64, cv::CV_8UC3, cv::Scalar(30, 60, 90));
+    cv::Mat img(64, 64, mcpplibs::mwrap::opencv::macros::CV_8UC3, cv::Scalar(30, 60, 90));
     cv::circle(img, {32, 32}, 20, {255, 255, 255}, -1);
     cv::rectangle(img, {4, 4}, {60, 60}, {0, 128, 255}, 2);
     return img;

@@ -3,7 +3,7 @@
 // feature is enabled, which also builds the vendored dnn module sources
 // (+ vendored protobuf + mlas) into the library. It is
 // deliberately NOT part of the `opencv.cv` umbrella — consumers opt in with
-// `import opencv.dnn;` (Net, blobFromImage, readNet, NMSBoxes, …).
+// `import mcpplibs.mwrap.opencv.dnn;` (Net, blobFromImage, readNet, NMSBoxes, …).
 module;
 #include <opencv2/dnn.hpp>
 // <opencv2/dnn.hpp> pulls in only the core dnn surface (Net, blobFromImage,
@@ -12,6 +12,6 @@ module;
 // visible to the `export using` list below.
 #include <opencv2/dnn/all_layers.hpp>
 
-export module opencv.dnn;
+export module mcpplibs.mwrap.opencv.dnn;
 
 #include "gen_exports/dnn.inc"

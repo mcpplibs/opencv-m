@@ -2,6 +2,6 @@
 module;
 #include <opencv2/imgproc.hpp>
 
-export module opencv.imgproc;
+export module mcpplibs.mwrap.opencv.imgproc;
 
 #include "gen_exports/imgproc.inc"

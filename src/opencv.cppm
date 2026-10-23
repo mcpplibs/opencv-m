@@ -1,6 +1,10 @@
-// opencv — library-root module (mcpp convention: src/<package>.cppm).
-// Everything lives in opencv.cv and the per-module interfaces; this root
-// simply forwards so `import opencv;` also works.
-export module opencv;
+export module mcpplibs.mwrap.opencv;
 
-export import opencv.cv;
+export import mcpplibs.mwrap.opencv.core;
+export import mcpplibs.mwrap.opencv.imgproc;
+export import mcpplibs.mwrap.opencv.imgcodecs;
+export import mcpplibs.mwrap.opencv.videoio;
+export import mcpplibs.mwrap.opencv.highgui;
+export import mcpplibs.mwrap.opencv.flann;
+export import mcpplibs.mwrap.opencv.geometry;
+export import mcpplibs.mwrap.opencv.macros;

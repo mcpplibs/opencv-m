@@ -16,7 +16,7 @@ each entity is exported by exactly one home module. Sub-namespace names
 private surfaces are dropped.
 
 Usage: gen_exports.py [opencv-root]      (default: the vendored
-                                          third_party/opencv-5.0.0 tree)
+                                          upstream/opencv tree)
 """
 import re
 import sys

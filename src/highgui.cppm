@@ -3,6 +3,6 @@
 module;
 #include <opencv2/highgui.hpp>
 
-export module opencv.highgui;
+export module mcpplibs.mwrap.opencv.highgui;
 
 #include "gen_exports/highgui.inc"

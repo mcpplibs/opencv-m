@@ -5,14 +5,14 @@
 // (would collide with the dep's modules/dnn/src/dnn.cpp — #240 family).
 #include <gtest/gtest.h>
 #if defined(MCPP_FEATURE_DNN)
-import opencv.cv;
-import opencv.dnn;
+import mcpplibs.mwrap.opencv;
+import mcpplibs.mwrap.opencv.dnn;
 
 // blobFromImage through the module layer must yield a correctly shaped/valued
 // NCHW blob (exercises the dnn core + the whole protobuf/mlas link closure),
 // and an empty Net must construct.
 TEST(DnnModule, BlobFromImageAndNet) {
-    cv::Mat img(32, 32, cv::CV_8UC3, cv::Scalar(10, 20, 30));
+    cv::Mat img(32, 32, mcpplibs::mwrap::opencv::macros::CV_8UC3, cv::Scalar(10, 20, 30));
     cv::Mat blob = cv::dnn::blobFromImage(img, 1.0 / 255.0, cv::Size(16, 16),
                                           cv::Scalar(), true, false);
     ASSERT_EQ(blob.dims, 4);

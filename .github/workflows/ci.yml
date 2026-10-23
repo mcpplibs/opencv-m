@@ -22,7 +22,7 @@ env:
   # the latest release; 0.0.103 adds the mcpplibs index org migration +
   # per-repo artifact adoption (mcpp#267/#269) — no manifest-grammar change,
   # the package floor stays 0.0.102.
-  MCPP_VERSION: "2026.8.5.4"
+  MCPP_VERSION: "2026.10.21.1"
 
 jobs:
   # ── Platform × toolchain matrix ─────────────────────────────────────────
@@ -36,7 +36,7 @@ jobs:
   #                 signature); merged as e83ed49, green since.
   #   windows     — per-glob flags live in [target.'cfg(windows)'.build.flags]
   #                 (mcpp#258, landed in 0.0.102), still keyed on the
-  #                 gen/windows/tu/w*/ stub paths; removing the stub layer
+  #                 generated/windows/tu/w*/ stub paths; removing the stub layer
   #                 itself is tracked in #17.
   test:
     name: ${{ matrix.name }}

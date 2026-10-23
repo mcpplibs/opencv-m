@@ -1,13 +1,13 @@
 // The optional macros side header must coexist with the import in one TU.
 // In such a mixed TU the RAW macro spellings are the ones to use (an active
-// CV_8UC3 macro would mangle the cv::CV_8UC3 spelling — that constexpr
+// CV_8UC3 macro would mangle the mcpplibs::mwrap::opencv::macros::CV_8UC3 spelling — that constexpr
 // surface is for module-only TUs, see api_surface_test.cpp).
 #include <gtest/gtest.h>
 
 // Canonical mixing order: textual includes BEFORE the import.
-#include <opencv-m/macros.hpp>
+#include <mwrap/opencv/macros.hpp>
 
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
 TEST(MacrosMix, AssertAndTypeMacros) {
     cv::Mat m(2, 2, CV_8UC1, cv::Scalar(7));

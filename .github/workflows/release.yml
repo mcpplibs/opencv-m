@@ -13,7 +13,7 @@ env:
   # path delivered whatever mcpp xlings shipped (0.0.101 at the time), which
   # rejects cfg-section flag tables — the v0.0.9 and v0.0.10 release runs both
   # failed on exactly that skew, while the 5-leg CI (pinned) was green.
-  MCPP_VERSION: "2026.8.5.4"
+  MCPP_VERSION: "2026.10.21.1"
 
 jobs:
   verify-and-release:

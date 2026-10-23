@@ -1,4 +1,4 @@
 [template]
-description  = "Image pipeline skeleton with import opencv.cv"
-default      = true
-post_message = "cd into the project and run `mcpp run -- <image-file>`."
+description = "Generate an image, convert it to grayscale, and write a PNG"
+default = true
+post_message = "Run `mcpp run` to generate out.png; no input image is required."

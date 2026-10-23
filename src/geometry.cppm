@@ -2,6 +2,6 @@
 module;
 #include <opencv2/geometry.hpp>
 
-export module opencv.geometry;
+export module mcpplibs.mwrap.opencv.geometry;
 
 #include "gen_exports/geometry.inc"
