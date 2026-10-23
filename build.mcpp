@@ -113,6 +113,7 @@ static void inject_catalog(const fs::path& man, const std::string& os,
     if (!input) return;
     std::string line;
     while (std::getline(input, line)) {
+        while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) line.pop_back();
         if (line.empty() || line[0] == '#') continue;
         for (const auto& source : expand_glob_line(man, line)) mcpp::source(source.c_str());
     }
@@ -140,6 +141,7 @@ int main() {
     std::istringstream module_list(slurp(man / "port/config/modules.txt"));
     std::string module;
     while (std::getline(module_list, module)) {
+        while (!module.empty() && (module.back() == '\r' || module.back() == ' ')) module.pop_back();
         if (module.empty() || (module != "core" && !mcpp::has_feature(module.c_str()))) continue;
         modules.push_back(module);
         if (module != "core" && module != "dnn") inject_catalog(man, os, module);
@@ -167,6 +169,7 @@ int main() {
     mcpp::rerun_if_changed("src/selected.cppm.in");
 
     std::string config = slurp(man / ("generated/" + os + "/cvconfig.h"));
+    config.erase(std::remove(config.begin(), config.end(), '\r'), config.end());
     for (const auto& entry : {std::pair{"HAVE_JPEG", "imgcodecs-jpeg"},
                               std::pair{"HAVE_PNG", "imgcodecs-png"}}) {
         if (!mcpp::has_feature(entry.second)) {

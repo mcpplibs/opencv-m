@@ -29,3 +29,10 @@
 - build.mcpp writes that selection module into its configuration-specific output and declares it with mcpp::generated before scanning. The generated file contains concrete imports for the selected features, with no header-induced or preprocessor-conditional imports.
 - Existing root-import API, header-mixing and codec tests exercise the aggregate from consumers; native Windows verification remains in CI.
 - This correction requires no mcpp engine changes.
+
+## Windows checkout newline correction
+
+- Reproduced the Windows selection problem locally by feeding CRLF versions of the tracked configuration files to the real build program: selected.cppm incorrectly contained no optional module imports.
+- Module and source catalog lines now strip CRLF carriage returns; cvconfig is normalized before optional codec definitions are disabled.
+- tools/test_build_config.py executes the compiled build program against LF and CRLF fixtures and verifies identical selected modules, source directives and codec configuration. It passed locally and is included in the Linux GCC CI job.
+- GCC 16 and musl static core-only tests passed, as did GCC 16 and LLVM 23 PNG/JPEG roundtrips after the aggregate correction. Windows core tests passed in run 40015097526; complete feature verification follows on the new CI head.

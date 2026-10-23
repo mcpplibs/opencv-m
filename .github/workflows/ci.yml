@@ -177,6 +177,11 @@ jobs:
         shell: bash
         run: mcpp build
 
+      - name: Build configuration newline regression
+        if: matrix.name == 'linux-gcc'
+        shell: bash
+        run: python3 tools/test_build_config.py target/.build-mcpp/build.mcpp.bin
+
       # Guard the module-interface BMIs against non-baseline target features.
       # A src/*.cppm compiled with -msse3/-mavx/-march=… bakes that feature
       # into opencv.<mod>.pcm; a consumer TU compiled at plain baseline then
