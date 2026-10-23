@@ -495,3 +495,11 @@ mcpp parser 的 DependencySpec.defaultFeatures、prepare 图的 feature 合并�
 
 组织权限已通过现有 Sunrisepeak 授权解决，mcpplibs/opencv-m fork 与 onnxruntime-m 仓库均已创建。
 使用单次命令的授权，不改变本机默认 GitHub account。
+
+## 15. mcpp 仓库边界（用户补充）
+
+mcpp 引擎代码只读。已有 PR #836 仅涉及文档与使用 skill，允许保留，但现在不合入。
+该 PR 的 review、CI 或合入状态不作为 opencv-m 实施与验证的前置条件。
+OpenCV 的模块、feature、平台后端、测试和模板继续在 opencv-m 内推进；
+索引分类及供应者适配在 mcpp-index 内处理。若遇到确切客户端缺口，保留最小复现并报告，
+不扩大 mcpp 修改范围，也不因此停止不受该缺口影响的 OpenCV 工作。

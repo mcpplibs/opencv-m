@@ -1,0 +1,24 @@
+{
+  "core": [],
+  "dnn": [
+    "geometry",
+    "imgproc"
+  ],
+  "flann": [],
+  "geometry": [
+    "flann"
+  ],
+  "highgui": [
+    "imgproc"
+  ],
+  "imgcodecs": [
+    "imgproc"
+  ],
+  "imgproc": [
+    "geometry"
+  ],
+  "videoio": [
+    "imgcodecs",
+    "imgproc"
+  ]
+}

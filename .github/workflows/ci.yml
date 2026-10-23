@@ -205,6 +205,10 @@ jobs:
         shell: bash
         run: mcpp test
 
+      - name: Image codec feature tests
+        shell: bash
+        run: mcpp test --features imgcodecs-png,imgcodecs-jpeg
+
       - name: Feature tests (dnn + unifont module interfaces)
         if: matrix.features
         shell: bash

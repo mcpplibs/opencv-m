@@ -1,0 +1,8 @@
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_backend_plugin.cpp
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_backend_static.cpp
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_cap.cpp
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_cap_images.cpp
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_cap_mjpeg_decoder.cpp
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_cap_mjpeg_encoder.cpp
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_container_avi.cpp
+generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_videoio_registry.cpp

@@ -1,0 +1,8 @@
+core
+dnn
+flann
+geometry
+highgui
+imgcodecs
+imgproc
+videoio

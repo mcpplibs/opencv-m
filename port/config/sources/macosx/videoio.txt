@@ -1,0 +1,8 @@
+upstream/opencv/modules/videoio/src/backend_plugin.cpp
+upstream/opencv/modules/videoio/src/backend_static.cpp
+upstream/opencv/modules/videoio/src/cap.cpp
+upstream/opencv/modules/videoio/src/cap_images.cpp
+upstream/opencv/modules/videoio/src/cap_mjpeg_decoder.cpp
+upstream/opencv/modules/videoio/src/cap_mjpeg_encoder.cpp
+upstream/opencv/modules/videoio/src/container_avi.cpp
+upstream/opencv/modules/videoio/src/videoio_registry.cpp

@@ -7,6 +7,7 @@
 
 import mcpplibs.mwrap.opencv;
 
+#if defined(MCPP_FEATURE_IMGPROC) && defined(MCPP_FEATURE_IMGCODECS)
 namespace {
 
 cv::Mat make_test_image() {
@@ -18,6 +19,7 @@ cv::Mat make_test_image() {
 
 } // namespace
 
+#if defined(MCPP_FEATURE_IMGCODECS_PNG)
 TEST(Roundtrip, PngIsPixelExact) {
     cv::Mat img = make_test_image();
     std::vector<unsigned char> buf;
@@ -29,7 +31,9 @@ TEST(Roundtrip, PngIsPixelExact) {
     cv::absdiff(img, back, diff);
     EXPECT_EQ(cv::countNonZero(diff.reshape(1)), 0);
 }
+#endif
 
+#if defined(MCPP_FEATURE_IMGCODECS_JPEG)
 TEST(Roundtrip, JpegIsClose) {
     cv::Mat img = make_test_image();
     std::vector<unsigned char> buf;
@@ -39,3 +43,6 @@ TEST(Roundtrip, JpegIsClose) {
     ASSERT_TRUE(back.size() == img.size());
     EXPECT_LT(cv::norm(img, back, cv::NORM_L1) / (64.0 * 64 * 3), 12.0);  // q95 ringing on sharp synthetic edges ≈ 7
 }
+#endif
+
+#endif

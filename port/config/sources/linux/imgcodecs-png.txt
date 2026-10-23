@@ -1,0 +1,17 @@
+upstream/opencv/3rdparty/libpng/intel/filter_sse2_intrinsics.c
+upstream/opencv/3rdparty/libpng/intel/intel_init.c
+upstream/opencv/3rdparty/libpng/png.c
+upstream/opencv/3rdparty/libpng/pngerror.c
+upstream/opencv/3rdparty/libpng/pngget.c
+upstream/opencv/3rdparty/libpng/pngmem.c
+upstream/opencv/3rdparty/libpng/pngpread.c
+upstream/opencv/3rdparty/libpng/pngread.c
+upstream/opencv/3rdparty/libpng/pngrio.c
+upstream/opencv/3rdparty/libpng/pngrtran.c
+upstream/opencv/3rdparty/libpng/pngrutil.c
+upstream/opencv/3rdparty/libpng/pngset.c
+upstream/opencv/3rdparty/libpng/pngtrans.c
+upstream/opencv/3rdparty/libpng/pngwio.c
+upstream/opencv/3rdparty/libpng/pngwrite.c
+upstream/opencv/3rdparty/libpng/pngwtran.c
+upstream/opencv/3rdparty/libpng/pngwutil.c

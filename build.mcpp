@@ -1,32 +1,5 @@
-// build.mcpp — opencv-m single-repo build glue. Covers exactly what the
-// mcpp.toml manifest grammar cannot express (v0.0.101), nothing more:
-//
-//   1. per-OS generated-config include dirs: the frozen config snapshots live
-//      in generated/<os>/ (cvconfig.h, cv_cpu_config.h, per-ISA dispatch TU headers)
-//      + generated/common/ overlaps; the manifest has no [target.'cfg(os)']
-//      include_dirs key, so the per-OS -I list is read from
-//      generated/<os>/INCLUDE_DIRS.txt (written by tools/vendor/port_descriptor.py)
-//      and emitted as PRIVATE include dirs — consumers only ever need
-//      generated/common (opencv2/opencv_modules.hpp), which is declarative in
-//      [build].include_dirs.
-//   2. per-OS dnn sources (feature-gated): [features.dnn] carries only the
-//      OS-neutral subset (no per-OS features in the manifest grammar); the
-//      per-OS remainder — ISA dispatch TUs, mlas, feature stubs — is listed
-//      in generated/<os>/DNN_SOURCES.txt and injected here.
-//   3. unifont: when the `unifont` feature is on, hex-embed the vendored
-//      assets/WenQuanYiMicroHei.ttf.gz into $MCPP_OUT_DIR/builtin_font_uni.h
-//      (symbol OcvBuiltinFontUni; byte-faithful port of cmake ocv_blob2hdr —
-//      the COMPRESSED bytes are embedded, OpenCV inflates at runtime).
-//
-// Style: modules-first per docs/07 — directives and the env contract go
-// through `import mcpp;` (the module is bundled in the mcpp binary, so it
-// always matches the protocol). `import std;` is NOT available in the
-// build.mcpp compile context — empirically verified 2026-07-21: only the
-// bundled `mcpp` module is wired up there (regular project TUs can import
-// std, this special TU cannot). Textual std includes remain for the file
-// I/O this program does itself, and MUST precede the import. Diagnostics go to stdout as
-// non-directive lines (never stderr: it can interleave into the buffered
-// directive stream).
+// OpenCV target configuration and selected source catalogs. The upstream
+// implementation stays unchanged; outputs are private to this build instance.
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
@@ -34,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 import mcpp;
@@ -121,12 +95,83 @@ static std::vector<std::string> expand_glob_line(const fs::path& man, const std:
     return files;
 }
 
+static std::string c_string(const std::string& value) {
+    std::string result = "\"";
+    for (char c : value) {
+        if (c == '\\' || c == '\"') result += '\\';
+        if (c == '\n') result += "\\n";
+        else if (c == '\r') result += "\\r";
+        else result += c;
+    }
+    return result + "\"";
+}
+
+static void inject_catalog(const fs::path& man, const std::string& os,
+                           const std::string& feature) {
+    std::string relative = "port/config/sources/" + os + "/" + feature + ".txt";
+    std::ifstream input(man / relative);
+    if (!input) return;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line[0] == '#') continue;
+        for (const auto& source : expand_glob_line(man, line)) mcpp::source(source.c_str());
+    }
+    mcpp::rerun_if_changed(relative.c_str());
+}
+
 int main() {
     fs::path man = mcpp::manifest_dir()[0] ? mcpp::manifest_dir() : ".";
 
     // 1. per-OS include dirs
     std::string os = mcpp::target_os()[0] ? mcpp::target_os() : "linux";
     if (os == "macos") os = "macosx";  // generated/ keeps the descriptor-era dir name
+    if (!mcpp::out_dir()[0]) {
+        std::printf("opencv-m: MCPP_OUT_DIR is required\n");
+        return 1;
+    }
+    if (mcpp::has_feature("videoio-v4l2") && os != "linux") {
+        std::printf("opencv-m: videoio-v4l2 requires a Linux target\n");
+        return 1;
+    }
+    fs::path out = mcpp::out_dir();
+    mcpp::include_dir(out.string().c_str());
+    inject_catalog(man, os, "core");
+    std::vector<std::string> modules;
+    std::istringstream module_list(slurp(man / "port/config/modules.txt"));
+    std::string module;
+    while (std::getline(module_list, module)) {
+        if (module.empty() || (module != "core" && !mcpp::has_feature(module.c_str()))) continue;
+        modules.push_back(module);
+        if (module != "core" && module != "dnn") inject_catalog(man, os, module);
+    }
+    mcpp::rerun_if_changed("port/config/modules.txt");
+    for (const char* feature : {"imgcodecs-jpeg", "imgcodecs-png", "videoio-ffmpeg", "videoio-v4l2"})
+        if (mcpp::has_feature(feature)) inject_catalog(man, os, feature);
+    std::ostringstream imports;
+    for (const auto& name : modules)
+        imports << "export import mcpplibs.mwrap.opencv." << name << ";\n";
+    imports << "export import mcpplibs.mwrap.opencv.macros;\n";
+    spew(out / "mwrap_opencv_exports.inc", imports.str());
+
+    std::string config = slurp(man / ("generated/" + os + "/cvconfig.h"));
+    for (const auto& entry : {std::pair{"HAVE_JPEG", "imgcodecs-jpeg"},
+                              std::pair{"HAVE_PNG", "imgcodecs-png"}}) {
+        if (!mcpp::has_feature(entry.second)) {
+            const std::string definition = std::string("#define ") + entry.first;
+            auto at = config.find(definition + "\n");
+            if (at != std::string::npos) config.replace(at, definition.size(), std::string("/* #undef ") + entry.first + " */");
+        }
+    }
+    spew(out / "cvconfig.h", config);
+    spew(out / "opencv2/cvconfig.h", config);
+    std::ostringstream report;
+    report << "OpenCV 5.0.0 (mcpplibs.mwrap.opencv 5.0.0.1)\nTarget: " << os << "\nModules:";
+    for (const auto& name : modules) report << ' ' << name;
+    report << "\nJPEG: " << (mcpp::has_feature("imgcodecs-jpeg") ? "YES" : "NO")
+           << "\nPNG: " << (mcpp::has_feature("imgcodecs-png") ? "YES" : "NO")
+           << "\nFFmpeg: " << (mcpp::has_feature("videoio-ffmpeg") ? "YES" : "NO") << "\n";
+    spew(out / "version_string.inc", c_string(report.str()) + "\n");
+
     // windows compiles through the generated/windows/tu/w*/ stub namespace (see
     // mcpp.toml header comment; workaround for mcpp-community/mcpp#258) —
     // same INCLUDE_DIRS/DNN_SOURCES machinery as the other OSes from here on.
