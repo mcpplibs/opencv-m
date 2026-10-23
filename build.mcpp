@@ -147,11 +147,24 @@ int main() {
     mcpp::rerun_if_changed("port/config/modules.txt");
     for (const char* feature : {"imgcodecs-jpeg", "imgcodecs-png", "videoio-ffmpeg", "videoio-v4l2"})
         if (mcpp::has_feature(feature)) inject_catalog(man, os, feature);
+    // Imports must be direct module declarations (GCC rejects them inside
+    // included headers). Generate the complete selected interface before
+    // mcpp scans it; there are no conditional imports for its scanner to guess.
     std::ostringstream imports;
     for (const auto& name : modules)
-        imports << "export import mcpplibs.mwrap.opencv." << name << ";\n";
-    imports << "export import mcpplibs.mwrap.opencv.macros;\n";
-    spew(out / "mwrap_opencv_exports.inc", imports.str());
+        if (name != "core") imports << "export import mcpplibs.mwrap.opencv." << name << ";\n";
+    std::string aggregate = slurp(man / "src/selected.cppm.in");
+    const std::string marker = "@MCPP_OPENCV_IMPORTS@";
+    auto marker_at = aggregate.find(marker);
+    if (marker_at == std::string::npos) {
+        std::printf("opencv-m: src/selected.cppm.in has no import marker\n");
+        return 1;
+    }
+    aggregate.replace(marker_at, marker.size(), imports.str());
+    const auto aggregate_path = out / "selected.cppm";
+    spew(aggregate_path, aggregate);
+    mcpp::generated(aggregate_path.string().c_str());
+    mcpp::rerun_if_changed("src/selected.cppm.in");
 
     std::string config = slurp(man / ("generated/" + os + "/cvconfig.h"));
     for (const auto& entry : {std::pair{"HAVE_JPEG", "imgcodecs-jpeg"},

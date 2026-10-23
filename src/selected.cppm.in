@@ -1,0 +1,3 @@
+export module mcpplibs.mwrap.opencv.detail.selected;
+
+@MCPP_OPENCV_IMPORTS@

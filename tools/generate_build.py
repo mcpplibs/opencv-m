@@ -131,6 +131,8 @@ def generate():
         "unifont": {"implies": ["imgproc"], "defines": ["HAVE_UNIFONT"]},
     })
     build = copy.deepcopy(config["build"])
+    # build.mcpp emits the selected interface with concrete imports after
+    # feature resolution, before mcpp scans the generated module.
     build["sources"] = ["src/opencv.cppm", "src/core.cppm", "src/macros.cppm"]
     manifest = {
         "package": {"namespace": "mcpplibs.mwrap", "name": "opencv", "version": "5.0.0.1",

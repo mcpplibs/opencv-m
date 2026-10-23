@@ -21,3 +21,11 @@
 - CI now runs image codec features separately from core-only and DNN/unifont configurations.
 - mcpp engine is read-only. Its existing documentation/skill PR remains unmerged and is not a dependency of this work.
 - Native GUI, remaining main modules and ORT bridge remain implementation work; this checkpoint does not claim full support.
+
+## Aggregate module CI correction
+
+- Run 40010892459 exposed imports introduced through a header: GCC rejected them, while Windows built the library but consumers could not see the aggregate's core API.
+- The conventional src/opencv.cppm now directly re-exports core, macros and an internal selection module.
+- build.mcpp writes that selection module into its configuration-specific output and declares it with mcpp::generated before scanning. The generated file contains concrete imports for the selected features, with no header-induced or preprocessor-conditional imports.
+- Existing root-import API, header-mixing and codec tests exercise the aggregate from consumers; native Windows verification remains in CI.
+- This correction requires no mcpp engine changes.
