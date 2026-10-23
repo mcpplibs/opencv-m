@@ -172,6 +172,10 @@ jobs:
           done < <(find templates -name '*.cpp.in' -o -name '*.cc.in' -o -name '*.cpp' -o -name '*.cc')
           exit $fail
 
+      - name: Generated macro mappings match pinned headers
+        shell: bash
+        run: python3 tools/generate_macros.py --check
+
       - name: Build
         shell: bash
         run: mcpp build

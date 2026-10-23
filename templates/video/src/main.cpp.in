@@ -8,7 +8,7 @@ int main() {
     } output;
     const auto cameras = cv::videoio_registry::getCameraBackends();
     for (auto backend : cameras)
-        std::println("Camera backend available: {} (no device opened)", cv::videoio_registry::getBackendName(backend));
+        std::println("Registered camera backend: {} (no device opened)", cv::videoio_registry::getBackendName(backend));
     cv::VideoWriter writer(output.path.string(), cv::CAP_FFMPEG,
         cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 24.0, cv::Size(96, 64));
     if (!writer.isOpened()) return 1;

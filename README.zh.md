@@ -120,6 +120,14 @@ cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
 需要 CV_Assert 等预处理宏时，在 import **之前**包含 `<mwrap/opencv/macros.hpp>`。
 原始宏仍会在限定名称中展开，因此宏形式与类型化映射应在不同使用上下文中选择。
 
+
+类型化映射包含 OpenCV 5 的全部 13 种标量深度、通道类型族
+（如 `CV_16BFC(n)`、`CV_BoolC(n)`、`CV_64UC(n)`）、HAL 值常量和矩阵布局函数。
+运行 `python3 tools/generate_macros.py` 重新生成，`--check` 检查生成结果。
+声明标记和控制流宏仍通过文本兼容头提供。类型化 `CV_IS_SUBMAT` 使用实际存在的
+`CV_SUBMAT_FLAG`，修复上游 5.0.0 对未定义 `CV_MAT_SUBMAT_FLAG` 的引用；原始宏不改动。
+测试通过实际 Mat 分配、读写与 ROI 标记验证布局。
+
 ## 仓库布局与升级
 
 - upstream/opencv 保存固定上游源码，upstream/sources.lock.toml 记录来源与归档 SHA256。

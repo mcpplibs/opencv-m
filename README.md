@@ -100,10 +100,10 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | dnn-onnxruntime | Adds dnn and the official ORT 1.25.1 CPU SDK through mcpplibs.mwrap.onnxruntime |
 | unifont | Unicode/CJK font rendering, implying imgproc |
 
-There is no current full/all-modules promise. GTK3 window creation, image display,
+The all-modules feature selects sixteen module implementations; it does not promise complete API or backend coverage. GTK3 window creation, image display,
 event processing and destruction have passed locally; Cocoa passed native CI.
-Win32 validation is pending. ORT CPU inference and actual ORT session profiling
-have passed Linux GCC/LLVM; native Windows/macOS validation is pending.
+Win32 window creation passed native CI. ORT CPU inference and actual session profiling
+have passed Linux GCC/LLVM and macOS; Windows validation is pending.
 Calling imshow with only the API-only
 highgui feature still reports missing window backend support; enable a backend.
 
@@ -131,6 +131,16 @@ cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
 For preprocessing macros such as CV_Assert, include
 `<mwrap/opencv/macros.hpp>` **before** importing. Raw macros still expand inside
 qualified names: use raw macro and typed-mapping forms in separate contexts.
+
+
+The typed mappings include all 13 OpenCV 5 scalar depths, channel families
+(`CV_16BFC(n)`, `CV_BoolC(n)`, `CV_64UC(n)`, etc.), HAL value constants and
+matrix type/layout helpers. Regenerate them with `python3 tools/generate_macros.py`;
+`--check` verifies the committed result. Annotation and control-flow macros remain
+in the textual side header. The typed `CV_IS_SUBMAT` mapping repairs OpenCV 5.0.0's
+undefined `CV_MAT_SUBMAT_FLAG` reference by using the actual `CV_SUBMAT_FLAG`;
+the raw upstream macro is unchanged. Tests compare these helpers to real Mat
+allocations and ROI flags.
 
 ## Repository structure and upgrades
 
