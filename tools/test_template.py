@@ -14,6 +14,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mcpp", default="mcpp")
     parser.add_argument("--toolchain", default="llvm@23.1.3")
+    parser.add_argument("--template", help="named template; omit for the package default")
+    parser.add_argument("--run-arg", action="append", default=[])
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     metadata = tomllib.loads((root / "mcpp.toml").read_text())["package"]
@@ -36,7 +38,7 @@ def main():
         env = dict(os.environ, MCPP_HOME=str(home))
         selector = identity + "@" + version
         for command in ([args.mcpp, "new", "--list-templates", selector],
-                        [args.mcpp, "new", "quickstart", "--template", selector]):
+                        [args.mcpp, "new", "quickstart", "--template", selector + (":" + args.template if args.template else "")]):
             print("+", " ".join(command), flush=True)
             subprocess.run(command, cwd=temporary, env=env, check=True)
         project = temporary / "quickstart"
@@ -54,7 +56,12 @@ def main():
         assert len(matches) == 1, "Expected exactly one qualified dependency from self.name"
         lines[matches[0]] = json.dumps(identity) + " = " + replacement
         manifest.write_text("\n".join(lines) + "\n")
+        command = [args.mcpp, "build", "--toolchain", args.toolchain, "--strict"]
+        print("+", " ".join(command), flush=True)
+        subprocess.run(command, cwd=project, check=True)
         command = [args.mcpp, "run", "--toolchain", args.toolchain]
+        if args.run_arg:
+            command += ["--", *args.run_arg]
         print("+", " ".join(command), flush=True)
         subprocess.run(command, cwd=project, check=True)
 

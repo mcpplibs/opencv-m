@@ -1,0 +1,3 @@
+[template]
+description = "Display a generated image with the platform's native highgui backend"
+post_message = "Run `mcpp run` and press a key in the window to close it. CI can pass --smoke-test."

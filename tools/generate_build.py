@@ -113,6 +113,14 @@ def generate():
                 flags["defines"] = [value for value in flags["defines"]
                                     if value not in {"HAVE_FFMPEG", "HAVE_FFMPEG_LIBAVDEVICE"}]
     features = {"default": []}
+    for codec in ("zlib", "libpng", "libjpeg-turbo"):
+        targets["cfg(unix)"]["build"]["flags"].append({
+            "glob": f"**/3rdparty/{codec}/**",
+            "cflags": ["-fvisibility=hidden"], "cxxflags": ["-fvisibility=hidden"]})
+    for bits in (12, 16):
+        targets["cfg(unix)"]["build"]["flags"].append({
+            "glob": f"**/tu/jpeg{bits}/**",
+            "cflags": ["-fvisibility=hidden"], "cxxflags": ["-fvisibility=hidden"]})
     for name in modules:
         if name == "core":
             continue
@@ -129,8 +137,23 @@ def generate():
         "videoio-ffmpeg": {"implies": ["videoio"], "defines": ["HAVE_FFMPEG", "HAVE_FFMPEG_LIBAVDEVICE"]},
         "videoio-v4l2": {"implies": ["videoio"], "defines": ["HAVE_CAMV4L2"]},
         "unifont": {"implies": ["imgproc"], "defines": ["HAVE_UNIFONT"]},
+        "highgui-native": {"implies": ["highgui", "imgcodecs"]},
+        "highgui-gtk3": {"implies": ["highgui", "imgcodecs"]},
+        "highgui-win32": {"implies": ["highgui"]},
+        "highgui-cocoa": {"implies": ["highgui"]},
     })
+    # GTK's pthread compiler mode is private to its implementation TU. Baking
+    # it into a public BMI would require every consumer to use -pthread too.
+    for name in ("highgui-native", "highgui-gtk3"):
+        features[name]["flags"] = [{"glob": "**/highgui/src/window_gtk.cpp", "cxxflags": ["-pthread"]}]
+    gtk_target = targets.setdefault('cfg(all(os = "linux", env = "gnu", arch = "x86_64"))', {})
+    gtk_target["feature-xlings"] = {
+        name: {"xim:gtk3": "3.24.43", "xim:libXtst": "1.2.5"}
+        for name in ("highgui-native", "highgui-gtk3")}
     build = copy.deepcopy(config["build"])
+    # The bundled zlib is an implementation detail, not another provider of
+    # the public zlib ABI used by GUI SDKs and other dependencies.
+    build.setdefault("defines", []).append("Z_PREFIX")
     # build.mcpp emits the selected interface with concrete imports after
     # feature resolution, before mcpp scans the generated module.
     build["sources"] = ["src/opencv.cppm", "src/core.cppm", "src/macros.cppm"]

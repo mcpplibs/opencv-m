@@ -5,9 +5,10 @@ The candidate package is **5.0.0.1**: upstream 5.0.0 plus wrapper revision 1.
 
 **English** · [中文](README.zh.md)
 
-This branch is an implementation checkpoint. Eight main modules are integrated;
-native windows, remaining main modules and the ONNX Runtime bridge are still
-being implemented. Passing the current CI does not establish full OpenCV support.
+This branch is an implementation checkpoint. Eight main modules are integrated.
+The native GTK3 window backend has passed local Linux tests; Win32/Cocoa need
+native CI validation. Remaining main modules and the ONNX Runtime bridge are
+still being implemented. Passing the current CI does not establish full OpenCV support.
 
 ## Build the checkout
 
@@ -39,6 +40,18 @@ cd myvision
 mcpp run
 ```
 
+The named `window` template displays a generated image and processes window events:
+
+```sh
+mcpp new mywindow --template mcpplibs.mwrap.opencv@5.0.0.1:window
+cd mywindow
+mcpp run
+```
+
+Linux requires a graphical session and the `pkg-config` executable. The GTK3
+headers and libraries come from declared SDK dependencies. Headless CI uses Xvfb
+and `mcpp run -- --smoke-test` to close the window automatically.
+
 The installed-template fixture used during development stages candidate sources;
 it is separate from the still-required published archive/index installation test.
 
@@ -61,13 +74,15 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | videoio-ffmpeg | Adds the FFmpeg implementation and compat.ffmpeg dependency |
 | videoio-v4l2 | Adds V4L2 on Linux; other targets are refused |
 | highgui | GUI API only; current window backend is NONE |
+| highgui-native | Select GTK3 on Linux x86_64 glibc, Win32 on Windows, or Cocoa on macOS |
+| highgui-gtk3, highgui-win32, highgui-cocoa | Explicit native backend; mismatched targets are refused |
 | dnn | OpenCV's existing native DNN implementation; does not enable ORT |
 | unifont | Unicode/CJK font rendering, implying imgproc |
 
-There is no current full/all-modules promise. highgui-native and dnn-onnxruntime
-are planned capabilities, not aliases for the existing highgui/dnn features.
-Calling imshow with only the current API-only highgui implementation still
-reports missing window backend support.
+There is no current full/all-modules promise. GTK3 window creation, image display,
+event processing and destruction have passed locally. Win32/Cocoa validation is
+pending. dnn-onnxruntime remains planned. Calling imshow with only the API-only
+highgui feature still reports missing window backend support; enable a backend.
 
 ## Modules, API and macros
 

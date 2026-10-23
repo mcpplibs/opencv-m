@@ -5,7 +5,8 @@
 
 [English](README.md) · **中文**
 
-本分支是实现 checkpoint。目前接入八个主模块，原生窗口、其余主模块和 ORT 桥接仍在实施。
+本分支是实现 checkpoint。目前接入八个主模块，GTK3 原生窗口已通过 Linux 本地测试，
+Win32/Cocoa 等待原生 CI 验证；其余主模块和 ORT 桥接仍在实施。
 当前 CI 通过不代表已经完整支持 OpenCV。
 
 ## 构建本地 checkout
@@ -36,6 +37,17 @@ cd myvision
 mcpp run
 ```
 
+命名模板 `window` 会显示生成的图像并处理窗口事件：
+
+```sh
+mcpp new mywindow --template mcpplibs.mwrap.opencv@5.0.0.1:window
+cd mywindow
+mcpp run
+```
+
+Linux 需要图形会话与 `pkg-config` 命令；GTK3 头文件与库由声明的 SDK 依赖提供。
+无桌面的 CI 使用 Xvfb，并通过 `mcpp run -- --smoke-test` 自动关闭窗口。
+
 开发用安装模板 fixture 会预置候选源码；它不能替代尚待执行的正式归档与索引安装验收。
 
 ## 依赖与 feature
@@ -57,11 +69,14 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | videoio-ffmpeg | 增加 FFmpeg 实现和 compat.ffmpeg 依赖 |
 | videoio-v4l2 | Linux V4L2，其他目标明确拒绝 |
 | highgui | 只有 GUI API，当前窗口后端为 NONE |
+| highgui-native | Linux x86_64 glibc 选择 GTK3，Windows 选择 Win32，macOS 选择 Cocoa |
+| highgui-gtk3、highgui-win32、highgui-cocoa | 显式选择原生后端，目标不匹配时拒绝构建 |
 | dnn | 现有 OpenCV 原生 DNN 实现，不代表启用 ORT |
 | unifont | Unicode/CJK 字体渲染，包含 imgproc |
 
-当前没有 full/all-modules 的完整功能承诺。highgui-native 和 dnn-onnxruntime 仍是待实现能力，
-不能用现有 highgui/dnn 替代。仅使用当前 highgui 调用 imshow 仍会报告缺少窗口后端。
+当前没有 full/all-modules 的完整功能承诺。GTK3 创建窗口、显示图像、处理事件和销毁窗口
+已在本地通过，Win32/Cocoa 验证尚未完成；dnn-onnxruntime 仍待实现。
+只启用 highgui API 调用 imshow 仍会报告缺少窗口后端，需要同时选择后端 feature。
 
 ## 模块、API 与宏
 

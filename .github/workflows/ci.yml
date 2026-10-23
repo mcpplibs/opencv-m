@@ -224,6 +224,20 @@ jobs:
         shell: bash
         run: mcpp test --features dnn,unifont
 
+      - name: Linux native GTK3 window and actual window template
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb pkg-config
+          xvfb-run -a mcpp test --features highgui-native --timeout 60
+          xvfb-run -a python3 tools/test_template.py --toolchain llvm@22.1.8 --template window --run-arg=--smoke-test
+
+      - name: Native Win32 or Cocoa window
+        if: runner.os == 'Windows' || runner.os == 'macOS'
+        shell: bash
+        run: mcpp test --features highgui-native --timeout 60
+
       # NOTE examples are exercised locally, not here: each one is a path-dep
       # consumer that cold-rebuilds the whole vendored OpenCV (+ffmpeg) in its
       # own target/ (~40 min per example on a 4-core runner) while adding

@@ -1,11 +1,13 @@
 // OpenCV target configuration and selected source catalogs. The upstream
 // implementation stays unchanged; outputs are private to this build instance.
 #include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -120,7 +122,99 @@ static void inject_catalog(const fs::path& man, const std::string& os,
     mcpp::rerun_if_changed(relative.c_str());
 }
 
-int main() {
+static std::string shell_quote(const std::string& value) {
+    std::string result = "'";
+    for (char c : value) result += c == '\'' ? "'\\''" : std::string(1, c);
+    return result + "'";
+}
+
+static std::vector<std::string> flag_words(const std::string& value) {
+    std::vector<std::string> words;
+    std::string word;
+    char quote = 0;
+    bool escape = false;
+    for (char c : value) {
+        if (escape) { word += c; escape = false; }
+        else if (c == '\\' && quote != '\'') escape = true;
+        else if (quote) { if (c == quote) quote = 0; else word += c; }
+        else if (c == '\'' || c == '"') quote = c;
+        else if (std::isspace(static_cast<unsigned char>(c))) {
+            if (!word.empty()) { words.push_back(word); word.clear(); }
+        } else word += c;
+    }
+    if (quote || escape) throw std::runtime_error("malformed GTK pkg-config flags");
+    if (!word.empty()) words.push_back(word);
+    return words;
+}
+
+static std::string configure_highgui(const fs::path& out, const std::string& os) {
+    const bool native = mcpp::has_feature("highgui-native");
+    const bool gtk = mcpp::has_feature("highgui-gtk3") || (native && os == "linux");
+    const bool win32 = mcpp::has_feature("highgui-win32") || (native && os == "windows");
+    const bool cocoa = mcpp::has_feature("highgui-cocoa") || (native && os == "macosx");
+    if (native && os != "linux" && os != "windows" && os != "macosx")
+        throw std::runtime_error("highgui-native supports Linux, Windows and macOS desktop targets");
+    if ((gtk && os != "linux") || (win32 && os != "windows") || (cocoa && os != "macosx"))
+        throw std::runtime_error("selected highgui backend does not support this target OS");
+    std::string backend = "NONE";
+    if (gtk) {
+        if (std::string(mcpp::target_arch()) != "x86_64")
+            throw std::runtime_error("the current GTK3 SDK closure is supported on Linux x86_64 only");
+        if (std::string(mcpp::target_libc()) == "musl")
+            throw std::runtime_error("highgui-gtk3 requires the glibc GTK SDK; musl is not supported");
+        const std::string sdk = mcpp::xpkg_dir("xim", "gtk3");
+        const std::string pc = mcpp::pkg_config_libdir();
+        if (sdk.empty() || pc.empty())
+            throw std::runtime_error("highgui-gtk3 requires the declared xim:gtk3@3.24.43 SDK");
+        const fs::path xtst = mcpp::xpkg_dir("xim", "libXtst");
+        if (xtst.empty() || !fs::exists(xtst / "lib/libXtst.so"))
+            throw std::runtime_error("highgui-gtk3 requires the declared xim:libXtst@1.2.5 SDK");
+        // The Xtst payload exports its libraries/headers but not an xtst.pc
+        // asset. Supply that metadata from its exact declared payload, never
+        // from the host pkg-config database.
+        const auto pc_extra = out / "gtk-pkgconfig";
+        spew(pc_extra / "xtst.pc", "prefix=" + xtst.string() +
+             "\nlibdir=${prefix}/lib\nincludedir=${prefix}/include\n"
+             "Name: Xtst\nDescription: Declared XTest SDK\nVersion: 1.2.5\n"
+             "Requires: x11 xext xi\nLibs: -L${libdir} -lXtst\nCflags: -I${includedir}\n");
+        const auto flags = out / "gtk3-flags.txt";
+        const std::string command = "PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR=" + shell_quote(pc_extra.string() + ":" + pc)
+            + " pkg-config --cflags --libs gtk+-3.0 > " + shell_quote(flags.string());
+        if (std::system(command.c_str()))
+            throw std::runtime_error("pkg-config could not resolve the declared GTK3 SDK");
+        for (const auto& flag : flag_words(slurp(flags))) {
+            if (flag.starts_with("-I")) mcpp::include_dir(flag.substr(2).c_str());
+            else if (flag.starts_with("-L")) {
+                mcpp::link_search(flag.substr(2).c_str());
+                mcpp::runtime_search_dir(flag.substr(2).c_str());
+            } else if (flag.starts_with("-l")) mcpp::link_lib(flag.substr(2).c_str());
+            else if (flag == "-pthread") mcpp::link_flag(flag.c_str());
+            else { mcpp::cxxflag(flag.c_str()); mcpp::link_flag(flag.c_str()); }
+        }
+        mcpp::runtime_search_dir((fs::path(sdk) / "lib").string().c_str());
+        mcpp::define("HAVE_GTK");
+        mcpp::define("HAVE_GTK3");
+        mcpp::source("upstream/opencv/modules/highgui/src/window_gtk.cpp");
+        backend = "GTK3";
+    } else if (win32) {
+        mcpp::define("HAVE_WIN32UI");
+        mcpp::source("upstream/opencv/modules/highgui/src/window_w32.cpp");
+        for (const char* lib : {"user32", "gdi32", "comdlg32", "advapi32"}) mcpp::link_lib(lib);
+        backend = "WIN32UI";
+    } else if (cocoa) {
+        mcpp::define("HAVE_COCOA");
+        mcpp::source("upstream/opencv/modules/highgui/src/window_cocoa.mm");
+        mcpp::link_flag("-framework");
+        mcpp::link_flag("Cocoa");
+        backend = "COCOA";
+    }
+    spew(out / "opencv_highgui_config.hpp",
+         "#pragma once\n#define OPENCV_HIGHGUI_BUILTIN_BACKEND_STR \"" + backend + "\"\n"
+         + (backend == "NONE" ? "#define OPENCV_HIGHGUI_WITHOUT_BUILTIN_BACKEND 1\n" : ""));
+    return backend;
+}
+
+int main() try {
     fs::path man = mcpp::manifest_dir()[0] ? mcpp::manifest_dir() : ".";
 
     // 1. per-OS include dirs
@@ -136,6 +230,7 @@ int main() {
     }
     fs::path out = mcpp::out_dir();
     mcpp::include_dir(out.string().c_str());
+    const std::string gui = configure_highgui(out, os);
     inject_catalog(man, os, "core");
     std::vector<std::string> modules;
     std::istringstream module_list(slurp(man / "port/config/modules.txt"));
@@ -186,6 +281,7 @@ int main() {
     report << "\nJPEG: " << (mcpp::has_feature("imgcodecs-jpeg") ? "YES" : "NO")
            << "\nPNG: " << (mcpp::has_feature("imgcodecs-png") ? "YES" : "NO")
            << "\nFFmpeg: " << (mcpp::has_feature("videoio-ffmpeg") ? "YES" : "NO") << "\n";
+    report << "Window backend: " << gui << "\n";
     spew(out / "version_string.inc", c_string(report.str()) + "\n");
 
     // windows compiles through the generated/windows/tu/w*/ stub namespace (see
@@ -240,4 +336,7 @@ int main() {
     std::printf("opencv-m build.mcpp: include dirs for '%s' emitted\n", os.c_str());
     std::fflush(stdout);
     return 0;
+} catch (const std::exception& error) {
+    std::fprintf(stderr, "opencv-m: %s\n", error.what());
+    return 1;
 }
