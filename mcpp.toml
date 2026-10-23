@@ -595,6 +595,10 @@ implies = ["imgcodecs", "imgproc"]
 sources = ["src/videoio.cppm"]
 defines = ["HAVE_OPENCV_VIDEOIO"]
 
+[[features.videoio.flags]]
+glob = "**/modules/videoio/**"
+defines = ["ENABLE_PLUGINS", "NDEBUG", "__OPENCV_BUILD=1", "_USE_MATH_DEFINES", "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]
+
 [features.all-modules]
 implies = ["calib", "dnn", "features", "flann", "geometry", "highgui", "imgcodecs", "imgproc", "objdetect", "photo", "ptcloud", "stereo", "stitching", "video", "videoio"]
 
@@ -611,6 +615,15 @@ defines = ["HAVE_FFMPEG", "HAVE_FFMPEG_LIBAVDEVICE"]
 [features.videoio-v4l2]
 implies = ["videoio"]
 defines = ["HAVE_CAMV4L2"]
+
+[features.videoio-native]
+implies = ["videoio"]
+
+[features.videoio-msmf]
+implies = ["videoio"]
+
+[features.videoio-avfoundation]
+implies = ["videoio"]
 
 [features.unifont]
 implies = ["imgproc"]

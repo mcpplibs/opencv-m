@@ -1,0 +1,32 @@
+import std;
+import mcpplibs.mwrap.opencv;
+
+int main() {
+    struct Output {
+        std::filesystem::path path = "{{project.name}}.avi";
+        ~Output() { std::error_code error; std::filesystem::remove(path, error); }
+    } output;
+    const auto cameras = cv::videoio_registry::getCameraBackends();
+    for (auto backend : cameras)
+        std::println("Camera backend available: {} (no device opened)", cv::videoio_registry::getBackendName(backend));
+    cv::VideoWriter writer(output.path.string(), cv::CAP_FFMPEG,
+        cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 24.0, cv::Size(96, 64));
+    if (!writer.isOpened()) return 1;
+    for (int frame = 0; frame < 12; ++frame) {
+        cv::Mat image(64, 96, mcpplibs::mwrap::opencv::macros::CV_8UC3, cv::Scalar(30 + frame, 60, 90));
+        writer.write(image);
+    }
+    writer.release();
+    cv::VideoCapture reader(output.path.string(), cv::CAP_FFMPEG);
+    if (!reader.isOpened() || reader.getBackendName() != "FFMPEG") return 2;
+    cv::Mat decoded;
+    int count = 0;
+    while (reader.read(decoded)) {
+        if (decoded.rows != 64 || decoded.cols != 96 || decoded.channels() != 3) return 3;
+        cv::Mat expected(64, 96, mcpplibs::mwrap::opencv::macros::CV_8UC3, cv::Scalar(30 + count, 60, 90));
+        if (cv::norm(decoded, expected, cv::NORM_L1) / (64.0 * 96 * 3) >= 15.0) return 4;
+        ++count;
+    }
+    std::println("FFmpeg encoded and decoded {} frames", count);
+    return count == 12 ? 0 : 5;
+}

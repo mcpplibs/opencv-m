@@ -150,6 +150,9 @@ def generate():
         "imgcodecs-png": {"implies": ["imgcodecs"]},
         "videoio-ffmpeg": {"implies": ["videoio"], "defines": ["HAVE_FFMPEG", "HAVE_FFMPEG_LIBAVDEVICE"]},
         "videoio-v4l2": {"implies": ["videoio"], "defines": ["HAVE_CAMV4L2"]},
+        "videoio-native": {"implies": ["videoio"]},
+        "videoio-msmf": {"implies": ["videoio"]},
+        "videoio-avfoundation": {"implies": ["videoio"]},
         "unifont": {"implies": ["imgproc"], "defines": ["HAVE_UNIFONT"]},
         "highgui-native": {"implies": ["highgui", "imgcodecs"]},
         "highgui-gtk3": {"implies": ["highgui", "imgcodecs"]},
@@ -157,6 +160,9 @@ def generate():
         "highgui-cocoa": {"implies": ["highgui"]},
         "dnn-onnxruntime": {"implies": ["dnn"], "defines": ["HAVE_ONNXRUNTIME=1"]},
     })
+    features["videoio"]["flags"] = [{"glob": "**/modules/videoio/**", "defines": [
+        "ENABLE_PLUGINS", "NDEBUG", "__OPENCV_BUILD=1", "_USE_MATH_DEFINES",
+        "__STDC_CONSTANT_MACROS", "__STDC_FORMAT_MACROS", "__STDC_LIMIT_MACROS"]}]
     # GTK's pthread compiler mode is private to its implementation TU. Baking
     # it into a public BMI would require every consumer to use -pthread too.
     for name in ("highgui-native", "highgui-gtk3"):

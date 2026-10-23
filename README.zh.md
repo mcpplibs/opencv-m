@@ -85,6 +85,8 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | videoio | 视频 I/O API |
 | videoio-ffmpeg | 增加 FFmpeg 实现和 compat.ffmpeg 依赖 |
 | videoio-v4l2 | Linux V4L2，其他目标明确拒绝 |
+| videoio-native | 按目标选择 Linux V4L2、Windows Media Foundation 或 macOS AVFoundation |
+| videoio-msmf / videoio-avfoundation | 显式选择 Windows MSVC ABI / macOS 原生视频后端，拒绝目标不匹配 |
 | highgui | 只有 GUI API，当前窗口后端为 NONE |
 | highgui-native | Linux x86_64 glibc 选择 GTK3，Windows 选择 Win32，macOS 选择 Cocoa |
 | highgui-gtk3、highgui-win32、highgui-cocoa | 显式选择原生后端，目标不匹配时拒绝构建 |
@@ -137,3 +139,11 @@ FAST 保留 x86 AVX2 实现。八个新增模块的 OpenCL 内核尚未接入，
 
 根 LICENSE 为 Apache-2.0，包元数据与之保持一致。
 内置 OpenCV 为 Apache-2.0，各第三方组件保留其自身许可证。
+
+命名模板 `video` 使用 FFmpeg 编码并解码 12 帧生成图像，列出原生相机后端；不需要相机硬件。Linux V4L2 测试只验证注册和缺失设备路径，不能证明实体相机采集。
+
+```sh
+mcpp new video-demo --template mcpplibs.mwrap.opencv@5.0.0.1:video
+cd video-demo
+mcpp run
+```

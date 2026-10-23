@@ -214,6 +214,42 @@ static std::string configure_highgui(const fs::path& out, const std::string& os)
     return backend;
 }
 
+static std::string configure_videoio(const fs::path& man, const std::string& os) {
+    const bool native = mcpp::has_feature("videoio-native");
+    const bool v4l = mcpp::has_feature("videoio-v4l2") || (native && os == "linux");
+    const bool msmf = mcpp::has_feature("videoio-msmf") || (native && os == "windows");
+    const bool avf = mcpp::has_feature("videoio-avfoundation") || (native && os == "macosx");
+    if ((native && os != "linux" && os != "windows" && os != "macosx") ||
+        (v4l && os != "linux") || (msmf && os != "windows") || (avf && os != "macosx"))
+        throw std::runtime_error("selected native videoio backend does not support this target OS");
+    if (v4l) {
+        mcpp::define("HAVE_CAMV4L2");
+        if (!mcpp::has_feature("videoio-v4l2")) inject_catalog(man, os, "videoio-v4l2");
+        return "V4L2";
+    }
+    if (msmf) {
+        if (std::string(mcpp::target_env()) != "msvc")
+            throw std::runtime_error("videoio-msmf is supported with the Windows MSVC ABI SDK only");
+        mcpp::define("HAVE_MSMF");
+        mcpp::source("upstream/opencv/modules/videoio/src/cap_msmf.cpp");
+        for (const char* lib : {"mfplat", "mf", "mfuuid", "mfreadwrite", "strmiids", "dxgi",
+                                "shlwapi", "ole32", "oleaut32", "uuid", "comsuppw"})
+            mcpp::link_lib(lib);
+        return "MSMF";
+    }
+    if (avf) {
+        mcpp::define("HAVE_AVFOUNDATION");
+        mcpp::source("upstream/opencv/modules/videoio/src/cap_avfoundation_mac.mm");
+        for (const char* framework : {"Cocoa", "Accelerate", "AVFoundation", "CoreGraphics",
+                                     "CoreMedia", "CoreVideo", "QuartzCore"}) {
+            mcpp::link_flag("-framework");
+            mcpp::link_flag(framework);
+        }
+        return "AVFOUNDATION";
+    }
+    return "NONE";
+}
+
 int main() try {
     fs::path man = mcpp::manifest_dir()[0] ? mcpp::manifest_dir() : ".";
 
@@ -231,6 +267,7 @@ int main() try {
     fs::path out = mcpp::out_dir();
     mcpp::include_dir(out.string().c_str());
     const std::string gui = configure_highgui(out, os);
+    const std::string native_video = configure_videoio(man, os);
     if (mcpp::has_feature("dnn-onnxruntime")) {
         const std::string arch = mcpp::target_arch();
         const std::string env = mcpp::target_env();
@@ -304,6 +341,7 @@ int main() try {
            << "\nPNG: " << (mcpp::has_feature("imgcodecs-png") ? "YES" : "NO")
            << "\nFFmpeg: " << (mcpp::has_feature("videoio-ffmpeg") ? "YES" : "NO") << "\n";
     report << "Window backend: " << gui << "\n";
+    report << "Native video backend: " << native_video << "\n";
     report << "DNN ONNX Runtime: " << (mcpp::has_feature("dnn-onnxruntime") ? "CPU (1.25.1)" : "NO") << "\n";
     spew(out / "version_string.inc", c_string(report.str()) + "\n");
 

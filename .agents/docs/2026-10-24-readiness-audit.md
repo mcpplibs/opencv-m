@@ -69,3 +69,11 @@ The public repository listing proves repository creation/forking, not merge or r
 - https://github.com/mcpplibs/onnxruntime-m/pull/1
 - https://github.com/mcpplibs/mcpp-index/pull/564
 - https://github.com/mcpplibs/llama.cpp-m/pull/5
+
+## Native video and cross-platform text checkpoint
+
+- Added videoio-native with explicit videoio-msmf/videoio-avfoundation overrides. Linux uses the existing V4L2 catalog; Windows MSVC ABI uses Media Foundation; macOS uses the upstream macOS AVFoundation implementation. Target/backend mismatches fail during configuration.
+- Linux LLVM 23.1.3 strict testing with videoio-native,videoio-ffmpeg passed ten binaries. V4L2 registration/missing-device behavior passed, and FFmpeg encoded and decoded twelve generated frames with backend identity, dimensions and image error checks. This is not physical camera coverage.
+- Every native CI leg now runs this feature combination. Windows/macOS additionally exercise native H.264 MP4 encode/decode; those new checks remain pending. The named video template performs an FFmpeg roundtrip without camera hardware; its actual scaffold/build/run is being validated locally and in CI.
+- On c59b226, macOS, Linux LLVM and musl passed. Windows passed all sixteen module tests and the real Win32 window, then failed a generated ONNX header byte comparison due to checkout line ending conversion. Added LF attributes for wrapper text and disabled conversion for the pinned upstream tree/binary assets; the generated-model check passes locally. This does not yet prove Windows ORT execution.
+- Index f0f8e48 updates current llama CPU/Metal examples to b10069.3, which carries the portable LLVM 23 include fix. Historical descriptor versions remain unchanged. The replacement native runs are live; the prior b10069.2 failure is not waived.

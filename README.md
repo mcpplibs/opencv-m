@@ -91,6 +91,8 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | videoio | Video I/O API |
 | videoio-ffmpeg | Adds the FFmpeg implementation and compat.ffmpeg dependency |
 | videoio-v4l2 | Adds V4L2 on Linux; other targets are refused |
+| videoio-native | Select V4L2 on Linux, Media Foundation on Windows, or AVFoundation on macOS |
+| videoio-msmf / videoio-avfoundation | Explicit Windows MSVC ABI / macOS native video backends; mismatched targets are refused |
 | highgui | GUI API only; current window backend is NONE |
 | highgui-native | Select GTK3 on Linux x86_64 glibc, Win32 on Windows, or Cocoa on macOS |
 | highgui-gtk3, highgui-win32, highgui-cocoa | Explicit native backend; mismatched targets are refused |
@@ -152,3 +154,11 @@ maintained in mcpp-index/docs/mwrap.md.
 
 The root LICENSE is Apache-2.0 and the package metadata follows it. The vendored
 OpenCV sources are Apache-2.0; third-party components retain their own licenses.
+
+The named `video` template encodes and decodes 12 generated frames through FFmpeg and lists native camera backends without requiring a camera. Linux V4L2 tests cover registration and the missing-device path; physical camera capture remains unverified.
+
+```sh
+mcpp new video-demo --template mcpplibs.mwrap.opencv@5.0.0.1:video
+cd video-demo
+mcpp run
+```

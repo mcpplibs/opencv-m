@@ -241,6 +241,15 @@ jobs:
         shell: bash
         run: mcpp test --features highgui-native --timeout 60
 
+      - name: Native video backend and FFmpeg file roundtrips
+        shell: bash
+        run: mcpp test --features videoio-native,videoio-ffmpeg --strict --timeout 120
+
+      - name: Actual video project template
+        if: matrix.ort_toolchain
+        shell: bash
+        run: python3 tools/test_template.py --toolchain "${{ matrix.ort_toolchain }}" --template video
+
       - name: Candidate ORT SDK and wrapper index
         if: matrix.ort_toolchain
         uses: actions/checkout@v4
