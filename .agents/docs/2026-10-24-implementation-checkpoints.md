@@ -36,3 +36,10 @@
 - Module and source catalog lines now strip CRLF carriage returns; cvconfig is normalized before optional codec definitions are disabled.
 - tools/test_build_config.py executes the compiled build program against LF and CRLF fixtures and verifies identical selected modules, source directives and codec configuration. It passed locally and is included in the Linux GCC CI job.
 - GCC 16 and musl static core-only tests passed, as did GCC 16 and LLVM 23 PNG/JPEG roundtrips after the aggregate correction. Windows core tests passed in run 40015097526; complete feature verification follows on the new CI head.
+
+## Executable quickstart and documentation checkpoint
+
+- tools/test_template.py invoked the actual mcpp installed-package template renderer, verified the qualified self.name/version dependency, then built and ran the generated candidate consumer under LLVM 23.1.3. It wrote a 64x64 out.png successfully. This is a staged-source template test, not a published archive installation test.
+- Added this actual template flow to the Linux LLVM CI leg.
+- English/Chinese README now describe current feature selection, module and macro names, verified coverage and unfinished native GUI/ORT/full-module work. Removed inherited full-featured claims and broken example links.
+- Package metadata now agrees with the existing Apache-2.0 root LICENSE, without replacing or relicensing the existing license file. The image example explicitly selects required PNG/JPEG features.

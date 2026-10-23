@@ -214,6 +214,11 @@ jobs:
         shell: bash
         run: mcpp test --features imgcodecs-png,imgcodecs-jpeg
 
+      - name: Actual default project template
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: python3 tools/test_template.py --toolchain llvm@22.1.8
+
       - name: Feature tests (dnn + unifont module interfaces)
         if: matrix.features
         shell: bash

@@ -137,7 +137,7 @@ def generate():
     manifest = {
         "package": {"namespace": "mcpplibs.mwrap", "name": "opencv", "version": "5.0.0.1",
                     "description": "OpenCV 5.0.0 public C++ APIs through optional mwrap modules",
-                    "license": "MIT", "repo": "https://github.com/mcpplibs/opencv-m",
+                    "license": "Apache-2.0", "repo": "https://github.com/mcpplibs/opencv-m",
                     "metadata": {"mwrap": {"upstream-version": "5.0.0", "wrapper-revision": 1}}},
         "build": build, "target": targets,
         "dev-dependencies": {"compat": {"gtest": "1.15.2"}},

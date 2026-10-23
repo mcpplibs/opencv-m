@@ -5,7 +5,7 @@ namespace = "mcpplibs.mwrap"
 name = "opencv"
 version = "5.0.0.1"
 description = "OpenCV 5.0.0 public C++ APIs through optional mwrap modules"
-license = "MIT"
+license = "Apache-2.0"
 repo = "https://github.com/mcpplibs/opencv-m"
 
 [package.metadata]
