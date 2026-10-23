@@ -142,6 +142,14 @@ undefined `CV_MAT_SUBMAT_FLAG` reference by using the actual `CV_SUBMAT_FLAG`;
 the raw upstream macro is unchanged. Tests compare these helpers to real Mat
 allocations and ROI flags.
 
+For a facade-visible C++ inventory, first run `mcpp test --features all-modules
+--toolchain llvm@23.1.3 --strict`, then `python3 tools/audit_api.py --verify-exports`.
+The report separates declaration signatures, header ownership, internal linkage
+and listed exports, and compiles a separate import-only name-lookup consumer.
+Unloaded public headers and unlisted declarations remain review work; successful
+name lookup alone does not prove overload or algorithm coverage. CI publishes
+the inventory and consumer log for review.
+
 ## Repository structure and upgrades
 
 - upstream/opencv contains the pinned source; upstream/sources.lock.toml records provenance and archive SHA256.

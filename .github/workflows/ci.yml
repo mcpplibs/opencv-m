@@ -221,6 +221,24 @@ jobs:
         shell: bash
         run: mcpp test --features all-modules --strict --timeout 120
 
+      - name: C++ declaration and header coverage inventory
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: |
+          python3 tools/test_audit_api.py
+          python3 tools/audit_api.py --verify-exports
+
+      - name: Preserve C++ inventory for review
+        if: matrix.name == 'linux-llvm-22' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencv-cpp-inventory
+          path: |
+            target/api-audit/inventory.json
+            target/api-audit/includes.log
+            target/api-audit/export-consumer.log
+          if-no-files-found: error
+
       - name: Actual default project template
         if: matrix.name == 'linux-llvm-22'
         shell: bash

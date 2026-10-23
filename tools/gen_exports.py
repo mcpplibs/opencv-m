@@ -183,6 +183,17 @@ def main() -> None:
                 lines.append(f"    using {fqns}::{n};")
                 total += 1
             lines.append("}")
+        # OpenCV also owns public global aliases, CPU enums and helper types.
+        # Their original namespace must survive the module facade unchanged.
+        globals_file = REPO / "tools" / "curated" / f"{mod}.globals.txt"
+        if globals_file.exists():
+            for raw in globals_file.read_text().splitlines():
+                name = raw.split("#", 1)[0].strip()
+                if name:
+                    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                        raise ValueError(f"Invalid global export in {globals_file}: {name}")
+                    lines.append(f"export using ::{name};")
+                    total += 1
         (out_dir / f"{mod}.inc").write_text("\n".join(lines) + "\n")
         (out_dir / f"{mod}.skipped.txt").write_text("\n".join(sorted(set(skipped))) + "\n")
         print(f"{mod:10} {total:4} names   ({len(skipped)} skipped notes)")

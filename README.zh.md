@@ -94,9 +94,9 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | dnn-onnxruntime | 启用 dnn，并通过 mcpplibs.mwrap.onnxruntime 引入官方 ORT 1.25.1 CPU SDK |
 | unifont | Unicode/CJK 字体渲染，包含 imgproc |
 
-当前没有 full/all-modules 的完整功能承诺。GTK3 创建窗口、显示图像、处理事件和销毁窗口
-已在本地通过，Cocoa 已通过原生 CI，Win32 验证尚未完成；ORT CPU 推理和真实 session profile 已通过 Linux GCC/LLVM，
-Windows/macOS 验证仍待 CI。
+all-modules 选择 16 个主模块实现，不代表完整 API 或后端覆盖。GTK3 创建窗口、显示图像、处理事件和销毁窗口
+已在本地通过，Cocoa 和 Win32 窗口已通过原生 CI；ORT CPU 推理和真实 session profile 已通过 Linux GCC/LLVM 与 macOS，
+Windows 验证仍待 CI。
 只启用 highgui API 调用 imshow 仍会报告缺少窗口后端，需要同时选择后端 feature。
 
 ## 模块、API 与宏
@@ -127,6 +127,12 @@ cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
 声明标记和控制流宏仍通过文本兼容头提供。类型化 `CV_IS_SUBMAT` 使用实际存在的
 `CV_SUBMAT_FLAG`，修复上游 5.0.0 对未定义 `CV_MAT_SUBMAT_FLAG` 的引用；原始宏不改动。
 测试通过实际 Mat 分配、读写与 ROI 标记验证布局。
+
+需要审计当前封装头可见的 C++ API 时，先运行
+`mcpp test --features all-modules --toolchain llvm@23.1.3 --strict`，再运行
+`python3 tools/audit_api.py --verify-exports`。报告分别记录签名、所属头、内部链接与导出列表，
+并编译独立的纯 import 消费者检查名称查找。未加载的公共头和未列出的声明仍需审阅；
+名称可见不等于全部重载或算法行为已覆盖。CI 保存报告与消费者日志供 review。
 
 ## 仓库布局与升级
 
