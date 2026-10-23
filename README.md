@@ -5,9 +5,9 @@ The candidate package is **5.0.0.1**: upstream 5.0.0 plus wrapper revision 1.
 
 **English** · [中文](README.zh.md)
 
-This branch is an implementation checkpoint. Eight main modules are integrated.
-The native GTK3 window backend has passed local Linux tests; Win32/Cocoa need
-native CI validation. Remaining main modules and the ONNX Runtime bridge are
+This branch is an implementation checkpoint. All sixteen main modules are integrated and have passed local Linux GCC/LLVM tests.
+The native GTK3 window backend has passed local Linux tests and Cocoa passed
+native macOS CI; Win32 validation is pending. Public API coverage auditing and the ONNX Runtime bridge are
 still being implemented. Passing the current CI does not establish full OpenCV support.
 
 ## Build the checkout
@@ -17,6 +17,7 @@ Use mcpp **2026.10.21.1**, pinned in .xlings.json and CI:
 ```sh
 mcpp test
 mcpp test --features imgcodecs-png,imgcodecs-jpeg
+mcpp test --features all-modules --strict
 mcpp test --features dnn,unifont
 python3 tools/test_template.py
 ```
@@ -68,6 +69,8 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | Feature | Current behavior |
 |---|---|
 | imgproc, flann, geometry | Selected algorithm modules |
+| calib, features, objdetect, photo, ptcloud, stereo, stitching, video | Remaining upstream main C++ modules |
+| all-modules | All sixteen main modules; external codecs, GUI backends and SDKs stay explicit |
 | imgcodecs | Image codec API and common source set |
 | imgcodecs-png, imgcodecs-jpeg | Enable the corresponding codec and imply imgcodecs |
 | videoio | Video I/O API |
@@ -80,8 +83,8 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | unifont | Unicode/CJK font rendering, implying imgproc |
 
 There is no current full/all-modules promise. GTK3 window creation, image display,
-event processing and destruction have passed locally. Win32/Cocoa validation is
-pending. dnn-onnxruntime remains planned. Calling imshow with only the API-only
+event processing and destruction have passed locally; Cocoa passed native CI.
+Win32 validation is pending. dnn-onnxruntime remains planned. Calling imshow with only the API-only
 highgui feature still reports missing window backend support; enable a backend.
 
 ## Modules, API and macros
@@ -116,10 +119,14 @@ qualified names: use raw macro and typed-mapping forms in separate contexts.
 - src contains wrapper interfaces and adapters; generated contains stable snapshots.
 - build.mcpp writes feature-specific configuration into its own output directory.
 - tools/generate_build.py regenerates the manifest, dependency map and source catalogs.
+- tools/check_upstream.py verifies retained file bytes against the pinned upstream archive.
 - templates and tests contain executable consumer examples and behavior checks.
 
-The current import is still pruned to eight main modules. API completeness,
-additional backends and installed archives remain release gates. Design and
+The import includes all sixteen main C++ modules. Newly integrated SIFT and
+pyramidal optical-flow dispatch use baseline implementations; FAST retains its
+x86 AVX2 TU. OpenCL kernels for the eight new modules are not integrated and
+configuration explicitly refuses enabling them. API completeness, additional
+backends and installed archives remain release gates. Design and
 implementation evidence live under .agents/docs; the common mwrap contract is
 maintained in mcpp-index/docs/mwrap.md.
 

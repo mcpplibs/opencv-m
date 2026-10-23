@@ -231,6 +231,18 @@ int main() try {
     fs::path out = mcpp::out_dir();
     mcpp::include_dir(out.string().c_str());
     const std::string gui = configure_highgui(out, os);
+    // Newly integrated modules use the upstream baseline dispatch path.
+    // Their optional OpenCL backends remain unavailable until actual kernel
+    // embeddings and runtime validation are provided; never fake that flag.
+    for (const char* name : {"features", "objdetect", "photo", "ptcloud", "stereo", "stitching", "video"}) {
+        spew(out / (std::string("opencl_kernels_") + name + ".hpp"),
+             "#pragma once\n#include <opencv2/core/ocl.hpp>\n"
+             "#include <opencv2/core/ocl_genbase.hpp>\n#include <opencv2/core/opencl/ocl_defs.hpp>\n"
+             "#ifdef HAVE_OPENCL\n#error OpenCL kernels for this module are not integrated\n#endif\n");
+    }
+    for (const char* name : {"sift", "lkpyramid"})
+        spew(out / (std::string(name) + ".simd_declarations.hpp"),
+             "#define CV_CPU_DISPATCH_MODES_ALL BASELINE\n");
     inject_catalog(man, os, "core");
     std::vector<std::string> modules;
     std::istringstream module_list(slurp(man / "port/config/modules.txt"));

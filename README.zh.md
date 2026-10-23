@@ -5,8 +5,8 @@
 
 [English](README.md) · **中文**
 
-本分支是实现 checkpoint。目前接入八个主模块，GTK3 原生窗口已通过 Linux 本地测试，
-Win32/Cocoa 等待原生 CI 验证；其余主模块和 ORT 桥接仍在实施。
+本分支是实现 checkpoint。目前已接入全部十六个主模块，并通过 Linux GCC/LLVM 本地测试；GTK3 原生窗口也已通过本地测试，
+Cocoa 已通过原生 CI，Win32 尚待结果；公共 API 覆盖审计和 ORT 桥接仍在实施。
 当前 CI 通过不代表已经完整支持 OpenCV。
 
 ## 构建本地 checkout
@@ -16,6 +16,7 @@ Win32/Cocoa 等待原生 CI 验证；其余主模块和 ORT 桥接仍在实施�
 ```sh
 mcpp test
 mcpp test --features imgcodecs-png,imgcodecs-jpeg
+mcpp test --features all-modules --strict
 mcpp test --features dnn,unifont
 python3 tools/test_template.py
 ```
@@ -63,6 +64,8 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | Feature | 当前行为 |
 |---|---|
 | imgproc、flann、geometry | 按需启用对应算法模块 |
+| calib、features、objdetect、photo、ptcloud、stereo、stitching、video | 其余上游主仓库 C++ 模块 |
+| all-modules | 全部十六个主模块；外部 codec、窗口后端和 SDK 仍显式选择 |
 | imgcodecs | 图像 codec API 与通用源码 |
 | imgcodecs-png、imgcodecs-jpeg | 启用对应格式，并包含 imgcodecs |
 | videoio | 视频 I/O API |
@@ -75,7 +78,7 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | unifont | Unicode/CJK 字体渲染，包含 imgproc |
 
 当前没有 full/all-modules 的完整功能承诺。GTK3 创建窗口、显示图像、处理事件和销毁窗口
-已在本地通过，Win32/Cocoa 验证尚未完成；dnn-onnxruntime 仍待实现。
+已在本地通过，Cocoa 已通过原生 CI，Win32 验证尚未完成；dnn-onnxruntime 仍待实现。
 只启用 highgui API 调用 imshow 仍会报告缺少窗口后端，需要同时选择后端 feature。
 
 ## 模块、API 与宏
@@ -106,9 +109,12 @@ cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
 - src 保存模块接口和适配，generated 保存稳定生成物。
 - build.mcpp 将 feature 相关配置写入自身输出目录。
 - tools/generate_build.py 生成 manifest、依赖图与源码清单。
+- tools/check_upstream.py 对照 SHA256 固定的上游归档验证保留文件字节。
 - templates 与 tests 保存可执行消费者和行为验证。
 
-当前上游导入仍只包含八个主模块。API 完整性、新后端和安装归档均是后续发布门槛。
+当前已导入全部十六个主仓库 C++ 模块。新增 SIFT 与金字塔光流使用 baseline dispatch，
+FAST 保留 x86 AVX2 实现。八个新增模块的 OpenCL 内核尚未接入，配置会明确拒绝启用，
+不会把占位头视为 OpenCL 支持。API 完整性、新后端和安装归档仍是后续发布门槛。
 设计与实施证据位于 .agents/docs；共同 mwrap 规范维护在 mcpp-index/docs/mwrap.md。
 
 ## 许可证

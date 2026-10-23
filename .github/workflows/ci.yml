@@ -214,6 +214,10 @@ jobs:
         shell: bash
         run: mcpp test --features imgcodecs-png,imgcodecs-jpeg
 
+      - name: All main modules and generated-input algorithm behavior
+        shell: bash
+        run: mcpp test --features all-modules --strict --timeout 120
+
       - name: Actual default project template
         if: matrix.name == 'linux-llvm-22'
         shell: bash

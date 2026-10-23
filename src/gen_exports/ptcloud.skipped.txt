@@ -1,0 +1,3 @@
+non-cv: class
+odd-name: cv.OdometrySettings.operator=
+odd-name: cv.VolumeSettings.operator=

@@ -17,7 +17,7 @@ wrapper-revision = 1
 [build]
 jobs = 6
 sources = ["src/opencv.cppm", "src/core.cppm", "src/macros.cppm"]
-include_dirs = ["port/include", "generated/common", "upstream/opencv", "upstream/opencv/3rdparty/dlpack/include", "upstream/opencv/3rdparty/libjpeg-turbo/src", "upstream/opencv/3rdparty/libjpeg-turbo/simd/nasm", "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64", "upstream/opencv/3rdparty/zlib", "upstream/opencv/modules/core/include", "upstream/opencv/modules/flann/include", "upstream/opencv/modules/geometry/include", "upstream/opencv/modules/imgproc/include", "upstream/opencv/3rdparty/mlas/inc", "upstream/opencv/3rdparty/mlas/lib", "upstream/opencv/modules/dnn/include", "upstream/opencv/modules/dnn/misc/caffe", "upstream/opencv/modules/dnn/misc/tensorflow", "upstream/opencv/modules/dnn/misc/onnx", "upstream/opencv/modules/dnn/misc/tflite", "upstream/opencv/3rdparty/flatbuffers/include", "upstream/opencv/3rdparty/protobuf/src", "upstream/opencv/3rdparty/libpng", "upstream/opencv/modules/imgcodecs/include", "upstream/opencv/modules/videoio/include", "upstream/opencv/modules/highgui/include"]
+include_dirs = ["port/include", "generated/common", "upstream/opencv", "upstream/opencv/3rdparty/dlpack/include", "upstream/opencv/3rdparty/libjpeg-turbo/src", "upstream/opencv/3rdparty/libjpeg-turbo/simd/nasm", "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64", "upstream/opencv/3rdparty/zlib", "upstream/opencv/modules/core/include", "upstream/opencv/modules/flann/include", "upstream/opencv/modules/geometry/include", "upstream/opencv/modules/imgproc/include", "upstream/opencv/3rdparty/mlas/inc", "upstream/opencv/3rdparty/mlas/lib", "upstream/opencv/modules/dnn/include", "upstream/opencv/modules/dnn/misc/caffe", "upstream/opencv/modules/dnn/misc/tensorflow", "upstream/opencv/modules/dnn/misc/onnx", "upstream/opencv/modules/dnn/misc/tflite", "upstream/opencv/3rdparty/flatbuffers/include", "upstream/opencv/3rdparty/protobuf/src", "upstream/opencv/3rdparty/libpng", "upstream/opencv/modules/imgcodecs/include", "upstream/opencv/modules/videoio/include", "upstream/opencv/modules/highgui/include", "upstream/opencv/modules/calib/include", "upstream/opencv/modules/features/include", "upstream/opencv/modules/objdetect/include", "upstream/opencv/modules/photo/include", "upstream/opencv/modules/ptcloud/include", "upstream/opencv/modules/stereo/include", "upstream/opencv/modules/stitching/include", "upstream/opencv/modules/video/include"]
 defines = ["Z_PREFIX"]
 
 [target]
@@ -111,6 +111,38 @@ glob = "**/tu/jpeg16/**"
 cflags = ["-fvisibility=hidden"]
 cxxflags = ["-fvisibility=hidden"]
 
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/calib/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/features/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/objdetect/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/photo/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/ptcloud/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/stereo/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/stitching/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(unix)".build.flags]]
+glob = "**/modules/video/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
 [target."cfg(linux)"]
 
 [target."cfg(linux)".build]
@@ -176,6 +208,11 @@ cxxflags = ["-msse3"]
 glob = "generated/**"
 cflags = ["-msse3"]
 cxxflags = ["-msse3"]
+
+[[target."cfg(linux)".build.flags]]
+glob = "**/features/src/fast.avx2.cpp"
+cxxflags = ["-mavx2"]
+defines = ["CV_CPU_COMPILE_AVX2=1", "CV_CPU_DISPATCH_MODE=AVX2"]
 
 [target."cfg(macos)"]
 
@@ -309,6 +346,43 @@ glob = "generated/windows/tu/**"
 cflags = ["-msse3"]
 cxxflags = ["-msse3"]
 
+[[target."cfg(windows)".build.flags]]
+glob = "**/features/src/fast.avx2.cpp"
+cxxflags = ["-mavx2"]
+defines = ["CV_CPU_COMPILE_AVX2=1", "CV_CPU_DISPATCH_MODE=AVX2"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/calib/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/features/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/objdetect/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/photo/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/ptcloud/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/stereo/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/stitching/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
+[[target."cfg(windows)".build.flags]]
+glob = "**/modules/video/**"
+defines = ["__OPENCV_BUILD=1", "NDEBUG"]
+
 [target.x86_64-linux-musl]
 linkage = "static"
 
@@ -331,6 +405,11 @@ gtest = "1.15.2"
 
 [features]
 default = []
+
+[features.calib]
+implies = ["flann", "geometry", "imgproc", "objdetect", "stereo"]
+sources = ["src/calib.cppm"]
+defines = ["HAVE_OPENCV_CALIB"]
 
 [features.dnn]
 implies = ["geometry", "imgproc"]
@@ -451,6 +530,11 @@ defines = ["CV_CPU_COMPILE_AVX2=1", "CV_CPU_COMPILE_AVX512_COMMON=1", "CV_CPU_CO
 glob = "generated/windows/tu/wdnn/dnn/third_party_opencv-5.0.0_modules_dnn_src_backend.cpp"
 defines = ["DEBUG_POSTFIX=d"]
 
+[features.features]
+implies = ["geometry", "imgproc"]
+sources = ["src/features.cppm"]
+defines = ["HAVE_OPENCV_FEATURES"]
+
 [features.flann]
 implies = []
 sources = ["src/flann.cppm"]
@@ -476,10 +560,43 @@ implies = ["geometry"]
 sources = ["src/imgproc.cppm"]
 defines = ["HAVE_OPENCV_IMGPROC"]
 
+[features.objdetect]
+implies = ["features", "geometry", "imgproc"]
+sources = ["src/objdetect.cppm"]
+defines = ["HAVE_OPENCV_OBJDETECT"]
+
+[features.photo]
+implies = ["geometry", "imgproc"]
+sources = ["src/photo.cppm"]
+defines = ["HAVE_OPENCV_PHOTO"]
+
+[features.ptcloud]
+implies = ["flann", "geometry", "imgproc"]
+sources = ["src/ptcloud.cppm"]
+defines = ["HAVE_OPENCV_PTCLOUD"]
+
+[features.stereo]
+implies = ["geometry", "imgproc"]
+sources = ["src/stereo.cppm"]
+defines = ["HAVE_OPENCV_STEREO"]
+
+[features.stitching]
+implies = ["features", "flann", "geometry", "imgproc"]
+sources = ["src/stitching.cppm"]
+defines = ["HAVE_OPENCV_STITCHING"]
+
+[features.video]
+implies = ["imgproc"]
+sources = ["src/video.cppm"]
+defines = ["HAVE_OPENCV_VIDEO"]
+
 [features.videoio]
 implies = ["imgcodecs", "imgproc"]
 sources = ["src/videoio.cppm"]
 defines = ["HAVE_OPENCV_VIDEOIO"]
+
+[features.all-modules]
+implies = ["calib", "dnn", "features", "flann", "geometry", "highgui", "imgcodecs", "imgproc", "objdetect", "photo", "ptcloud", "stereo", "stitching", "video", "videoio"]
 
 [features.imgcodecs-jpeg]
 implies = ["imgcodecs"]

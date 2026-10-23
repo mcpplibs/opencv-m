@@ -93,6 +93,7 @@ def generate():
     dependencies = {name: module_dependencies(name) for name in modules}
     (CONFIG / "module-dependencies.json").write_text(json.dumps(dependencies, indent=2) + "\n")
     targets = copy.deepcopy(config["target"])
+    added_modules = ["calib", "features", "objdetect", "photo", "ptcloud", "stereo", "stitching", "video"]
     for predicate, target in targets.items():
         build = target.get("build", {})
         if "sources" in build:
@@ -101,6 +102,18 @@ def generate():
             for pattern in build.pop("sources"):
                 for path in expand(pattern):
                     groups.setdefault(source_group(path), set()).add(path)
+            # Upstream's default module source glob is recursive. Keep all
+            # implementation subdirectories, including barcode/aruco/ccm and
+            # tracking; architecture-specific FAST is a separate x86 TU.
+            for name in added_modules:
+                sources = (ROOT / "upstream/opencv/modules" / name / "src").rglob("*.cpp")
+                groups[name] = {p.relative_to(ROOT).as_posix() for p in sources
+                                if not re.search(r"\.(?:avx\w*|sse\w*|neon)\.cpp$", p.name)}
+            if os_name in ("linux", "windows"):
+                groups["features"].add("upstream/opencv/modules/features/src/fast.avx2.cpp")
+                build.setdefault("flags", []).append({
+                    "glob": "**/features/src/fast.avx2.cpp", "cxxflags": ["-mavx2"],
+                    "defines": ["CV_CPU_COMPILE_AVX2=1", "CV_CPU_DISPATCH_MODE=AVX2"]})
             directory = CONFIG / "sources" / os_name
             directory.mkdir(parents=True, exist_ok=True)
             for group, paths in sorted(groups.items()):
@@ -126,6 +139,7 @@ def generate():
             continue
         features[name] = {"implies": dependencies[name], "sources": [f"src/{name}.cppm"],
                           "defines": ["HAVE_OPENCV_" + name.upper()]}
+    features["all-modules"] = {"implies": [name for name in modules if name != "core"]}
     # Retain the upstream DNN-specific TU flags, but gate all sources through
     # the module feature and the per-target source catalogs.
     if "dnn" in features:
@@ -151,6 +165,13 @@ def generate():
         name: {"xim:gtk3": "3.24.43", "xim:libXtst": "1.2.5"}
         for name in ("highgui-native", "highgui-gtk3")}
     build = copy.deepcopy(config["build"])
+    for name in added_modules:
+        build["include_dirs"].append(f"upstream/opencv/modules/{name}/include")
+        # These are upstream implementation flags, never public BMI flags.
+        targets["cfg(unix)"]["build"]["flags"].append({
+            "glob": f"**/modules/{name}/**", "defines": ["__OPENCV_BUILD=1", "NDEBUG"]})
+        targets["cfg(windows)"]["build"]["flags"].append({
+            "glob": f"**/modules/{name}/**", "defines": ["__OPENCV_BUILD=1", "NDEBUG"]})
     # The bundled zlib is an implementation detail, not another provider of
     # the public zlib ABI used by GUI SDKs and other dependencies.
     build.setdefault("defines", []).append("Z_PREFIX")

@@ -1,8 +1,16 @@
+calib
 core
 dnn
+features
 flann
 geometry
 highgui
 imgcodecs
 imgproc
+objdetect
+photo
+ptcloud
+stereo
+stitching
+video
 videoio

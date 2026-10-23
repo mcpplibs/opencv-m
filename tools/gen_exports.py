@@ -24,7 +24,8 @@ from collections import defaultdict
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-MODULE_ORDER = ["core", "imgproc", "imgcodecs", "videoio", "highgui", "flann", "geometry", "dnn"]
+MODULE_ORDER = ["core", "imgproc", "imgcodecs", "videoio", "highgui", "flann", "geometry", "dnn",
+                "features", "objdetect", "stereo", "calib", "photo", "ptcloud", "stitching", "video"]
 SKIP_HEADER_PARTS = ("detail", "legacy", "private", "cuda", "opencl", "hal",
                      "utils", "llapi", "parallel", "detection_based_tracker")
 SKIP_NS = ("detail", "internal", "traits", "hal", "instr", "utils", "samples",
@@ -34,7 +35,7 @@ SKIP_NS = ("detail", "internal", "traits", "hal", "instr", "utils", "samples",
 def opencv_root() -> Path:
     if len(sys.argv) > 1:
         return Path(sys.argv[1]).resolve()
-    return REPO / "third_party" / "opencv-5.0.0"  # vendored source
+    return REPO / "upstream" / "opencv"
 
 
 def module_headers(root: Path, mod: str):
