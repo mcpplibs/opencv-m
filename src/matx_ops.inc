@@ -1,35 +1,14 @@
-// matx_ops.inc — hand-maintained replacement surface for the Matx/Vec
-// algebra (R1): the namespace-scope `static inline` operator templates and
-// reduction helpers of core/matx.hpp + core/matx.inl.hpp, which have
-// internal linkage upstream and cannot cross a module boundary. Textually
-// included after core_ops.inc in the same module purview; upstream's
-// unqualified saturate_cast calls become fully qualified
-// cv::opencv_m_repl::saturate_cast (gcc16 counts GMF-internal upstream
-// declarations as overload candidates during importer-side instantiation —
-// unqualified calls would be ambiguous).
+// Matx/Vec namespace operators and reductions retain SDK template argument order.
+// The adapter imports original class declarations from detail.core before
+// compiling this file in detail.matx. Keeping these exact patterns beside the
+// textual SDK classes in one producer crashes Clang22 importer lookup.
 //
-// These are self-contained reimplementations (no calls into TU-local
-// upstream helpers): the Matx_AddOp/SubOp/ScaleOp/MatMulOp ctor-tag paths
-// and base.hpp's static-inline normL1/normL2Sqr/normInf are replaced by
-// explicit element loops over the public .val arrays, transcribed 1:1 from
-// matx.inl.hpp — accumulator types and saturate_cast placement included.
-// cv::LU and cv::cv_abs are called (CV_EXPORTS resp. plain-inline external
-// linkage upstream — reachable, not redefined).
-//
-// Deliberately NOT replaced here:
-//  * normalize(Vec)      — plain `inline` upstream (external linkage), not
-//    static; already re-exported by gen_exports/core.inc `using cv::normalize;`.
-//  * Matx members (inv/solve/t/mul/div/ddot/…), Vec members (cross/conj/…)
-//    — member functions, cross the boundary with the class.
-//  * operations.hpp augmenting ops (Mat += Matx, Mat_ ^= Matx, …) — static
-//    inline but Mat-based (cv::add/gemm/…); Mat/MatExpr surface lives in
-//    core_ops.inc.
-//  * operations.hpp randu<_Tp>(), format(), print() family — static inline
-//    but not Matx/Vec algebra (Mat/Formatter based), out of R1 scope.
-//
-// Mixed TUs (textual <opencv2/…> include + import): the header's internal
-// operators and these module operators are both visible there — calls on
-// value types become ambiguous. In mixed TUs prefer member/field forms.
+// Arithmetic bodies use the SDK's public .val storage, accumulator types and
+// saturation points. Calls to the module scalar conversion adapter avoid GCC's
+// ambiguous lookup of TU-local SDK saturate_cast during importer instantiation.
+// Original class members (inv/solve/t/mul/div/ddot/cross/conj) are not replaced.
+// Mat/MatExpr helpers and other operations.hpp adapters live in detail.core.
+// Full textual SDK mixing still has the documented compiler-specific limits.
 
 export namespace cv {
 // inline namespace: distinct entities from the upstream TU-local ones (no
@@ -37,27 +16,12 @@ export namespace cv {
 // ADL on the importer side, where the upstream internals are invisible.
 inline namespace opencv_m_repl {
 
-// ── Matx comma-initializer (upstream: CV_DEPRECATED_EXTERNAL static inline) ─
-// NOTE all two-typename / extra-NTTP upstream shapes in this file are
-// reformulated over whole deduced operand types: serialized into a module
-// BMI, templates whose parameters are not all pinned by the first argument
-// (e.g. template<typename _Tp, typename _T2, int m, int n>, or the 4-int
-// Matx multiply below) poison clang 20/22's lookup for that NAME — any use
-// of the operator on ANY cv type in an importer segfaults the frontend
-// (AddArgumentDependentLookupCandidates / InstantiateFunctionDefinition;
-// gcc16 fine; minimal repros archived 2026-07-21). The whole-type form has
-// identical call semantics; in mixed TUs upstream's exact-pattern
-// static-inline templates are more specialized and win (they are TU-local
-// and defined there), pure-import TUs only ever see these.
-template<typename _MA, typename _T2>
-    requires opencv_m_pick<typename _MA::value_type>
-          && __is_same(_MA, typename _MA::mat_type)
-CV_DEPRECATED_EXTERNAL inline
-MatxCommaInitializer<typename _MA::value_type, (int)_MA::rows, (int)_MA::cols>
-operator << (const _MA& mtx, _T2 val)
+// ── Matx comma-initializer (upstream template argument order retained) ─
+template<typename _Tp, typename _T2, int m, int n> requires opencv_m_pick<_Tp>
+[[deprecated]] inline MatxCommaInitializer<_Tp, m, n>
+operator << (const Matx<_Tp, m, n>& mtx, _T2 val)
 {
-    using _Tp = typename _MA::value_type;
-    MatxCommaInitializer<_Tp, (int)_MA::rows, (int)_MA::cols> ci((_MA*)&mtx);
+    MatxCommaInitializer<_Tp, m, n> ci((Matx<_Tp, m, n>*)&mtx);
     ci.dst->val[ci.idx++] = cv::opencv_m_repl::saturate_cast<_Tp>(val);
     return ci;
 }
@@ -68,19 +32,9 @@ operator << (const _MA& mtx, _T2 val)
 // the CV_EXPORTS cv::LU proxy (instantiable for float/double only, as
 // upstream). Small-size arithmetic runs in _Tp and converts to double at
 // return, exactly like the upstream functors.
-// determinant: not the upstream-shaped `template<typename _Tp, int m>
-// (const Matx<_Tp, m, m>&)` form — the repeated NTTP inside one parameter
-// type is another spelling of the clang 20/22 BMI ADL-poisoning bug that hit
-// operator* below (any lookup of the NAME determinant in an importer
-// segfaults). Deduce the Matx whole, encode squareness in the constraint.
-template<typename _MA>
-    requires opencv_m_pick<typename _MA::value_type>
-          && __is_same(_MA, typename _MA::mat_type)
-          && ((int)_MA::rows == (int)_MA::cols)
-inline double determinant(const _MA& a)
+template<typename _Tp, int m> requires opencv_m_pick<_Tp>
+inline double determinant(const Matx<_Tp, m, m>& a)
 {
-    using _Tp = typename _MA::value_type;
-    constexpr int m = (int)_MA::rows;
     if constexpr (m == 1)
         return a.val[0];
     else if constexpr (m == 2)
@@ -153,25 +107,17 @@ template<typename _Tp, int m, int n> requires opencv_m_pick<_Tp> inline double n
 }
 
 // ── Matx algebra (upstream: static inline, matx.hpp/matx.inl.hpp) ───────
-template<typename _MA, typename _MB>
-    requires opencv_m_pick<typename _MA::value_type>
-          && __is_same(_MA, typename _MA::mat_type)
-          && __is_same(_MB, Matx<typename _MB::value_type, (int)_MA::rows, (int)_MA::cols>)
-inline _MA& operator += (_MA& a, const _MB& b)
+template<typename _Tp1, typename _Tp2, int m, int n> requires opencv_m_pick<_Tp1>
+inline Matx<_Tp1, m, n>& operator += (Matx<_Tp1, m, n>& a, const Matx<_Tp2, m, n>& b)
 {
-    using _Tp1 = typename _MA::value_type;
-    for (int i = 0; i < (int)_MA::channels; i++)
+    for (int i = 0; i < m*n; i++)
         a.val[i] = cv::opencv_m_repl::saturate_cast<_Tp1>(a.val[i] + b.val[i]);
     return a;
 }
-template<typename _MA, typename _MB>
-    requires opencv_m_pick<typename _MA::value_type>
-          && __is_same(_MA, typename _MA::mat_type)
-          && __is_same(_MB, Matx<typename _MB::value_type, (int)_MA::rows, (int)_MA::cols>)
-inline _MA& operator -= (_MA& a, const _MB& b)
+template<typename _Tp1, typename _Tp2, int m, int n> requires opencv_m_pick<_Tp1>
+inline Matx<_Tp1, m, n>& operator -= (Matx<_Tp1, m, n>& a, const Matx<_Tp2, m, n>& b)
 {
-    using _Tp1 = typename _MA::value_type;
-    for (int i = 0; i < (int)_MA::channels; i++)
+    for (int i = 0; i < m*n; i++)
         a.val[i] = cv::opencv_m_repl::saturate_cast<_Tp1>(a.val[i] - b.val[i]);
     return a;
 }
@@ -302,29 +248,10 @@ Matx<_Tp, m, n> operator - (const Matx<_Tp, m, n>& a)
         M.val[i] = cv::opencv_m_repl::saturate_cast<_Tp>(a.val[i] * -1);
     return M;
 }
-// Matx x Matx multiplication. NOT the upstream-shaped 4-parameter form
-// (template<typename _Tp, int m, int n, int l> over Matx<_Tp,m,l> x
-// Matx<_Tp,l,n>): serialized into a module BMI, that exact shape poisons
-// clang 20/22's ADL for the NAME operator* — every `x * y` on ANY cv type
-// in an importer segfaults the compiler frontend inside
-// AddArgumentDependentLookupCandidates (gcc16 is fine; minimal repro
-// archived 2026-07-21). Deduce the two Matx operands whole instead:
-// mat_type self-check keeps it Matx-only (a Vec's mat_type is Matx<T,cn,1>,
-// never Vec itself), the value_type/cols==rows checks encode the same
-// dimension contract. In mixed TUs upstream's exact-pattern static-inline
-// template is more specialized and wins (it is TU-local and defined there);
-// pure-import TUs only ever see this one.
-template<typename _MA, typename _MB>
-    requires opencv_m_pick<typename _MA::value_type>
-          && __is_same(_MA, typename _MA::mat_type)
-          && __is_same(_MB, typename _MB::mat_type)
-          && __is_same(typename _MA::value_type, typename _MB::value_type)
-          && ((int)_MA::cols == (int)_MB::rows)
-inline Matx<typename _MA::value_type, (int)_MA::rows, (int)_MB::cols>
-operator * (const _MA& a, const _MB& b)
+// Preserve the SDK template order: element, output rows, output columns, inner dimension.
+template<typename _Tp, int m, int n, int l> requires opencv_m_pick<_Tp>
+inline Matx<_Tp, m, n> operator * (const Matx<_Tp, m, l>& a, const Matx<_Tp, l, n>& b)
 {
-    using _Tp = typename _MA::value_type;
-    constexpr int m = (int)_MA::rows, n = (int)_MB::cols, l = (int)_MA::cols;
     Matx<_Tp, m, n> M; // upstream Matx_MatMulOp: _Tp accumulator, no saturate
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
@@ -365,15 +292,11 @@ bool operator != (const Matx<_Tp, m, n>& a, const Matx<_Tp, m, n>& b)
 }
 
 // ── Vec comma-initializer (upstream: CV_DEPRECATED_EXTERNAL static inline) ─
-template<typename _VA, typename _T2>
-    requires opencv_m_pick<typename _VA::value_type>
-          && __is_same(_VA, Vec<typename _VA::value_type, (int)_VA::channels>)
-CV_DEPRECATED_EXTERNAL inline
-VecCommaInitializer<typename _VA::value_type, (int)_VA::channels>
-operator << (const _VA& vec, _T2 val)
+template<typename _Tp, typename _T2, int cn> requires opencv_m_pick<_Tp>
+[[deprecated]] inline VecCommaInitializer<_Tp, cn>
+operator << (const Vec<_Tp, cn>& vec, _T2 val)
 {
-    using _Tp = typename _VA::value_type;
-    VecCommaInitializer<_Tp, (int)_VA::channels> ci((_VA*)&vec);
+    VecCommaInitializer<_Tp, cn> ci((Vec<_Tp, cn>*)&vec);
     ci.dst->val[ci.idx++] = cv::opencv_m_repl::saturate_cast<_Tp>(val);
     return ci;
 }
@@ -381,25 +304,17 @@ operator << (const _VA& vec, _T2 val)
 // ── Vec algebra (upstream: static inline, matx.hpp/matx.inl.hpp) ────────
 // Note: ==/!= and Matx-typed scalar overloads apply to Vec through
 // derived-to-base deduction against the Matx templates above, as upstream.
-template<typename _VA, typename _VB>
-    requires opencv_m_pick<typename _VA::value_type>
-          && __is_same(_VA, Vec<typename _VA::value_type, (int)_VA::channels>)
-          && __is_same(_VB, Vec<typename _VB::value_type, (int)_VA::channels>)
-inline _VA& operator += (_VA& a, const _VB& b)
+template<typename _Tp1, typename _Tp2, int cn> requires opencv_m_pick<_Tp1>
+inline Vec<_Tp1, cn>& operator += (Vec<_Tp1, cn>& a, const Vec<_Tp2, cn>& b)
 {
-    using _Tp1 = typename _VA::value_type;
-    for (int i = 0; i < (int)_VA::channels; i++)
+    for (int i = 0; i < cn; i++)
         a.val[i] = cv::opencv_m_repl::saturate_cast<_Tp1>(a.val[i] + b.val[i]);
     return a;
 }
-template<typename _VA, typename _VB>
-    requires opencv_m_pick<typename _VA::value_type>
-          && __is_same(_VA, Vec<typename _VA::value_type, (int)_VA::channels>)
-          && __is_same(_VB, Vec<typename _VB::value_type, (int)_VA::channels>)
-inline _VA& operator -= (_VA& a, const _VB& b)
+template<typename _Tp1, typename _Tp2, int cn> requires opencv_m_pick<_Tp1>
+inline Vec<_Tp1, cn>& operator -= (Vec<_Tp1, cn>& a, const Vec<_Tp2, cn>& b)
 {
-    using _Tp1 = typename _VA::value_type;
-    for (int i = 0; i < (int)_VA::channels; i++)
+    for (int i = 0; i < cn; i++)
         a.val[i] = cv::opencv_m_repl::saturate_cast<_Tp1>(a.val[i] - b.val[i]);
     return a;
 }

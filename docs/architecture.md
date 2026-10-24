@@ -20,8 +20,11 @@ OpenCV 实现对象只有一个所有者，不能再链接另一份 compat.openc
 
 ## 公共接口与内部适配单元
 
-`src/core.cppm` 导出上游 core 实体，并提供 namespace 级 static-inline 运算符与函数
-所需的适配。值常量与纯计算宏位于 `mcpplibs.mwrap.opencv.macros`；原始预处理宏
+`src/core.cppm` 聚合 `detail.core` 与 `detail.matx`。前者维护 SDK 头文件 facade 与
+通用内部链接函数适配；后者先导入原始类声明，再定义保留上游模板参数的 Matx/Vec 适配。
+在文本类声明所在单元直接定义这些模板会使 Clang22 消费者崩溃，旧的整体操作数模板
+则丢失显式模板参数和派生类到基类的推导。分开模板 producer 后能保留原调用形式，
+避免该序列化问题。值常量与纯计算宏位于 `mcpplibs.mwrap.opencv.macros`；原始预处理宏
 通过 import 前包含 `<mwrap/opencv/macros.hpp>` 使用。
 
 其余公共模块由生成的聚合单元提供。例如 `mcpplibs.mwrap.opencv.stitching`

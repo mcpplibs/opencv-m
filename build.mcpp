@@ -317,7 +317,9 @@ int main() try {
     // Keep every adapter in the aggregate's direct dependency graph too.
     // GCC's mapper for cross-package self-tests otherwise mixes default and
     // explicit BMI paths for indirect internal imports (notably with ORT).
-    imports << "export import mcpplibs.mwrap.opencv.core;\n";
+    imports << "export import mcpplibs.mwrap.opencv.detail.core;\n"
+               "export import mcpplibs.mwrap.opencv.detail.matx;\n"
+               "export import mcpplibs.mwrap.opencv.core;\n";
     if (mcpp::has_feature("simd"))
         imports << "export import mcpplibs.mwrap.opencv.detail.simd;\n"
                    "export import mcpplibs.mwrap.opencv.core.simd;\n";

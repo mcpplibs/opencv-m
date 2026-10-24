@@ -26,8 +26,14 @@ compiling module interfaces.
 
 ## Public interfaces and internal adapter units
 
-`src/core.cppm` exports upstream core entities plus the explicit operator/helper
-adaptations needed for namespace-level static-inline functions. Values and pure
+`src/core.cppm` aggregates `detail.core` and `detail.matx`. The first owns the
+SDK header facade and general internal-linkage helpers. The second imports
+those original class declarations before defining Matx/Vec adapters with the
+SDK's exact template parameters. Defining these patterns beside the textual
+class declarations crashed Clang22 importers; changing them to whole-operand
+templates lost explicit template arguments and derived-to-base deduction.
+The separate producer preserves the original argument forms and avoids that
+serialization failure. Values and pure
 macro calculations live in `mcpplibs.mwrap.opencv.macros`; raw preprocessing
 macros remain available through `<mwrap/opencv/macros.hpp>` before imports.
 
@@ -78,7 +84,7 @@ The opt-in `simd` utility exposes native 128-bit intrinsics through
 library baseline from per-TU ISA selection. Vector types remain original SDK
 entities. GCC memory-entry forwards preserve unaligned semantics that its
 imported inline intrinsic body miscompiled. Native/platform acceptance and the
-remaining emulator/ISA families stay explicit in the coverage review.
+software-mode and other ISA acceptance stay explicit in the coverage review.
 
 ## API verification and known boundaries
 

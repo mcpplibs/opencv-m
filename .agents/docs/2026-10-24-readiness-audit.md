@@ -9,13 +9,15 @@ The six companion source PR heads were rechecked through GitHub: ORT 576c780b
 ImGui ffebf83b (4) and Godot 40f72d55 (3) all have successful checks. Their
 independent draft PRs remain open, with executable templates included.
 
-OpenCV's 16baa03 native matrix passed all five jobs. Native run 40086514828
-on eb1d34b is running; Windows has passed the all-main-module step, including
-the formerly crashing ArUCo constant case. Local software SIMD work described
-below has three-compiler and GCC release parity; its all-main-module combination
-and new exact-head native matrix remain required. Index 6ff350a fixes the
-cross-namespace ambiguity that failed validation on 2e54735; its new site check
-passes, while workspace validation, updater and OpenKAL checks remain pending.
+OpenCV's 16baa03 native matrix passed all five jobs. Native run 40088385850
+on d1c3152 is running; the earlier eb1d34b Windows leg passed all-main-module
+tests, including the formerly crashing ArUCo constant case, before cancellation.
+The software SIMD checkpoint now passes all 28 programs on all three Linux
+compilers. Current Matx producer separation restores SDK template argument forms
+and passes independent three-compiler parity; its new 30-program combination
+and native matrix remain required. Index ee52fdb corrects the mixed-workspace
+ambiguity that persisted on 6ff350a; its site check passes, while workspace
+validation, updater and OpenKAL checks remain pending.
 The index still pins the independently verified 019eaadb OpenCV archive.
 Final source/archive alignment and all relevant exact-head checks remain
 required. API/header and backend classification is unfinished. No merge/release
@@ -520,3 +522,44 @@ regression. A fresh-home immutable ORT consumer passed strict inference/public
 API tests (103.25s). Index publication bytes/layout are unchanged. The index PR
 and source PR descriptions now distinguish current source work from the older
 verified immutable OpenCV archive. mcpp engine sources remain read-only.
+
+## Exact Matx/Vec template API restoration
+
+The SDK accepts determinant<float,3>(Matx33f); the former whole-operand wrapper
+rejects it with too many template arguments. Eight adaptations lost original
+argument forms: determinant, matrix/vector comma initialization, mixed-type
+matrix/vector += and -=, and matrix multiplication. Directly restoring their
+parameter patterns inside the original header producer reproduces a Clang22
+frontend crash in api_surface_test. A separate import-only prototype passes,
+so core now aggregates detail.core (original SDK facade/general adapters) and
+detail.matx (exact Matx/Vec templates over already imported original classes).
+No upstream file, engine or vector/matrix class definition is changed. Matx
+arithmetic bodies retain their prior SDK accumulator/saturation behavior.
+
+The independent original-header/import fixture exercises every argument prefix
+of those eight families, explicit second-argument conversion for initializers,
+function-pointer selection, saturation, derived-class determinant and matrix/
+vector base deduction with exact SDK reference-return types. All three compilers
+match 342 output bytes: LLVM22 2.45s, GCC16 73.41s, LLVM23 41.83s. Each also checks
+SDK/import rejection of wrong determinant/product dimensions and const left
+augmentation, rejecting compiler crashes as acceptance. Existing LLVM22 API/
+Matx behavior passes after the producer split. Logs:
+/tmp/mwrap-matx-template-matrix.log and /tmp/mwrap-matx-split-llvm22.log.
+The failing direct-definition reproduction is retained at
+/tmp/mwrap-matx-original-shapes-llvm22.log.
+
+The preceding d1c3152 software SIMD full compositions completed successfully on
+LLVM23 (314.59s), GCC16 (593.65s) and LLVM22 (357.54s): 28 programs each, 644-byte
+SIMD/1302-byte utility parity, baseline interface arguments, makePtr contracts
+and 223 SIMD names. After the Matx split, a new three-compiler all-modules,
+simd-emulated run checks 30 programs and an additional 342-byte Matx oracle at
+/tmp/mwrap-matx-split-composition.log. Native SDK/compiler/platform acceptance
+still needs the exact new source head, and final immutable archive/index pins
+are not yet aligned. No release/merge readiness is inferred from focused tests.
+
+The new composition has passed all 30 programs on LLVM23 (69.62s) and GCC16
+(156.35s), with all three output pairs identical, 37 interface argument checks,
+makePtr contracts and 223 SIMD name lookups. LLVM22 is running on the same
+source. The temporary detached worktree used to prepare the failed direct-shape
+candidate is task-owned and can be removed after this checkpoint; its failure
+and successful imported-type reproductions remain in the logs above.

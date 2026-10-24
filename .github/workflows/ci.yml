@@ -293,6 +293,10 @@ jobs:
         shell: bash
         run: python3 tools/check_utility_helpers.py
 
+      - name: Original SDK versus module Matx and Vec template contracts
+        shell: bash
+        run: python3 tools/check_matx_templates.py
+
       - name: Native SDK versus module baseline SIMD behavior
         shell: bash
         run: |
