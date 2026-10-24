@@ -6,10 +6,24 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from audit_api import ast_declarations, inventory
+from audit_api import ast_declarations, inventory, optional_simd_facades
 
 
 class InventoryTest(unittest.TestCase):
+    def test_inactive_feature_does_not_audit_stale_simd_commands(self):
+        root = Path("/fixture").resolve()
+        stale = [{"file": str(root / "src/detail/simd.cppm")}]
+        self.assertEqual(optional_simd_facades(root, stale, ["-DMCPP_FEATURE_ALL_MODULES"]), [])
+
+    def test_active_simd_requires_both_actual_adapter_commands(self):
+        root = Path("/fixture").resolve()
+        commands = [{"file": str(root / "src/detail" / (name + ".cppm"))}
+                    for name in ("simd", "simd_legacy")]
+        selected = optional_simd_facades(root, commands, ["-DMCPP_FEATURE_SIMD"])
+        self.assertEqual([name for name, _ in selected], ["core.simd", "core.simd.legacy"])
+        with self.assertRaisesRegex(AssertionError, "no compile command"):
+            optional_simd_facades(root, commands[:1], ["-DMCPP_FEATURE_SIMD"])
+
     def test_transitive_simd_namespace_imports(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

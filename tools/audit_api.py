@@ -57,6 +57,20 @@ def compiler_flags(entry, keep_modules=False):
     return flags
 
 
+def optional_simd_facades(root, commands, active_arguments):
+    # CDBs can retain commands for previously enabled optional source files.
+    # The active root's feature flags, not file presence alone, select this API.
+    if "-DMCPP_FEATURE_SIMD" not in active_arguments:
+        return []
+    result = []
+    compiled = {Path(item["file"]).resolve() for item in commands}
+    for source, module in (("simd", "core.simd"), ("simd_legacy", "core.simd.legacy")):
+        path = root / "src/detail" / (source + ".cppm")
+        assert path in compiled, f"Active SIMD facade has no compile command: {path}"
+        result.append((module, path))
+    return result
+
+
 def ast_declarations(lines, capture=None):
     """Read one top-level Clang declaration at a time, not the huge TU tree.
 
@@ -237,10 +251,10 @@ def main():
         source = facade.read_text()
         prefixes.append(source.split("export module", 1)[0].replace("module;", ""))
     optional_facades = []
-    if any(Path(item["file"]).resolve() == root / "src/detail/simd.cppm" for item in commands):
-        source = (root / "src/detail/simd.cppm").read_text()
+    for module, facade in optional_simd_facades(root, commands, entry["arguments"]):
+        source = facade.read_text()
         prefixes.append(source.split("export module", 1)[0].replace("module;", ""))
-        optional_facades.append("core.simd")
+        optional_facades.append(module)
     probe.write_text("\n".join(prefixes))
     ast_path, includes_path = work / "upstream.ast.json", work / "includes.log"
     if not args.reuse_ast:

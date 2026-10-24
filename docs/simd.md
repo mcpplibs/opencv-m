@@ -61,11 +61,29 @@ explicit forwards. Public aggregation is separate from the header adapter to
 avoid GCC's full-header/default-argument merge issue. Full textual SDK header
 mixing follows the restrictions in [architecture](architecture.en.md).
 
+For the operators removed from the ordinary intrinsics header in OpenCV 4.11,
+explicitly import `mcpplibs.mwrap.opencv.core.simd.legacy` with `simd` enabled.
+It corresponds to manually including the original `intrin_legacy_ops.h` after
+the intrinsics header. All 21 original operator templates stay in `cv::hal`;
+use its operators as with the SDK, for example `using cv::hal::operator+;`.
+The base SIMD and root imports deliberately do not introduce these overloads.
+No additional feature or implementation library is required. The opt-in
+interface is built with the same native/software vector configuration.
+
+The SDK software implementation declares `v_not<float,N>` without defining it:
+floating legacy `operator~` therefore fails to link in both SDK and module
+consumers. Integer complement is tested in software mode; native mode also
+checks floating complement. The adapter re-exports the SDK templates and does
+not manufacture a replacement definition for the broken specialization.
+
 `tools/check_simd.py` compares independent original-header/import-only
 consumers. It exercises unaligned memory, saturating/wrapping arithmetic,
 packing/widening, lane ordering, masks, dot products, rounding, doubles and
 interleaved RGB. It also checks every enabled name through direct/root imports.
 Pass `--emulated` to check software mode, including eight-lane generic arithmetic,
 bitwise operations, double conversion, reductions and rounding shifts.
+Both modes compare the 21 legacy operators against independent SDK consumers,
+including compound reference identity, function-pointer selection and byte
+saturation, and verify that base/root imports keep those operators opt-in.
 Native CI covers the declared platforms; pending results remain acceptance
 gates. See [coverage](coverage.md) for the current verified scope.

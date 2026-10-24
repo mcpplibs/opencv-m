@@ -166,7 +166,8 @@ def generate():
     features["all-modules"] = {"implies": [name for name in modules if name != "core"]}
     # Public CPU intrinsics are an opt-in utility surface, separate from the
     # sixteen upstream algorithm modules and from private implementation ISAs.
-    features["simd"] = {"sources": ["src/core_simd.cppm", "src/detail/simd.cppm"]}
+    features["simd"] = {"sources": ["src/core_simd.cppm", "src/detail/simd.cppm",
+                                  "src/core_simd_legacy.cppm", "src/detail/simd_legacy.cppm"]}
     features["simd-emulated"] = {"implies": ["simd"]}
     # Retain the upstream DNN-specific TU flags, but gate all sources through
     # the module feature and the per-target source catalogs.

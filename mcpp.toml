@@ -675,7 +675,7 @@ defines = ["ENABLE_PLUGINS", "NDEBUG", "__OPENCV_BUILD=1", "_USE_MATH_DEFINES", 
 implies = ["calib", "dnn", "features", "flann", "geometry", "highgui", "imgcodecs", "imgproc", "objdetect", "photo", "ptcloud", "stereo", "stitching", "video", "videoio"]
 
 [features.simd]
-sources = ["src/core_simd.cppm", "src/detail/simd.cppm"]
+sources = ["src/core_simd.cppm", "src/detail/simd.cppm", "src/core_simd_legacy.cppm", "src/detail/simd_legacy.cppm"]
 
 [features.simd-emulated]
 implies = ["simd"]

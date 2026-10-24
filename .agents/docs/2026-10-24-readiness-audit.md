@@ -563,3 +563,41 @@ makePtr contracts and 223 SIMD name lookups. LLVM22 is running on the same
 source. The temporary detached worktree used to prepare the failed direct-shape
 candidate is task-owned and can be removed after this checkpoint; its failure
 and successful imported-type reproductions remain in the logs above.
+
+## Explicit SIMD compatibility operators
+
+With simd enabled, core.simd.legacy explicitly imports the compatibility header's
+21 original cv::hal operator templates. Base/root imports keep those operators
+out of their visible API; the test checks that boundary. The wrapper does not
+copy operator bodies or add another implementation owner/feature. Its generator
+extracts the exact operator list from the pinned original header.
+
+Independent SDK/import fixtures match 976 output bytes in native and software
+modes on GCC16, LLVM22 and LLVM23; software GCC release also passes. The fixture
+covers all 21 names, normal syntax, explicit function-pointer selection,
+compound reference identity and byte saturation. Native mode checks floating
+complement; the original software SDK declares v_not<float,N> without a body,
+so its floating complement and the unchanged module operator both fail to link.
+That original failure is retained at /tmp/mwrap-simd-legacy-sdk-float-not.log;
+software positive tests exercise integer complement. No broken export is pruned.
+Focused logs: /tmp/mwrap-simd-legacy-llvm23.log and
+/tmp/mwrap-simd-legacy-matrix.log.
+
+Full all-modules,simd-emulated composition has passed all 32 programs on LLVM23
+(297.73s), including SIMD 644, utility 1302, Matx 342 and legacy 976 byte-pairs,
+39 interface argument guards, makePtr contracts and 223 SIMD name lookups.
+GCC16/LLVM22 are running at /tmp/mwrap-legacy-simd-composition.log. Native CI
+and exact final archive/index alignment remain acceptance gates.
+
+The inventory selector now uses the active root's feature flags, ignoring stale
+optional source entries retained in a CDB. Active SIMD requires both actual
+adapter commands and includes the explicit legacy facade in its inventory.
+Seven parser/profile regressions pass. Header review retains legacy as partial,
+with eight native-family partial records, two software/legacy partial records
+and ten other ISA records open. This is not full-support acceptance.
+
+Further unlisted-entity review has identified explicit follow-ups for FP state
+controls, videoio opaque forward declarations and generic SIMD broadcast
+helpers. Source evidence and names are recorded in
+ target/api-audit/unlisted-next-review.json. Existing aliases or using-list
+counts do not prove those original qualified APIs are visible or callable.

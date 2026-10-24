@@ -62,13 +62,19 @@ headers = [
 ]
 
 [[groups]]
+decision = "partial"
+reason = "The explicit core.simd.legacy module re-exports all 21 original cv::hal operator templates. Native/software SDK parity, reference identity, saturation and root/base opt-in boundaries pass GCC16/LLVM22/LLVM23; GCC release software parity passes too. Native platform CI and full composition remain required. The original software floating v_not link failure is preserved."
+headers = [
+  "modules/core/include/opencv2/core/hal/intrin_legacy_ops.h",
+]
+
+[[groups]]
 decision = "public-gap"
-reason = "Legacy operators and other architecture/ISA implementations still need explicit module integration and applicable verification. Native 128-bit and software mode support do not certify these modes."
+reason = "Other architecture/ISA implementations still need explicit module integration and applicable verification. Native 128-bit, software mode and legacy operator support do not certify these modes."
 headers = [
   "modules/core/include/opencv2/core/hal/intrin_avx.hpp",
   "modules/core/include/opencv2/core/hal/intrin_avx512.hpp",
   "modules/core/include/opencv2/core/hal/intrin_lasx.hpp",
-  "modules/core/include/opencv2/core/hal/intrin_legacy_ops.h",
   "modules/core/include/opencv2/core/hal/intrin_lsx.hpp",
   "modules/core/include/opencv2/core/hal/intrin_msa.hpp",
   "modules/core/include/opencv2/core/hal/intrin_rvv071.hpp",

@@ -200,6 +200,7 @@ jobs:
           python3 tools/generate_inline_helpers.py --check
           python3 tools/generate_cuda_helpers.py --check
           python3 tools/generate_simd.py --check
+          python3 tools/generate_simd_legacy.py --check
           python3 tools/generate_objdetect_constants.py --check
           python3 tools/generate_type_ops.py --check
           python3 tools/test_export_diagnostics.py
