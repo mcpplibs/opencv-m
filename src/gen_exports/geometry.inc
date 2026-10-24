@@ -29,6 +29,7 @@ export namespace cv {
     using cv::LevMarq;
     using cv::LocalOptimMethod;
     using cv::MAGSAC;
+    using cv::MatrixType;
     using cv::NEIGH_FLANN_KNN;
     using cv::NEIGH_FLANN_RADIUS;
     using cv::NEIGH_GRID;
@@ -75,6 +76,7 @@ export namespace cv {
     using cv::USAC_PARALLEL;
     using cv::USAC_PROSAC;
     using cv::UsacParams;
+    using cv::VariableType;
     using cv::approxPolyDP;
     using cv::approxPolyN;
     using cv::arcLength;

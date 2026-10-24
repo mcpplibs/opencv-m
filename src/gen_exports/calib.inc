@@ -51,6 +51,18 @@ export namespace cv {
     using cv::stereoCalibrate;
 }
 export namespace cv::fisheye {
+    using cv::fisheye::CALIB_CHECK_COND;
+    using cv::fisheye::CALIB_FIX_FOCAL_LENGTH;
+    using cv::fisheye::CALIB_FIX_INTRINSIC;
+    using cv::fisheye::CALIB_FIX_K1;
+    using cv::fisheye::CALIB_FIX_K2;
+    using cv::fisheye::CALIB_FIX_K3;
+    using cv::fisheye::CALIB_FIX_K4;
+    using cv::fisheye::CALIB_FIX_PRINCIPAL_POINT;
+    using cv::fisheye::CALIB_FIX_SKEW;
+    using cv::fisheye::CALIB_RECOMPUTE_EXTRINSIC;
+    using cv::fisheye::CALIB_USE_INTRINSIC_GUESS;
+    using cv::fisheye::CALIB_ZERO_DISPARITY;
     using cv::fisheye::calibrate;
     using cv::fisheye::stereoCalibrate;
 }

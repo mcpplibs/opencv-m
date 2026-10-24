@@ -1,0 +1,5 @@
+
+# Public C++ entities restored from the Clang facade inventory.
+OdometryAlgoType
+OdometryType
+VolumeType

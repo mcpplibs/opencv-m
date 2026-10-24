@@ -4,9 +4,11 @@ export namespace cv {
     using cv::N_PYRAMIDS;
     using cv::Octree;
     using cv::Odometry;
+    using cv::OdometryAlgoType;
     using cv::OdometryFrame;
     using cv::OdometryFramePyramidType;
     using cv::OdometrySettings;
+    using cv::OdometryType;
     using cv::PYR_CLOUD;
     using cv::PYR_DEPTH;
     using cv::PYR_DIX;
@@ -33,6 +35,7 @@ export namespace cv {
     using cv::TriangleShadingType;
     using cv::Volume;
     using cv::VolumeSettings;
+    using cv::VolumeType;
     using cv::depthTo3d;
     using cv::depthTo3dSparse;
     using cv::findPlanes;

@@ -59,3 +59,30 @@ TEST(CoreCppTypes, QuaternionRotationAndGrowingAutoBuffer) {
     EXPECT_EQ(labels[1], labels[4]);
     EXPECT_NE(labels[0], labels[1]);
 }
+
+TEST(CoreCppTypes, ErrorCodesTraitsAndLoggingKeepTheirCppSurface) {
+    static_assert(cv::traits::Type<cv::Vec3b>::value == mcpplibs::mwrap::opencv::macros::CV_8UC3);
+    static_assert(cv::traits::Depth<float>::value == mcpplibs::mwrap::opencv::macros::CV_32F);
+    static_assert(cv::ParamType<int>::type == cv::Param::INT);
+    try {
+        cv::error(cv::Error::StsBadArg, "module error surface", __func__, __FILE__, __LINE__);
+        FAIL() << "cv::error must throw";
+    } catch (const cv::Exception& error) {
+        EXPECT_EQ(error.code, cv::Error::StsBadArg);
+    }
+    namespace logging = cv::utils::logging;
+    const auto previous = logging::setLogLevel(logging::LOG_LEVEL_DEBUG);
+    EXPECT_EQ(logging::getLogLevel(), logging::LOG_LEVEL_DEBUG);
+    logging::setLogLevel(previous);
+}
+
+TEST(CoreCppTypes, QuaternionFreeFunctionsOperateThroughDirectImport) {
+    const auto quarter_turn = cv::Quatd::createFromAngleAxis(
+        mcpplibs::mwrap::opencv::macros::CV_PI / 2, cv::Vec3d(0, 0, 1));
+    const auto inverted = cv::inv(quarter_turn).toRotMat3x3() * cv::Vec3d(1, 0, 0);
+    EXPECT_NEAR(inverted[0], 0, 1e-12);
+    EXPECT_NEAR(inverted[1], -1, 1e-12);
+    const auto half_turn = cv::power(quarter_turn, 2.0).toRotMat3x3() * cv::Vec3d(1, 0, 0);
+    EXPECT_NEAR(half_turn[0], -1, 1e-12);
+    EXPECT_NEAR(half_turn[1], 0, 1e-12);
+}

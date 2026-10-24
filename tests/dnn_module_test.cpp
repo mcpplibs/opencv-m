@@ -46,4 +46,13 @@ void verify_native_engine(int engine) {
 
 TEST(DnnModule, ClassicCpuEngineExecutesOnnxAdd) { verify_native_engine(cv::dnn::ENGINE_CLASSIC); }
 TEST(DnnModule, NewCpuEngineExecutesOnnxAdd) { verify_native_engine(cv::dnn::ENGINE_NEW); }
+TEST(DnnModule, PublicDispatchedActivationFunctionRunsRelu) {
+    cv::dnn::ActivationFunc relu = cv::dnn::getActivationFunc(cv::dnn::ACTIV_RELU);
+    ASSERT_NE(relu, nullptr);
+    const float input[]{-3, -1, 0, 2, 4};
+    float output[5]{};
+    relu(input, output, 5, nullptr);
+    const float expected[]{0, 0, 0, 2, 4};
+    for (int i = 0; i < 5; ++i) EXPECT_FLOAT_EQ(output[i], expected[i]);
+}
 #endif

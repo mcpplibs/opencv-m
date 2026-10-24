@@ -2,7 +2,6 @@
 # / layer-factory helpers that hdr_parser collected but that are not part of
 # the public surface reachable through <opencv2/dnn.hpp> + all_layers.hpp.
 dnn::concat
-dnn::getActivationFunc
 dnn::getLayerFactoryImpl
 dnn::getLayerFactoryMutex
 dnn::getPlane

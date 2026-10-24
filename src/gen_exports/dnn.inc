@@ -21,6 +21,7 @@ export namespace cv::dnn {
     using cv::dnn::AccumLayer;
     using cv::dnn::AcosLayer;
     using cv::dnn::AcoshLayer;
+    using cv::dnn::ActivationFunc;
     using cv::dnn::ActivationInt8Params;
     using cv::dnn::ActivationLayer;
     using cv::dnn::ActivationLayerInt8;
@@ -188,6 +189,7 @@ export namespace cv::dnn {
     using cv::dnn::MatMulInt8Layer;
     using cv::dnn::MatMulInt8Params;
     using cv::dnn::MatMulLayer;
+    using cv::dnn::MatType;
     using cv::dnn::MaxPoolLayer;
     using cv::dnn::MaxUnpoolLayer;
     using cv::dnn::MishLayer;
@@ -254,6 +256,7 @@ export namespace cv::dnn {
     using cv::dnn::SizeLayer;
     using cv::dnn::Slice2Layer;
     using cv::dnn::SliceLayer;
+    using cv::dnn::SoftNMSMethod;
     using cv::dnn::SoftmaxCrossEntropyLossLayer;
     using cv::dnn::SoftmaxLayer;
     using cv::dnn::SoftmaxLayerInt8;
@@ -290,6 +293,7 @@ export namespace cv::dnn {
     using cv::dnn::blobFromImages;
     using cv::dnn::blobFromImagesWithParams;
     using cv::dnn::enableModelDiagnostics;
+    using cv::dnn::getActivationFunc;
     using cv::dnn::getAvailableBackends;
     using cv::dnn::getAvailableTargets;
     using cv::dnn::imagesFromBlob;

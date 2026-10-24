@@ -12,6 +12,7 @@ module;
 #include <opencv2/core/ocl.hpp>
 #include <opencv2/core/quaternion.hpp>
 #include <opencv2/core/softfloat.hpp>
+#include <opencv2/core/utils/logger.hpp>
 #include <opencv2/core/version.hpp>
 
 export module mcpplibs.mwrap.opencv.core;

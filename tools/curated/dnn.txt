@@ -1,0 +1,6 @@
+
+# Public C++ entities restored from the Clang facade inventory.
+dnn::ActivationFunc
+dnn::MatType
+dnn::SoftNMSMethod
+dnn::getActivationFunc

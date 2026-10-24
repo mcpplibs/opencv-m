@@ -205,6 +205,7 @@ export namespace cv {
     using cv::NORM_MINMAX;
     using cv::NORM_RELATIVE;
     using cv::NORM_TYPE_MASK;
+    using cv::Node;
     using cv::NormTypes;
     using cv::OutputArray;
     using cv::OutputArrayOfArrays;
@@ -215,6 +216,8 @@ export namespace cv {
     using cv::PSNR;
     using cv::ParallelLoopBody;
     using cv::ParallelLoopBodyLambdaWrapper;
+    using cv::Param;
+    using cv::ParamType;
     using cv::Point;
     using cv::Point2d;
     using cv::Point2f;
@@ -324,8 +327,14 @@ export namespace cv {
     using cv::_OutputArray;
     using cv::__UMAT_USAGE_FLAGS_32BIT;
     using cv::absdiff;
+    using cv::acos;
+    using cv::acosh;
     using cv::add;
     using cv::addWeighted;
+    using cv::asin;
+    using cv::asinh;
+    using cv::atan;
+    using cv::atanh;
     using cv::batchDistance;
     using cv::bfloat;
     using cv::bitwise_and;
@@ -345,7 +354,9 @@ export namespace cv {
     using cv::copyMakeBorder;
     using cv::copyTo;
     using cv::cos;
+    using cv::cosh;
     using cv::countNonZero;
+    using cv::crossProduct;
     using cv::cv_abs;
     using cv::cv_absdiff;
     using cv::dct;
@@ -383,8 +394,10 @@ export namespace cv {
     using cv::getVersionString;
     using cv::glob;
     using cv::hasNonZero;
+    using cv::has_custom_delete;
     using cv::hconcat;
     using cv::hfloat;
+    using cv::hfloatFromBits;
     using cv::idct;
     using cv::idft;
     using cv::inRange;
@@ -393,6 +406,7 @@ export namespace cv {
     using cv::int32_t;
     using cv::int64_t;
     using cv::int8_t;
+    using cv::inv;
     using cv::invert;
     using cv::kmeans;
     using cv::layoutToString;
@@ -417,6 +431,7 @@ export namespace cv {
     using cv::phase;
     using cv::polarToCart;
     using cv::pow;
+    using cv::power;
     using cv::pprint;
     using cv::randShuffle;
     using cv::randn;
@@ -434,6 +449,7 @@ export namespace cv {
     using cv::setRNGSeed;
     using cv::setUseOptimized;
     using cv::sin;
+    using cv::sinh;
     using cv::softdouble;
     using cv::softfloat;
     using cv::solve;
@@ -446,7 +462,10 @@ export namespace cv {
     using cv::sqrt;
     using cv::subtract;
     using cv::sum;
+    using cv::tan;
+    using cv::tanh;
     using cv::tempfile;
+    using cv::terminate;
     using cv::theRNG;
     using cv::transform;
     using cv::transpose;
@@ -459,6 +478,64 @@ export namespace cv {
     using cv::useOptimized;
     using cv::vconcat;
     using cv::writeScalar;
+}
+export namespace cv::Error {
+    using cv::Error::BadAlign;
+    using cv::Error::BadAlphaChannel;
+    using cv::Error::BadCOI;
+    using cv::Error::BadCallBack;
+    using cv::Error::BadDataPtr;
+    using cv::Error::BadDepth;
+    using cv::Error::BadImageSize;
+    using cv::Error::BadModelOrChSeq;
+    using cv::Error::BadNumChannel1U;
+    using cv::Error::BadNumChannels;
+    using cv::Error::BadOffset;
+    using cv::Error::BadOrder;
+    using cv::Error::BadOrigin;
+    using cv::Error::BadROISize;
+    using cv::Error::BadStep;
+    using cv::Error::BadTileSize;
+    using cv::Error::Code;
+    using cv::Error::GpuApiCallError;
+    using cv::Error::GpuNotSupported;
+    using cv::Error::HeaderIsNull;
+    using cv::Error::MaskIsTiled;
+    using cv::Error::OpenCLApiCallError;
+    using cv::Error::OpenCLDoubleNotSupported;
+    using cv::Error::OpenCLInitError;
+    using cv::Error::OpenCLNoAMDBlasFft;
+    using cv::Error::OpenGlApiCallError;
+    using cv::Error::OpenGlNotSupported;
+    using cv::Error::StsAssert;
+    using cv::Error::StsAutoTrace;
+    using cv::Error::StsBackTrace;
+    using cv::Error::StsBadArg;
+    using cv::Error::StsBadFlag;
+    using cv::Error::StsBadFunc;
+    using cv::Error::StsBadMask;
+    using cv::Error::StsBadMemBlock;
+    using cv::Error::StsBadPoint;
+    using cv::Error::StsBadSize;
+    using cv::Error::StsDivByZero;
+    using cv::Error::StsError;
+    using cv::Error::StsFilterOffsetErr;
+    using cv::Error::StsFilterStructContentErr;
+    using cv::Error::StsInplaceNotSupported;
+    using cv::Error::StsInternal;
+    using cv::Error::StsKernelStructContentErr;
+    using cv::Error::StsNoConv;
+    using cv::Error::StsNoMem;
+    using cv::Error::StsNotImplemented;
+    using cv::Error::StsNullPtr;
+    using cv::Error::StsObjectNotFound;
+    using cv::Error::StsOk;
+    using cv::Error::StsOutOfRange;
+    using cv::Error::StsParseError;
+    using cv::Error::StsUnmatchedFormats;
+    using cv::Error::StsUnmatchedSizes;
+    using cv::Error::StsUnsupportedFormat;
+    using cv::Error::StsVecLengthErr;
 }
 export namespace cv::cuda {
     using cv::cuda::Event;
@@ -528,6 +605,36 @@ export namespace cv::ogl {
     using cv::ogl::Texture2D;
 }
 export namespace cv::ogl::ocl {
+}
+export namespace cv::samples {
+    using cv::samples::addSamplesDataSearchPath;
+    using cv::samples::addSamplesDataSearchSubDirectory;
+    using cv::samples::findFile;
+    using cv::samples::findFileOrKeep;
+}
+export namespace cv::traits {
+    using cv::traits::Depth;
+    using cv::traits::SafeFmt;
+    using cv::traits::SafeType;
+    using cv::traits::Type;
+}
+export namespace cv::utils::logging {
+    using cv::utils::logging::ENUM_LOG_LEVEL_FORCE_INT;
+    using cv::utils::logging::LOG_LEVEL_DEBUG;
+    using cv::utils::logging::LOG_LEVEL_ERROR;
+    using cv::utils::logging::LOG_LEVEL_FATAL;
+    using cv::utils::logging::LOG_LEVEL_INFO;
+    using cv::utils::logging::LOG_LEVEL_SILENT;
+    using cv::utils::logging::LOG_LEVEL_VERBOSE;
+    using cv::utils::logging::LOG_LEVEL_WARNING;
+    using cv::utils::logging::LogLevel;
+    using cv::utils::logging::LogTag;
+    using cv::utils::logging::LogTagAuto;
+    using cv::utils::logging::getLogLevel;
+    using cv::utils::logging::getLogTagLevel;
+    using cv::utils::logging::registerLogTag;
+    using cv::utils::logging::setLogLevel;
+    using cv::utils::logging::setLogTagLevel;
 }
 export using ::CPU_AVX;
 export using ::CPU_AVX2;
