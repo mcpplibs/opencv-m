@@ -21,6 +21,13 @@ TEST(MacrosMix, VersionMacros) {
     EXPECT_EQ(cv::getVersionMajor(), CV_VERSION_MAJOR);
 }
 
+TEST(MacrosMix, GlobalFastMathCoexistsWithTextualHeaders) {
+    EXPECT_EQ(::cvRound(2.5), 2);
+    EXPECT_EQ(::cvFloor(-2.5f), -3);
+    EXPECT_EQ(::cvCeil(2), 2);
+    EXPECT_EQ(::CV_FOURCC('M', 'J', 'P', 'G'), CV_FOURCC_MACRO('M', 'J', 'P', 'G'));
+}
+
 TEST(MacrosMix, SubmatrixMacroMatchesMatFlags) {
     cv::Mat image(8, 10, CV_8UC1);
     cv::Mat roi = image(cv::Rect(2, 2, 4, 3));

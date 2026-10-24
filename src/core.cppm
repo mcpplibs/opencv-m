@@ -1,6 +1,7 @@
 // opencv.core — C++23 module over OpenCV 5 core. The C++ API is unchanged:
-// every exported name is the upstream entity itself (`export using`), only
-// the header inclusion goes away. Function-like macros (CV_Assert, CV_Error,
+// external API entities retain their SDK identity through `export using`.
+// TU-local helpers use SDK-body adapters or exact platform function forwards.
+// Function-like macros (CV_Assert, CV_Error,
 // …) cannot cross a module boundary — include <mwrap/opencv/macros.hpp> BEFORE
 // importing when you need them.
 module;
@@ -34,6 +35,7 @@ export module mcpplibs.mwrap.opencv.core;
 #include "type_ops.inc"
 #include "core_fns.inc"
 #include "portable_helpers.inc"
+#include "fast_math_helpers.inc"
 #include "persistence_ops.inc"
 #include "instrumentation_ops.inc"
 #include "affine_ops.inc"

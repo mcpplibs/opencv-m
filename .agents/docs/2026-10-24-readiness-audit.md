@@ -258,3 +258,31 @@ complete base/types/matx/mat.inl BSD preambles, all 15 deployment inputs, and al
 2,305 retained SDK files matching the pinned upstream archive. Index relocation
 acceptance now explicitly requires the supplement byte for byte. Actual archive
 installation/relocation and native CI for this checkpoint remain pending.
+
+## Global fast-math API checkpoint
+
+The remaining public global fast-math overload sets cannot be exported with a
+single using declaration because they mix TU-local platform implementations and
+external SoftFloat functions. Twenty exact forwards now preserve the original
+cvRound/cvFloor/cvCeil, cvIsInf/cvIsNaN and CV_FOURCC names and signatures. Private
+bridges call original SDK overloads; constrained public templates also coexist
+with textual headers. Generator assertions pin all thirteen primitive overloads,
+six SoftFloat overloads and the original FOURCC declaration.
+
+All 26 strict all-module test programs passed with LLVM23 (21.52s), GCC16
+(62.59s) and LLVM22 (109.69s). Each compiler's independent header/module oracle
+matches exactly at 380 output bytes. The extended fixture checks negative/half
+rounding, SoftFloat agreement, integer limits, Inf/NaN, overload addresses and
+high-bit FOURCC bytes. The mixed-header test also passes on all three compilers.
+Logs: target/fast-math-oracle-llvm23.log and target/fast-math-all-compilers.log;
+complete compilation databases are saved under target/api-audit/fast-math-all-*.
+Only completed task-owned executables were removed between compiler legs;
+objects, BMIs and evidence remain. All heavy checks ran serially in the capped
+slice with three build jobs and the host pressure guard.
+
+The earlier 019eaadb immutable archive passed fresh-home WebP build/run,
+release packaging and relocation with eighteen byte-identical notices. Its
+source native matrix was still queued at the last authoritative poll; index
+2e54735 carries that verified archive. Final source/index alignment, native CI
+and the remaining portable-header/codec/backend inventory are still required
+before merge/release readiness can be claimed.

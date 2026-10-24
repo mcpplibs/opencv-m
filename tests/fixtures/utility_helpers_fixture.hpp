@@ -126,6 +126,32 @@ inline void emit(const char* consumer) {
             cvRound64(cv::softdouble(4294967297.0)) == 4294967297LL, "soft scalar nearest-even int64");
     require(cv::utils::getThreadID() >= 0 && cv::utils::getThreadID() == cv::utils::getThreadID(), "thread identity");
     result << "scalar: 2,-2,2,-2,4294967297\n";
+    for (double value : {-3.75, -2.5, -0.0, 0.0, 2.5, 3.75}) {
+        const float narrow = static_cast<float>(value);
+        const int rounded = ::cvRound(value), floor = ::cvFloor(value), ceil = ::cvCeil(value);
+        require(rounded == ::cvRound(narrow) && floor == ::cvFloor(narrow) && ceil == ::cvCeil(narrow),
+                "global fast math float/double overloads");
+        require(rounded == ::cvRound(cv::softdouble(value)) && rounded == ::cvRound(cv::softfloat(narrow)) &&
+                floor == ::cvFloor(cv::softdouble(value)) && floor == ::cvFloor(cv::softfloat(narrow)) &&
+                ceil == ::cvCeil(cv::softdouble(value)) && ceil == ::cvCeil(cv::softfloat(narrow)),
+                "global fast math SoftFloat overloads");
+        result << "round: " << value << ',' << rounded << ',' << floor << ',' << ceil << '\n';
+    }
+    for (int value : {std::numeric_limits<int>::min(), -1, 0, 1, std::numeric_limits<int>::max()})
+        require(::cvRound(value) == value && ::cvFloor(value) == value && ::cvCeil(value) == value,
+                "integer fast math identity");
+    require(::cvIsInf(std::numeric_limits<double>::infinity()) &&
+            ::cvIsInf(-std::numeric_limits<float>::infinity()) &&
+            ::cvIsNaN(std::numeric_limits<double>::quiet_NaN()) &&
+            ::cvIsNaN(std::numeric_limits<float>::quiet_NaN()) &&
+            !::cvIsInf(0.0) && !::cvIsInf(-0.f) && !::cvIsNaN(0.0) && !::cvIsNaN(-0.f),
+            "global infinity/NaN classification");
+    auto round_address = static_cast<int (*)(double)>(&::cvRound);
+    require(round_address(2.5) == 2, "fast math overload address");
+    require(::CV_FOURCC('M', 'J', 'P', 'G') == 0x47504a4d &&
+            ::CV_FOURCC(char(0xff), 'A', 'B', char(0x7f)) == 0x7f4241ff,
+            "legacy global fourcc byte packing");
+    result << "fast math: classification,integer,address,fourcc\n";
     if (const char* directory = std::getenv("OPENCV_M_UTILITY_OUTPUT")) {
         std::ofstream file(std::filesystem::path(directory) / (std::string(consumer) + ".txt"), std::ios::binary);
         file << result.str();
