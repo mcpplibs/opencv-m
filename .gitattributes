@@ -1,7 +1,7 @@
 # Generated text must compare byte-for-byte on Windows as well as Unix.
 * text=auto eol=lf
 # Retain the pinned archive's original bytes, including third-party assets.
-upstream/** -text
+upstream/** -text -whitespace
 *.onnx -text
 *.png -text
 *.jpg -text
