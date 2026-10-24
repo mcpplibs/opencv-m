@@ -398,6 +398,13 @@ linkage = "static"
 "xim:gtk3" = "3.24.43"
 "xim:libXtst" = "1.2.5"
 
+[target."cfg(all(arch = \"x86_64\", any(os = \"linux\", os = \"windows\")))"]
+
+[target."cfg(all(arch = \"x86_64\", any(os = \"linux\", os = \"windows\")))".feature-xlings]
+
+[target."cfg(all(arch = \"x86_64\", any(os = \"linux\", os = \"windows\")))".feature-xlings.videoio-ffmpeg]
+"xim:nasm" = "3.02"
+
 [dev-dependencies]
 
 [dev-dependencies.compat]

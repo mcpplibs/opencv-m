@@ -113,3 +113,26 @@ The public repository listing proves repository creation/forking, not merge or r
 - Local GUI validation initially exposed an incomplete warm graphics SDK cache: libllvm/libxshmfence payloads were absent and Mesa view links were stale. Official package-tool installation/activation of the declared SDKs restored normal mcpp strict build/run and three-frame rendering under Xvfb. A temporary isolated library-path experiment was diagnostic only, not acceptance proof; native CI independently passed without that override.
 - Index f0f8e48 passed every applicable check, including all platform workspaces, four llama candidates, graphics isolation and the 40m51s OpenKAL measurement. This is the checkpoint before adding finalized additional wrapper archives/consumers, so it is not the final index acceptance.
 - OpenCV 79a8b60 native CI passed macOS (including AVFoundation/FFmpeg file roundtrips, video template and ORT bridge/template) and musl (V4L2/FFmpeg). Windows and both glibc Linux jobs remain live. These results precede the new internal-adapter/direct-import checkpoint and do not validate that later source change.
+
+## User resource and README constraints
+
+- All -m root READMEs use the same concise entry structure and normally stay within 100 lines per language. Detailed usage moves to docs/; prerequisites, candidate status and critical scope limits remain visible. The index's bilingual mwrap spec and package-authoring skill record the rule.
+- Local tests and subprocesses collectively stay below 80% of effective CPU/memory. This host currently has 32 logical CPUs and about 62 GiB RAM. The task-specific mwrap-tests.slice has CPUQuota=1600%, MemoryHigh=28G, MemoryMax=32G and TasksMax=512; future local heavy checks use that shared slice, MCPP_JOBS=6 and one heavy task at a time. These limits apply only to this task's processes, with unrelated user jobs untouched. Check current load/available memory before further heavy work.
+
+The kernel cgroup files confirm cpu.max=1600000/100000, memory.high=28 GiB and memory.max=32 GiB. This user hierarchy does not delegate cpuset, so test commands additionally use taskset -c 0-15; an actual scoped process reported exactly those sixteen CPUs. Local heavy checks run as:
+
+```sh
+systemd-run --user --scope --slice=mwrap-tests.slice --quiet \
+  taskset -c 0-15 env MCPP_JOBS=6 <check-command>
+```
+
+README rewrites cover OpenCV (EN/ZH), ORT, llama.cpp, FFmpeg, gRPC (EN/ZH) and ImGui. Each entry is below 100 lines, with its detailed prior content retained in docs/usage*.md and local links checked.
+
+## FLANN and strict-consumer portability checkpoint
+
+- Restored the public cv::flann aliases/GenericIndex and 164 non-internal cvflann names without changing their namespaces. Two direct-import runtime tests perform nearest-neighbor searches through the high-level and low-level APIs and check distance functions. LLVM 23/GCC 16 strict FLANN suites passed; the LLVM all-module suite passed fourteen binaries. The combined GCC all-module strict recheck also passed fourteen binaries in 250 seconds (247 seconds build), including both FLANN cases, stitching, both native DNN engines and codec roundtrips.
+- The all-module Clang audit now inventories 3,328 facade-visible entities and resolves 2,983 listed exports through the root and all sixteen direct modules. It leaves 346 unlisted entities and 132 not-in-facade headers for review; these counts include internal declarations/manual adapters and cannot be called complete API coverage. Namespace const internal linkage now accounts for desugared types, pointer/reference constness and preceding external declarations; four parser regressions pass.
+- Repaired the optional raw CV_IS_SUBMAT compatibility macro to match the existing typed mapping and Mat::isSubmatrix, while preserving vendor bytes. Actual ROI checks passed on GCC/LLVM.
+- The previous remote GCC job failed during ORT tests because its BMI mapper mixed indirect adapter paths. Explicit aggregate imports of selected internal adapters fixed compilation. A retained candidate then passed fourteen strict binaries, including actual ONNX Add through ORT with CPUExecutionProvider profile evidence. Its first link attempt ran out of disk; the successful retry had sufficient free space and a 6 GiB cutoff guard.
+- On remote edadf5c, LLVM, musl and macOS passed. Windows passed all modules, actual Win32 GUI and both MSMF/FFmpeg twelve-frame file roundtrips, then failed the video template's strict build because Strawberry Perl's host NASM was selected. The wrapper now declares managed xim:nasm@3.02 for x86_64 Linux/Windows videoio-ffmpeg; ffmpeg-m declares the same tool for its x86 profile. This is a library dependency declaration, with no engine/PATH/strict-mode workaround. Native Windows verification is pending.
+- Latest README heads for ORT 576c780, llama.cpp 5028a1a, FFmpeg fa850f4 and ImGui ffebf83 passed all source checks. gRPC 839b61e has live native/template jobs. No PR has been merged or tagged.

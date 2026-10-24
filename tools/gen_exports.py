@@ -63,6 +63,7 @@ def main() -> None:
 
     for mod in MODULE_ORDER:
         names = defaultdict(set)          # sub-namespace ("", "ocl", …) -> names
+        qualified_names = defaultdict(set) # upstream namespaces outside cv
         skipped: list[str] = []
 
         def claim(fq: str, ns: str, name: str):
@@ -156,6 +157,19 @@ def main() -> None:
                 parts = line.split("::")
                 claim(fq, "::".join(parts[:-1]), parts[-1])
 
+        qualified_file = REPO / "tools" / "curated" / f"{mod}.qualified.txt"
+        if qualified_file.exists():
+            for raw in qualified_file.read_text().splitlines():
+                name = raw.split("#", 1)[0].strip()
+                if not name:
+                    continue
+                if not re.fullmatch(r"(?:[A-Za-z_][A-Za-z0-9_]*::)+[A-Za-z_][A-Za-z0-9_]*", name):
+                    raise ValueError(f"Invalid qualified export in {qualified_file}: {name}")
+                if name not in claimed:
+                    claimed[name] = mod
+                    namespace, leaf = name.rsplit("::", 1)
+                    qualified_names[namespace].add(leaf)
+
         # prune list: names that fail compile-verification (internal linkage,
         # header not in the module's GMF, …) — maintained by tools/prune_loop.py
         prune = REPO / "tools" / "curated" / f"{mod}.prune.txt"
@@ -170,7 +184,7 @@ def main() -> None:
                     names[ns].discard(leaf)
                     skipped.append(f"pruned (compile-verify): cv::{line}")
 
-        per_mod[mod] = {"names": names, "skipped": skipped}
+        per_mod[mod] = {"names": names, "qualified": qualified_names, "skipped": skipped}
 
     for mod in MODULE_ORDER:
         names, skipped = per_mod[mod]["names"], per_mod[mod]["skipped"]
@@ -182,6 +196,12 @@ def main() -> None:
             lines.append(f"export namespace {fqns} {{")
             for n in sorted(names[ns]):
                 lines.append(f"    using {fqns}::{n};")
+                total += 1
+            lines.append("}")
+        for namespace, entries in sorted(per_mod[mod]["qualified"].items()):
+            lines.append(f"export namespace {namespace} {{")
+            for name in sorted(entries):
+                lines.append(f"    using {namespace}::{name};")
                 total += 1
             lines.append("}")
         # OpenCV also owns public global aliases, CPU enums and helper types.

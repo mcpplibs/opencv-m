@@ -307,6 +307,12 @@ int main() try {
     std::ostringstream imports;
     if (mcpp::has_feature("dnn-onnxruntime"))
         imports << "export import mcpplibs.mwrap.onnxruntime;\n";
+    // Keep every adapter in the aggregate's direct dependency graph too.
+    // GCC's mapper for cross-package self-tests otherwise mixes default and
+    // explicit BMI paths for indirect internal imports (notably with ORT).
+    imports << "export import mcpplibs.mwrap.opencv.core;\n";
+    for (const auto& name : modules)
+        if (name != "core") imports << "export import mcpplibs.mwrap.opencv.detail." << name << ";\n";
     for (const auto& name : modules)
         if (name != "core") imports << "export import mcpplibs.mwrap.opencv." << name << ";\n";
     std::string aggregate = slurp(man / "src/selected.cppm.in");

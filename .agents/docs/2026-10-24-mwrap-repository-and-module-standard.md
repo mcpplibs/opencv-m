@@ -268,3 +268,13 @@ metadata 与 sources.lock 仍明确固定上游版本、commit/hash；尾号仅�
 5. 接受旧身份冻结、新身份切换，兼容入口不形成第二份实现。
 6. 索引使用 pkgs/mwrap 平铺描述符与 tests/mwrap 分类，无 staging 路径转换。
 7. feature 沿用上游模块/后端名称，Linux 本地验证，Windows/macOS CI 覆盖。
+
+## README 与本地验证资源补充规范
+
+所有 xxx-m 仓库的根 README 使用统一简洁风格，原则上每种语言不超过 100 行。
+保留一句定位、快捷模板、最小依赖/import 用法、关键平台边界与文档/许可入口；
+架构、完整矩阵、后端细节、排错和验证记录放到 docs/，不以超长行或删除必要前提凑行数。
+
+本地测试及依赖构建、编译器、代码生成和 AST 子进程的合计 CPU/内存占用不得超过
+本机有效资源的 80%，默认预留更多余量；限制总并发并监测资源，不停止用户的其他进程。
+正式中英文规范与 package-authoring skill 同步维护于 mcpp-index。

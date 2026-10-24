@@ -67,6 +67,27 @@ class InventoryTest(unittest.TestCase):
             self.assertIn("cv::dnn::dnn5_v20260605::MODE_CPU", found)
             self.assertFalse(any(name.endswith(("HIDDEN", "forward")) for name in found))
 
+    def test_implicit_const_linkage_and_external_redeclarations(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            header = str(root / "upstream/opencv/modules/flann/include/opencv2/flann.hpp")
+            declarations = [
+                {"id": "ext", "kind": "VarDecl", "name": "external", "storageClass": "extern", "type": {"qualType": "const int"}},
+                {"id": "def", "kind": "VarDecl", "name": "external", "previousDecl": "ext", "type": {"qualType": "const int"}},
+                {"kind": "VarDecl", "name": "blocksize", "type": {"qualType": "const int"}},
+                {"kind": "VarDecl", "name": "pointee", "type": {"qualType": "const char *"}},
+                {"kind": "VarDecl", "name": "pointer", "type": {"qualType": "int *const"}},
+                {"kind": "VarDecl", "name": "reference", "type": {"qualType": "const int &"}},
+                {"kind": "VarDecl", "name": "inline_value", "inline": True, "type": {"qualType": "const int"}},
+                {"kind": "VarDecl", "name": "alias", "type": {"qualType": "size_type", "desugaredQualType": "const unsigned long"}},
+            ]
+            tree = {"id": "flann", "kind": "NamespaceDecl", "name": "cvflann", "loc": {"offset": 0, "file": header}, "inner": declarations}
+            found = inventory(iter([tree]), root)
+            for name in ["blocksize", "pointer", "alias"]:
+                self.assertTrue(found["cvflann::" + name]["internal-linkage"], name)
+            for name in ["external", "pointee", "reference", "inline_value"]:
+                self.assertFalse(found["cvflann::" + name]["internal-linkage"], name)
+
 
 if __name__ == "__main__":
     unittest.main()

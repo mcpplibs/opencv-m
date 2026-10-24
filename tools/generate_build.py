@@ -195,6 +195,11 @@ def generate():
     gtk_target["feature-xlings"] = {
         name: {"xim:gtk3": "3.24.43", "xim:libXtst": "1.2.5"}
         for name in ("highgui-native", "highgui-gtk3")}
+    # FFmpeg's x86 snapshots contain NASM sources. Declare the managed tool
+    # before build planning: a host NASM otherwise prevents auto-provisioning
+    # and makes strict consumers fail (notably Strawberry Perl on Windows).
+    nasm_target = targets.setdefault('cfg(all(arch = "x86_64", any(os = "linux", os = "windows")))', {})
+    nasm_target.setdefault("feature-xlings", {})["videoio-ffmpeg"] = {"xim:nasm": "3.02"}
     build = copy.deepcopy(config["build"])
     for name in added_modules:
         build["include_dirs"].append(f"upstream/opencv/modules/{name}/include")

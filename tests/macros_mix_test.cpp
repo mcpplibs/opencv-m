@@ -20,3 +20,11 @@ TEST(MacrosMix, VersionMacros) {
     EXPECT_EQ(CV_VERSION_MAJOR, 5);
     EXPECT_EQ(cv::getVersionMajor(), CV_VERSION_MAJOR);
 }
+
+TEST(MacrosMix, SubmatrixMacroMatchesMatFlags) {
+    cv::Mat image(8, 10, CV_8UC1);
+    cv::Mat roi = image(cv::Rect(2, 2, 4, 3));
+    EXPECT_EQ(CV_IS_SUBMAT(image.flags) != 0, image.isSubmatrix());
+    EXPECT_EQ(CV_IS_SUBMAT(roi.flags) != 0, roi.isSubmatrix());
+    EXPECT_TRUE(roi.isSubmatrix());
+}

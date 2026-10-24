@@ -15,3 +15,11 @@
 #include <opencv2/core/check.hpp>
 #include <opencv2/core/cvdef.h>
 #include <opencv2/core/version.hpp>
+
+// OpenCV 5.0.0 spells the flag CV_MAT_SUBMAT_FLAG in this macro, but only
+// CV_SUBMAT_FLAG exists. Keep the vendor file intact and repair the optional
+// compatibility surface, matching Mat::isSubmatrix and the typed mapping.
+#if CV_VERSION_MAJOR == 5 && CV_VERSION_MINOR == 0 && CV_VERSION_REVISION == 0
+#undef CV_IS_SUBMAT
+#define CV_IS_SUBMAT(flags) ((flags) & CV_SUBMAT_FLAG)
+#endif

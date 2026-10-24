@@ -18,6 +18,26 @@ KINDS = {"CXXRecordDecl", "RecordDecl", "ClassTemplateDecl", "FunctionTemplateDe
          "EnumDecl", "VarDecl", "UsingDecl"}
 
 
+def namespace_const(node):
+    """Recognize namespace-level const objects with implicit internal linkage.
+
+    Clang omits storageClass on these. Pointee constness does not make a
+    pointer/reference object const; aliases use their desugared type.
+    """
+    if node.get("inline") or node.get("storageClass") == "extern":
+        return False
+    type_ = node.get("type", {})
+    spelling = type_.get("desugaredQualType", type_.get("qualType", ""))
+    spelling = re.sub(r"(?:\[[^]]*\])+$", "", spelling).strip()
+    if "&" in spelling:
+        return False
+    if "*" in spelling:
+        pointer = re.search(r"\([^)]*\*([^)]*)\)", spelling)
+        tail = pointer[1] if pointer else spelling.rsplit("*", 1)[1]
+        return "const" in tail.split()
+    return spelling.startswith("const ") or spelling.endswith(" const")
+
+
 def compiler_flags(entry, keep_modules=False):
     arguments = entry["arguments"]
     flags = []
@@ -65,6 +85,7 @@ def inventory(declarations, root):
     last_file = ""
     namespaces = {}
     imports = []
+    variable_linkage = {}
 
     def restore_locations(value):
         """Clang elides repeated file names across the entire JSON stream.
@@ -123,6 +144,13 @@ def inventory(declarations, root):
                 continue  # an out-of-line class member rides with its class
             if not file:
                 continue
+            variable_internal = False
+            if kind == "VarDecl":
+                previous = node.get("previousDecl")
+                variable_internal = variable_linkage.get(previous,
+                    node.get("storageClass") == "static" or namespace_const(node))
+                if node.get("id"):
+                    variable_linkage[node["id"]] = variable_internal
             try:
                 relative = Path(file).resolve().relative_to(root / "upstream/opencv")
             except ValueError:
@@ -149,7 +177,7 @@ def inventory(declarations, root):
                     for child in decl.get("inner", []):
                         if child.get("kind") in {"FunctionDecl", "TypeAliasDecl"} and child.get("type", {}).get("qualType"):
                             item["signatures"].add(child["type"]["qualType"])
-                item["internal-linkage"] |= decl.get("storageClass") == "static" or any(
+                item["internal-linkage"] |= variable_internal or decl.get("storageClass") == "static" or any(
                     child.get("storageClass") == "static" for child in decl.get("inner", [])
                     if child.get("kind") == "FunctionDecl")
 
