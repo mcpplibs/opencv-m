@@ -1,17 +1,14 @@
 # opencv
 
 > OpenCV 5.0.0 through C++23 modules; the upstream cv:: API is preserved.
-> Sixteen main modules, optional native windows, codecs, video and ORT CPU; pinned upstream sources are separate from adapters.
 
-**English** · [简体中文](README.zh.md)
-
-Upstream: [opencv/opencv](https://github.com/opencv/opencv)
-
-[Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
+**English** · [简体中文](README.zh.md) · Upstream: [opencv/opencv](https://github.com/opencv/opencv) · [Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
 
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
 [![License](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml)
+
+Sixteen main modules, optional native windows, codecs, video and ORT CPU; pinned upstream sources are separate from adapters.
 
 ## Getting started
 

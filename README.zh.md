@@ -1,17 +1,14 @@
 # opencv
 
 > 以 C++23 模块使用 OpenCV 5.0.0，保留上游 cv:: API。
-> 十六个主模块；原生窗口、编解码、视频和 ORT CPU 按需启用，上游源码与适配分层。
 
-[English](README.md) · **简体中文**
-
-上游仓库：[opencv/opencv](https://github.com/opencv/opencv)
-
-[Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
+[English](README.md) · **简体中文** · 上游：[opencv/opencv](https://github.com/opencv/opencv) · [Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
 
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
 [![License](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml)
+
+十六个主模块；原生窗口、编解码、视频和 ORT CPU 按需启用，上游源码与适配分层。
 
 ## 快速开始
 
