@@ -354,7 +354,7 @@ int main() try {
     spew(out / "cvconfig.h", config);
     spew(out / "opencv2/cvconfig.h", config);
     std::ostringstream report;
-    report << "OpenCV 5.0.0 (mcpplibs.mwrap.opencv 5.0.0.1)\nTarget: " << os << "\nModules:";
+    report << "OpenCV 5.0.0 (mcpplibs.mwrap.opencv 5.0.0)\nTarget: " << os << "\nModules:";
     for (const auto& name : modules) report << ' ' << name;
     report << "\nJPEG: " << (mcpp::has_feature("imgcodecs-jpeg") ? "YES" : "NO")
            << "\nPNG: " << (mcpp::has_feature("imgcodecs-png") ? "YES" : "NO")

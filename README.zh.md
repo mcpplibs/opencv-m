@@ -1,51 +1,62 @@
-# opencv-m
+# opencv
 
-OpenCV **5.0.0** 的 C++23 模块封装，保留 `cv::Mat`、`cv::cvtColor` 等上游 API。
+> 以 C++23 模块使用 OpenCV 5.0.0，保留上游 cv:: API。
 
-[English](README.md)
+[English](README.md) · **简体中文**
+
+[Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
+
+[![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
+[![License](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](LICENSE)
+[![CI](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml)
+
+使用 mcpp **2026.10.24.1**。新 mwrap 身份在索引发布后可直接安装。
+
+## 特性
+
+十六个主模块；原生窗口、编解码、视频和 ORT CPU 按需启用，上游源码与适配分层。
 
 ## 快速开始
 
-使用 mcpp **2026.10.24.1**。以下为候选版本，索引发布后可直接创建项目。
-
 ```sh
-mcpp new vision --template mcpplibs.mwrap.opencv@5.0.0.1
+mcpp new vision --template mcpplibs.mwrap.opencv@5.0.0
 cd vision
 mcpp run
 ```
 
-默认模板生成图像、转换灰度并写出 PNG，不需要桌面或外部输入。
-
-## 已有项目
-
 ```toml
 [dependencies]
-"mcpplibs.mwrap.opencv" = { version = "5.0.0.1", features = ["imgproc", "imgcodecs-png"] }
+mcpplibs.mwrap.opencv = { version = "5.0.0", features = ["imgproc", "imgcodecs-png"] }
 ```
 
 ```cpp
 import mcpplibs.mwrap.opencv;
 namespace macros = mcpplibs::mwrap::opencv::macros;
-int main() {
-    cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
-    return image.empty();
-}
+int main() { return cv::Mat(8, 8, macros::CV_8UC3).empty(); }
 ```
 
-## 能力边界
+## 模块
 
-core 始终可用。`all-modules` 选择 16 个主模块，编解码与后端分别启用；
-模块可构建不代表全部 API 或硬件能力已验证。
+根模块聚合已启用模块，也可单独 import `.core`、`.imgproc`、`.dnn` 等。
+见[十六模块与 API 矩阵](docs/coverage.md)。
 
-- `highgui-native`：Linux x86_64 glibc 的 GTK3、Windows 的 Win32、macOS 的 Cocoa。
-- `videoio-native`：V4L2、Media Foundation 或 AVFoundation；`videoio-ffmpeg` 增加 FFmpeg。
-- `dnn-onnxruntime`：在 ORT CPU SDK 支持的目标上启用对应推理引擎。
-- `simd`：[原生 CPU intrinsics](docs/simd.md)，入口为 `mcpplibs.mwrap.opencv.core.simd`。
+## 特性开关
 
-另有 `:window`、`:video`、`:onnxruntime` 模板；窗口模板需要桌面会话。
-需要预处理宏时，在 import 前包含 `<mwrap/opencv/macros.hpp>`。
+core 必需，`default=[]`；`all-modules` 只选择模块，不自动开启所有后端。
+按需选择 `highgui-native`、`videoio-native`、`videoio-ffmpeg`、`imgcodecs-webp`、`dnn-onnxruntime`。
+宏映射位于 `.macros`；预处理宏在 import 前包含 `<mwrap/opencv/macros.hpp>`。
 
-## 文档
+## 示例
 
-[用法与 feature](docs/usage.zh.md) · [架构](docs/architecture.md) ·
-[示例](examples) · [验收记录](.agents/docs/2026-10-24-readiness-audit.md) · [Apache-2.0](LICENSE)
+默认模板自行生成图像；另有 `:window`、`:video`、`:onnxruntime` 模板。
+[示例](examples) · [使用说明](docs/usage.zh.md)
+
+## 构建与工具链
+
+已验证 Linux GCC/LLVM、Windows LLVM、macOS ARM64 LLVM；窗口需要桌面会话。
+真实摄像头需要设备；GPU/contrib 与非基线 ISA 不在本次发布范围。
+[架构](docs/architecture.en.md) · [覆盖与编译器限制](docs/coverage.md)
+
+## 许可证
+
+[Apache-2.0](LICENSE)；保留上游及选中依赖的通知。

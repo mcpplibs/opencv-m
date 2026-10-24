@@ -3,7 +3,7 @@
 [中文](architecture.md)
 
 The package `mcpplibs.mwrap.opencv` wraps OpenCV 5.0.0 for C++23 modules.
-The wrapper revision is 5.0.0.1. Upstream `cv::` names and type identities remain
+The wrapper revision is 5.0.0. Upstream `cv::` names and type identities remain
 unchanged; package/module identity identifies the adaptation layer. This
 checkpoint does not claim complete public API or hardware coverage.
 

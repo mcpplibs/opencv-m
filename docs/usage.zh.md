@@ -3,7 +3,7 @@
 # opencv-m
 
 通过 `mcpplibs.mwrap.opencv` 使用 OpenCV 5.0.0 C++ API，保留 `cv::` 名称。
-候选包版本为 **5.0.0.1**：上游 5.0.0，加封装修订 1。
+候选包版本为 **5.0.0**：上游 5.0.0，加封装修订 1。
 
 [English](../README.md) · **中文**
 
@@ -36,7 +36,7 @@ CI 覆盖 Linux GCC/LLVM、Linux musl 静态、macOS arm64 和 Windows MSVC ABI�
 候选版本发布并加入索引后：
 
 ```sh
-mcpp new myvision --template mcpplibs.mwrap.opencv@5.0.0.1
+mcpp new myvision --template mcpplibs.mwrap.opencv@5.0.0
 cd myvision
 mcpp run
 ```
@@ -44,7 +44,7 @@ mcpp run
 命名模板 `window` 会显示生成的图像并处理窗口事件：
 
 ```sh
-mcpp new mywindow --template mcpplibs.mwrap.opencv@5.0.0.1:window
+mcpp new mywindow --template mcpplibs.mwrap.opencv@5.0.0:window
 cd mywindow
 mcpp run
 ```
@@ -56,7 +56,7 @@ Linux 需要图形会话与 `pkg-config` 命令；GTK3 头文件与库由声明�
 并同时导入独立 ORT 模块：
 
 ```sh
-mcpp new inference --template mcpplibs.mwrap.opencv@5.0.0.1:onnxruntime
+mcpp new inference --template mcpplibs.mwrap.opencv@5.0.0:onnxruntime
 cd inference
 mcpp run
 ```
@@ -73,7 +73,7 @@ mcpp run
 
 ```toml
 [dependencies."mcpplibs.mwrap"]
-opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
+opencv = { version = "5.0.0", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 ```
 
 `default = []`，core 始终存在。可选模块按上游依赖关系展开。
@@ -127,7 +127,7 @@ cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
 
 | 旧形式 | 新候选形式 |
 |---|---|
-| `opencv.opencv@5.0.0` | `mcpplibs.mwrap.opencv@5.0.0.1`；默认仅 core，其他 feature 显式选择 |
+| `opencv.opencv@5.0.0` | `mcpplibs.mwrap.opencv@5.0.0`；默认仅 core，其他 feature 显式选择 |
 | `import opencv;` / `import opencv.cv;` | `import mcpplibs.mwrap.opencv;` |
 | `import opencv.<module>;` | `import mcpplibs.mwrap.opencv.<module>;`，并启用对应模块 feature |
 | 封装常量 `cv::CV_8UC3` | 使用上文 namespace 别名的 `macros::CV_8UC3` |
@@ -175,7 +175,7 @@ FAST 保留 x86 AVX2 实现。八个新增模块的 OpenCL 内核尚未接入，
 命名模板 `video` 使用 FFmpeg 编码并解码 12 帧生成图像，列出原生相机后端；不需要相机硬件。Linux V4L2 测试只验证注册和缺失设备路径，不能证明实体相机采集。
 
 ```sh
-mcpp new video-demo --template mcpplibs.mwrap.opencv@5.0.0.1:video
+mcpp new video-demo --template mcpplibs.mwrap.opencv@5.0.0:video
 cd video-demo
 mcpp run
 ```

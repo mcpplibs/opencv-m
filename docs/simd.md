@@ -5,7 +5,7 @@ original `cv::` vector types and function names:
 
 ```toml
 [dependencies]
-"mcpplibs.mwrap.opencv" = { version = "5.0.0.1", features = ["simd"] }
+"mcpplibs.mwrap.opencv" = { version = "5.0.0", features = ["simd"] }
 ```
 
 ```cpp

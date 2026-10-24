@@ -243,7 +243,7 @@ def generate():
     # contract used by the standalone ORT project and the ORT consumer template.
     targets.setdefault("x86_64-linux-gnu", {})["cxx_runtime"] = "toolchain-coupled"
     manifest = {
-        "package": {"namespace": "mcpplibs.mwrap", "name": "opencv", "version": "5.0.0.1",
+        "package": {"namespace": "mcpplibs.mwrap", "name": "opencv", "version": "5.0.0",
                     "description": "OpenCV 5.0.0 public C++ APIs through optional mwrap modules",
                     "license": "Apache-2.0", "repo": "https://github.com/mcpplibs/opencv-m",
                     "metadata": {"mwrap": {"upstream-version": "5.0.0", "wrapper-revision": 1}}},

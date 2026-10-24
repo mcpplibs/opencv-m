@@ -2,7 +2,7 @@
 
 [English](architecture.en.md)
 
-`mcpplibs.mwrap.opencv` 为 OpenCV 5.0.0 提供 C++23 模块入口，封装修订为 5.0.0.1。
+`mcpplibs.mwrap.opencv` 为 OpenCV 5.0.0 提供 C++23 模块入口，封装修订为 5.0.0。
 上游 `cv::` 名称与类型身份保持一致；包名和模块名表达封装层归属。当前 checkpoint
 仍在补齐公共 API 与后端覆盖，不能据此宣称完整支持。
 

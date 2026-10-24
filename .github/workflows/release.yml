@@ -1,68 +1,49 @@
 name: Release
-
 on:
   push:
-    tags: ["v*"]
-
+    tags: ["mwrap-*"]
 permissions:
-  contents: write
-
-env:
-  # Keep in lockstep with ci.yml: the manifest needs >= 0.0.102
-  # ([target.'cfg(...)'.build.flags], mcpp#258). The previous `xlings install`
-  # path delivered whatever mcpp xlings shipped (0.0.101 at the time), which
-  # rejects cfg-section flag tables — the v0.0.9 and v0.0.10 release runs both
-  # failed on exactly that skew, while the 5-leg CI (pinned) was green.
-  MCPP_VERSION: "2026.10.24.1"
-
+  contents: read
 jobs:
-  verify-and-release:
-    name: verify (linux) + GitHub Release
+  publish:
     runs-on: ubuntu-latest
-    # Cold source-build of the vendored OpenCV + transitive compat.ffmpeg (see ci.yml).
-    timeout-minutes: 90
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Same pinned install as ci.yml: the release tarball seeds
-      # ~/.mcpp/registry (nasm included), no xlings needed.
-      - name: Download mcpp
-        shell: bash
-        env:
-          MCPP_ARCHIVE: mcpp-${{ env.MCPP_VERSION }}-linux-x86_64.tar.gz
-          MCPP_ROOT: mcpp-${{ env.MCPP_VERSION }}-linux-x86_64
-        run: |
-          curl -L -fsS -o "$MCPP_ARCHIVE" \
-            "https://github.com/mcpp-community/mcpp/releases/download/v${MCPP_VERSION}/${MCPP_ARCHIVE}"
-          tar -xzf "$MCPP_ARCHIVE"
-          root="$PWD/$MCPP_ROOT"
-          mkdir -p "$HOME/.mcpp/registry"
-          cp -a "$root/registry/." "$HOME/.mcpp/registry/"
-          echo "$root/bin" >> "$GITHUB_PATH"
-
-      - name: Set default toolchain
-        run: |
-          mcpp toolchain install gcc 16.1.0
-          mcpp toolchain default gcc@16.1.0
-          mcpp --version
-
-      - name: Build + test at the tagged revision
-        run: |
-          mcpp build
-          mcpp test
-
-      - name: Verify tag matches package version
-        run: |
-          pkg_ver="$(sed -n 's/^version *= *"\(.*\)"/\1/p' mcpp.toml | head -1)"
-          tag="${GITHUB_REF_NAME#v}"
-          test "$pkg_ver" = "$tag" || { echo "tag $GITHUB_REF_NAME != package version $pkg_ver"; exit 1; }
-
-      - name: Create GitHub Release
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check tag, upstream version and bilingual entry pages
+        run: python3 tools/check_mwrap_release.py --tag "$GITHUB_REF_NAME"
+      - name: Require successful source CI at this exact commit
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            --title "opencv-m $GITHUB_REF_NAME" \
-            --generate-notes \
-            --verify-tag
+          set -euo pipefail
+          result=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq '.[0] | .status == "completed" and .conclusion == "success"')
+          test "$result" = true || { echo 'No successful source CI at the tag commit'; exit 1; }
+      - name: Build immutable source asset and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#mwrap-}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          asset="${repo}-${version}.tar.gz"
+          git archive --format=tar.gz --prefix="${repo}-${version}/" "$GITHUB_SHA" > "$RUNNER_TEMP/$asset"
+          (cd "$RUNNER_TEMP" && sha256sum "$asset" > "$asset.sha256")
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release already exists; refusing to change immutable assets'; exit 1
+          fi
+          extra=()
+          if [[ "$version" == *-rc* ]]; then extra+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/$asset" "$RUNNER_TEMP/$asset.sha256" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --title "$repo $version" \
+            --notes "Module wrapper for upstream $version. New mwrap package identities become installable after mcpp-index publication; see the bilingual README for the tested support scope." "${extra[@]}"

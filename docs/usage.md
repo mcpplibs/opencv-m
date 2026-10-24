@@ -3,7 +3,7 @@ Detailed usage and background. See the [README](../README.md) for the current ca
 # opencv-m
 
 OpenCV 5.0.0 C++ APIs through `mcpplibs.mwrap.opencv`, preserving `cv::` names.
-The candidate package is **5.0.0.1**: upstream 5.0.0 plus wrapper revision 1.
+The candidate package is **5.0.0**: upstream 5.0.0 plus wrapper revision 1.
 
 **English** · [中文](../README.zh.md)
 
@@ -40,7 +40,7 @@ are tested. No input image is required.
 After this candidate is published and indexed:
 
 ```sh
-mcpp new myvision --template mcpplibs.mwrap.opencv@5.0.0.1
+mcpp new myvision --template mcpplibs.mwrap.opencv@5.0.0
 cd myvision
 mcpp run
 ```
@@ -48,7 +48,7 @@ mcpp run
 The named `window` template displays a generated image and processes window events:
 
 ```sh
-mcpp new mywindow --template mcpplibs.mwrap.opencv@5.0.0.1:window
+mcpp new mywindow --template mcpplibs.mwrap.opencv@5.0.0:window
 cd mywindow
 mcpp run
 ```
@@ -61,7 +61,7 @@ The named `onnxruntime` template runs a generated ONNX Add model through
 OpenCV's ENGINE_ORT and also imports the standalone ORT module:
 
 ```sh
-mcpp new inference --template mcpplibs.mwrap.opencv@5.0.0.1:onnxruntime
+mcpp new inference --template mcpplibs.mwrap.opencv@5.0.0:onnxruntime
 cd inference
 mcpp run
 ```
@@ -81,7 +81,7 @@ A successful older archive does not certify a later source checkpoint.
 
 ```toml
 [dependencies."mcpplibs.mwrap"]
-opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
+opencv = { version = "5.0.0", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 ```
 
 `default = []`; core is mandatory. Optional modules add their upstream dependency
@@ -144,7 +144,7 @@ Migration from the legacy wrapper uses these explicit replacements:
 
 | Legacy form | New candidate form |
 |---|---|
-| `opencv.opencv@5.0.0` | `mcpplibs.mwrap.opencv@5.0.0.1`; core-only default, with other features requested explicitly |
+| `opencv.opencv@5.0.0` | `mcpplibs.mwrap.opencv@5.0.0`; core-only default, with other features requested explicitly |
 | `import opencv;` / `import opencv.cv;` | `import mcpplibs.mwrap.opencv;` |
 | `import opencv.<module>;` | `import mcpplibs.mwrap.opencv.<module>;` with its module feature enabled |
 | Wrapper constant `cv::CV_8UC3` | `macros::CV_8UC3` with the namespace alias above |
@@ -202,7 +202,7 @@ OpenCV sources are Apache-2.0; third-party components retain their own licenses.
 The named `video` template encodes and decodes 12 generated frames through FFmpeg and lists native camera backends without requiring a camera. Linux V4L2 tests cover registration and the missing-device path; physical camera capture remains unverified.
 
 ```sh
-mcpp new video-demo --template mcpplibs.mwrap.opencv@5.0.0.1:video
+mcpp new video-demo --template mcpplibs.mwrap.opencv@5.0.0:video
 cd video-demo
 mcpp run
 ```
