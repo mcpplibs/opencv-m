@@ -883,7 +883,7 @@ A second A/B replay restores the original root against the SAME warmed graph:
 it fails with both missing-BMI diagnostics again. Restoring exact formal root
 bytes passes actual CPU/profile inference (6.41s), excluding cache warmth as
 the explanation. Logs: /tmp/mwrap-gcc-ort-root-repro.log,
-/tmp/mwrap-gcc-ort-root-import-negative.log, /tmp/mwrap-gcc-root-import-ab.log.
+/tmp/mwrap-gcc-root-import-negative.log, /tmp/mwrap-gcc-root-import-ab.log.
 
 All 38 programs pass on LLVM23 (128.68s), GCC16 (238.24s) and LLVM22 (790.55s,
 including its cold configuration rebuild). Seven SDK/module outputs remain

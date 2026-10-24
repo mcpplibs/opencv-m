@@ -140,6 +140,19 @@ namespace macros = mcpplibs::mwrap::opencv::macros;
 cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
 ```
 
+Migration from the legacy wrapper uses these explicit replacements:
+
+| Legacy form | New candidate form |
+|---|---|
+| `opencv.opencv@5.0.0` | `mcpplibs.mwrap.opencv@5.0.0.1`; core-only default, with other features requested explicitly |
+| `import opencv;` / `import opencv.cv;` | `import mcpplibs.mwrap.opencv;` |
+| `import opencv.<module>;` | `import mcpplibs.mwrap.opencv.<module>;` with its module feature enabled |
+| Wrapper constant `cv::CV_8UC3` | `macros::CV_8UC3` with the namespace alias above |
+| Ordinary upstream `cv::Mat`, `cv::cvtColor`, etc. | Keep the original spelling |
+
+Historical package identities and resource bytes remain available unchanged;
+the new package does not add permanent aliases for the legacy module names.
+
 For preprocessing macros such as CV_Assert, include
 `<mwrap/opencv/macros.hpp>` **before** importing. Raw macros still expand inside
 qualified names: use raw macro and typed-mapping forms in separate contexts.

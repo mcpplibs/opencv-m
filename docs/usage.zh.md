@@ -123,6 +123,18 @@ namespace macros = mcpplibs::mwrap::opencv::macros;
 cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
 ```
 
+从旧封装迁移时，使用以下明确对照：
+
+| 旧形式 | 新候选形式 |
+|---|---|
+| `opencv.opencv@5.0.0` | `mcpplibs.mwrap.opencv@5.0.0.1`；默认仅 core，其他 feature 显式选择 |
+| `import opencv;` / `import opencv.cv;` | `import mcpplibs.mwrap.opencv;` |
+| `import opencv.<module>;` | `import mcpplibs.mwrap.opencv.<module>;`，并启用对应模块 feature |
+| 封装常量 `cv::CV_8UC3` | 使用上文 namespace 别名的 `macros::CV_8UC3` |
+| 普通上游 `cv::Mat`、`cv::cvtColor` 等 | 保持原名称 |
+
+旧包身份及其历史资源字节继续保留；新包不为旧模块名增加永久别名。
+
 需要 CV_Assert 等预处理宏时，在 import **之前**包含 `<mwrap/opencv/macros.hpp>`。
 原始宏仍会在限定名称中展开，因此宏形式与类型化映射应在不同使用上下文中选择。
 
