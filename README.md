@@ -6,6 +6,7 @@
 
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
 [![License](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](LICENSE)
+[![mcpp-community](https://img.shields.io/badge/mcpp--community-mwrap-blue)](https://github.com/mcpp-community)
 [![CI](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml)
 
 Sixteen main modules, optional native windows, codecs, video and ORT CPU; pinned upstream sources are separate from adapters.
@@ -72,3 +73,5 @@ Physical cameras require devices; GPU/contrib and nonbaseline ISA are outside th
 ## License
 
 [Apache-2.0](LICENSE); upstream and selected dependencies retain their notices.
+
+Wrapper: Apache-2.0, mcpp-community. [Original upstream README and licenses](upstream/opencv/). Upstream licenses remain unchanged.

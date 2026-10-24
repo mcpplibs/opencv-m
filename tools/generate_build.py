@@ -224,7 +224,7 @@ def generate():
     # build.mcpp emits the selected interface with concrete imports after
     # feature resolution, before mcpp scans the generated module.
     build["sources"] = ["src/opencv.cppm", "src/core.cppm", "src/detail/core.cppm", "src/detail/matx.cppm", "src/macros.cppm"]
-    notices = [ROOT / "LICENSE", ROOT / "port/licenses/UPSTREAM_SOURCE_NOTICES.txt", *sorted(
+    notices = [ROOT / "LICENSE", ROOT / "NOTICE", ROOT / "upstream/opencv/README.md", ROOT / "port/licenses/UPSTREAM_SOURCE_NOTICES.txt", *sorted(
         path for path in (ROOT / "upstream/opencv").rglob("*")
         if path.is_file() and any(word in path.name for word in
                                  ("LICENSE", "COPYING", "COPYRIGHT", "NOTICE")))]
@@ -245,8 +245,8 @@ def generate():
     manifest = {
         "package": {"namespace": "mcpplibs.mwrap", "name": "opencv", "version": "5.0.0",
                     "description": "OpenCV 5.0.0 public C++ APIs through optional mwrap modules",
-                    "license": "Apache-2.0", "repo": "https://github.com/mcpplibs/opencv-m",
-                    "metadata": {"mwrap": {"upstream-version": "5.0.0", "wrapper-revision": 1}}},
+                    "license": "Apache-2.0", "authors": ["mcpp-community"], "repo": "https://github.com/mcpplibs/opencv-m",
+                    "metadata": {"mwrap": {"upstream-version": "5.0.0", "wrapper-revision": 0}}},
         "build": build, "target": targets,
         "runtime": {"deploy": license_deploy},
         "dev-dependencies": {"compat": {"gtest": "1.15.2"}},
@@ -254,7 +254,7 @@ def generate():
         "feature-deps": {"videoio-ffmpeg": {"compat": {"ffmpeg": "8.1.2"}},
                          "imgcodecs-webp": {"compat": {"libwebp": {
                              "version": "1.5.0", "features": ["demux", "mux"]}}},
-                         "dnn-onnxruntime": {"mcpplibs.mwrap": {"onnxruntime": "1.25.1"}}},
+                         "dnn-onnxruntime": {"mcpplibs.mwrap": {"onnxruntime": "1.25.1.1"}}},
         "targets": {"opencv": {"kind": "lib"}},
     }
     write_if_changed(ROOT / "mcpp.toml",
