@@ -1,20 +1,17 @@
 # opencv
 
 > OpenCV 5.0.0 through C++23 modules; the upstream cv:: API is preserved.
+> Sixteen main modules, optional native windows, codecs, video and ORT CPU; pinned upstream sources are separate from adapters.
 
 **English** · [简体中文](README.zh.md)
+
+Upstream: [opencv/opencv](https://github.com/opencv/opencv)
 
 [Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
 
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
 [![License](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml)
-
-Use mcpp **2026.10.24.1**. The new mwrap identity becomes installable after index publication.
-
-## Characteristics
-
-Sixteen main modules, optional native windows, codecs, video and ORT CPU; pinned upstream sources are separate from adapters.
 
 ## Getting started
 
@@ -42,9 +39,18 @@ See the [sixteen-module and API matrices](docs/coverage.md).
 
 ## Features
 
-Core is mandatory; `default=[]`. `all-modules` selects modules, not every backend.
-Use `highgui-native`, `videoio-native`, `videoio-ffmpeg`, `imgcodecs-webp` or `dnn-onnxruntime` explicitly.
-Macro mappings use `.macros`; preprocessing macros use `<mwrap/opencv/macros.hpp>` before imports.
+Core is mandatory; `default=[]`. Select capabilities explicitly.
+
+| Feature | Purpose |
+|---|---|
+| `all-modules` | Sixteen main modules; backends stay explicit |
+| `highgui-native` | GTK3 / Win32 / Cocoa windows |
+| `imgcodecs-png`, `imgcodecs-jpeg`, `imgcodecs-webp` | Selected image formats |
+| `videoio-native`, `videoio-ffmpeg` | Native platform / FFmpeg video |
+| `dnn-onnxruntime` | ORT CPU inference |
+| `simd`, `simd-emulated` | Native baseline / software vectors |
+
+Macro mappings use `.macros`; include `<mwrap/opencv/macros.hpp>` before imports for preprocessing macros.
 
 ## Examples
 

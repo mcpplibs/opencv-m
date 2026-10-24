@@ -1,20 +1,17 @@
 # opencv
 
 > 以 C++23 模块使用 OpenCV 5.0.0，保留上游 cv:: API。
+> 十六个主模块；原生窗口、编解码、视频和 ORT CPU 按需启用，上游源码与适配分层。
 
 [English](README.md) · **简体中文**
+
+上游仓库：[opencv/opencv](https://github.com/opencv/opencv)
 
 [Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
 
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
 [![License](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml)
-
-使用 mcpp **2026.10.24.1**。新 mwrap 身份在索引发布后可直接安装。
-
-## 特性
-
-十六个主模块；原生窗口、编解码、视频和 ORT CPU 按需启用，上游源码与适配分层。
 
 ## 快速开始
 
@@ -42,9 +39,18 @@ int main() { return cv::Mat(8, 8, macros::CV_8UC3).empty(); }
 
 ## 特性开关
 
-core 必需，`default=[]`；`all-modules` 只选择模块，不自动开启所有后端。
-按需选择 `highgui-native`、`videoio-native`、`videoio-ffmpeg`、`imgcodecs-webp`、`dnn-onnxruntime`。
-宏映射位于 `.macros`；预处理宏在 import 前包含 `<mwrap/opencv/macros.hpp>`。
+core 必需，`default=[]`；按需叠加以下能力。
+
+| Feature | 用途 |
+|---|---|
+| `all-modules` | 十六个主模块，后端仍显式选择 |
+| `highgui-native` | GTK3 / Win32 / Cocoa 窗口 |
+| `imgcodecs-png`, `imgcodecs-jpeg`, `imgcodecs-webp` | 按格式选择图像编解码 |
+| `videoio-native`, `videoio-ffmpeg` | 平台原生 / FFmpeg 视频 |
+| `dnn-onnxruntime` | ORT CPU 推理 |
+| `simd`, `simd-emulated` | 原生基线 / 软件向量 |
+
+宏映射位于 `.macros`；文本宏在 import 前包含 `<mwrap/opencv/macros.hpp>`。
 
 ## 示例
 
