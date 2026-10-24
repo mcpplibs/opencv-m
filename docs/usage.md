@@ -7,10 +7,12 @@ The candidate package is **5.0.0.1**: upstream 5.0.0 plus wrapper revision 1.
 
 **English** · [中文](../README.zh.md)
 
-This branch is an implementation checkpoint. All sixteen main modules are integrated and have passed local Linux GCC/LLVM tests.
-The native GTK3 window backend has passed local Linux tests and Cocoa passed
-native macOS CI; Win32 validation is pending. Public API coverage auditing and additional video/codec backends are
-still being implemented; the ORT CPU bridge has passed Linux validation. Passing the current CI does not establish full OpenCV support.
+This is an unpublished candidate with all sixteen main modules, explicit native
+window/video backends, PNG/JPEG/WebP and the ORT CPU bridge. Module availability,
+API coverage, runtime backends and target certification are separate questions.
+See the [coverage matrices](coverage.md) and [readiness ledger](../.agents/docs/2026-10-24-readiness-audit.md)
+for exact evidence and outstanding gates. Current source/index CI and final
+archive installation/deployment must pass before release.
 
 ## Build the checkout
 
@@ -70,8 +72,10 @@ fallback cannot satisfy them. Enabling dnn-onnxruntime also re-exports the ORT
 module through the selected aggregate, keeping cross-package BMI paths consistent
 for GCC. `cv::` and `Ort::` retain their upstream names.
 
-The installed-template fixture used during development stages candidate sources;
-it is separate from the still-required published archive/index installation test.
+Local-source template tests and actual immutable-archive installation tests are
+separate. The index acceptance uses a fresh private home, runs the unmodified
+template and indexed API consumer, then packs and relocates the application.
+A successful older archive does not certify a later source checkpoint.
 
 ## Dependencies and features
 
@@ -103,12 +107,15 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | dnn-onnxruntime | Adds dnn and the official ORT 1.25.1 CPU SDK through mcpplibs.mwrap.onnxruntime |
 | unifont | Unicode/CJK font rendering, implying imgproc |
 
-The all-modules feature selects sixteen module implementations; it does not promise complete API or backend coverage. GTK3 window creation, image display,
-event processing and destruction have passed locally; Cocoa passed native CI.
-Win32 window creation passed native CI. ORT CPU inference and actual session profiling
-have passed Linux GCC/LLVM and macOS; Windows validation is pending.
-Calling imshow with only the API-only
-highgui feature still reports missing window backend support; enable a backend.
+The all-modules feature selects sixteen implementations; it does not select
+external SDKs or every runtime backend. GTK3, Win32 and Cocoa window behavior
+and ORT CPU inference have native evidence in the coverage/readiness records;
+each new source checkpoint still requires its own platform CI. Physical camera
+capture and GPU/provider execution require applicable device runners.
+Calling imshow with API-only highgui still reports a missing window backend;
+enable highgui-native or a supported explicit backend. Planned/unavailable codec,
+GUI, video and accelerator names are listed in the coverage matrix and are not
+registered as empty features.
 
 ## Modules, API and macros
 

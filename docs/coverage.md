@@ -76,6 +76,20 @@ features and their required dependency closure. Every module also depends on cor
 | CUDA, OpenCL, OpenVINO, other SDK backends | Planned/unavailable | Declaration exports do not enable a device implementation |
 | Contrib | Not imported | Separate matching upstream version and per-module verification required |
 
+The following design names are planned/unavailable in this candidate, rather
+than registered empty features. Retained upstream source files alone do not
+enable their codec or backend implementations.
+
+| Planned names / scope | Current boundary |
+|---|---|
+| `imgcodecs-tiff`, `imgcodecs-openexr`, `imgcodecs-jpeg2000`, `imgcodecs-avif`, `imgcodecs-jpegxl` | No integrated provider/configuration or certified roundtrip |
+| `highgui-qt6`, `highgui-wayland` | No selected implementation/SDK; native GTK3/Win32/Cocoa are the implemented choices |
+| `videoio-gstreamer`, `videoio-dshow` | No integrated backend; native V4L2/MSMF/AVFoundation and FFmpeg are separately verified |
+| `opencl`, `opengl`, `tbb`, `ipp`, `lapack`, `eigen` | No feature integration or acceleration claim from declaration availability |
+| `dnn-openvino`, `dnn-cuda`, ORT GPU providers | CPU inference is the declared scope; runtime/SDK/device integration remains separate |
+| `contrib-*` | Matching contrib sources are not imported; no contrib module is certified |
+| AVX/AVX512, VSX, MSA, LSX/LASX, RVV and WASM universal-intrinsic families | No public module/target certification beyond the declared baseline/native and software modes |
+
 ## Targets and configuration
 
 | Target | Toolchain / linkage | Verified scope at e72c09b |

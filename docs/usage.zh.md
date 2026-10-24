@@ -7,9 +7,10 @@
 
 [English](../README.md) · **中文**
 
-本分支是实现 checkpoint。目前已接入全部十六个主模块，并通过 Linux GCC/LLVM 本地测试；GTK3 原生窗口也已通过本地测试，
-Cocoa 已通过原生 CI，Win32 尚待结果；公共 API 覆盖审计、更多视频/codec 后端仍在实施；ORT CPU 桥接已通过 Linux 验证。
-当前 CI 通过不代表已经完整支持 OpenCV。
+这是尚未发布的候选版本，已接入全部十六个主模块、显式原生窗口/视频后端、PNG/JPEG/WebP 和 ORT CPU 桥接。
+模块可用、API 覆盖、运行后端与目标认证分别验收；具体证据和剩余门槛见
+[覆盖矩阵](coverage.md) 与 [验收记录](../.agents/docs/2026-10-24-readiness-audit.md)。
+发布前仍须通过当前源码/索引提交的 CI，以及最终归档的实际安装和搬迁部署验收。
 
 ## 构建本地 checkout
 
@@ -65,7 +66,8 @@ mcpp run
 启用 dnn-onnxruntime 后，选择聚合模块也会转导出 ORT 模块，使 GCC 的跨包 BMI 路径保持一致；
 `cv::` 与 `Ort::` 名称不变。
 
-开发用安装模板 fixture 会预置候选源码；它不能替代尚待执行的正式归档与索引安装验收。
+本地源码模板测试与真实不可变归档安装分别验收。索引验收使用独立测试 home，先运行未修改的模板，
+再运行索引 API 消费者并打包搬迁。旧归档通过不能证明后续源码 checkpoint 已通过。
 
 ## 依赖与 feature
 
@@ -97,10 +99,11 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | dnn-onnxruntime | 启用 dnn，并通过 mcpplibs.mwrap.onnxruntime 引入官方 ORT 1.25.1 CPU SDK |
 | unifont | Unicode/CJK 字体渲染，包含 imgproc |
 
-all-modules 选择 16 个主模块实现，不代表完整 API 或后端覆盖。GTK3 创建窗口、显示图像、处理事件和销毁窗口
-已在本地通过，Cocoa 和 Win32 窗口已通过原生 CI；ORT CPU 推理和真实 session profile 已通过 Linux GCC/LLVM 与 macOS，
-Windows 验证仍待 CI。
-只启用 highgui API 调用 imshow 仍会报告缺少窗口后端，需要同时选择后端 feature。
+all-modules 选择十六个实现，不隐式选择外部 SDK 或全部后端。GTK3、Win32、Cocoa 窗口行为及 ORT CPU
+推理的原生证据见覆盖矩阵与验收记录；每个新源码 checkpoint 仍须通过对应平台 CI。
+真实摄像头采集与 GPU/provider 执行需要具备设备的 runner。
+仅选择 highgui API 时，imshow 仍会报告缺少窗口后端；请启用 highgui-native 或明确支持的后端。
+尚未接入的 codec、GUI、视频和加速能力列在覆盖矩阵中，不注册无实现的空 feature。
 
 ## 模块、API 与宏
 
