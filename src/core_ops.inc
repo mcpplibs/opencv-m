@@ -26,6 +26,13 @@
 // Net: every operator works in BOTH worlds — the v0.0.2 "prefer member
 // forms in mixed TUs" caveat is gone.
 
+// Non-inline module-private bridges preserve the SDK's exact platform rounding
+// without exposing its TU-local helpers through exported conversion templates.
+namespace opencv_m_scalar_bridge {
+int round32(float value) { return ::cvRound(value); }
+int round32(double value) { return ::cvRound(value); }
+}
+
 export namespace cv {
 // inline namespace: distinct entities from the upstream TU-local ones (no
 // in-module redefinition), yet reachable as cv::… via qualified lookup and
@@ -36,44 +43,7 @@ inline namespace opencv_m_repl {
 // CONSTRAINED than upstream's identical-signature one (see header comment)
 template<class> inline constexpr bool opencv_m_pick = true;
 
-// ── saturate_cast (upstream: static inline, core/saturate.hpp) ──────────
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(unsigned char v)      { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(signed char v)        { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(unsigned short v)     { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(short v)              { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(unsigned v)           { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(int v)                { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(float v)              { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(double v)             { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(long long v)          { return _Tp(v); }
-template<typename _Tp> requires opencv_m_pick<_Tp> constexpr _Tp saturate_cast(unsigned long long v) { return _Tp(v); }
-
-template<> inline unsigned char saturate_cast<unsigned char>(int v)
-{ return (unsigned char)((unsigned)v <= 255 ? v : v > 0 ? 255 : 0); }
-template<> inline unsigned char saturate_cast<unsigned char>(float v)
-{ return saturate_cast<unsigned char>((int)__builtin_lrintf(v)); }
-template<> inline unsigned char saturate_cast<unsigned char>(double v)
-{ return saturate_cast<unsigned char>((int)__builtin_lrint(v)); }
-template<> inline signed char saturate_cast<signed char>(int v)
-{ return (signed char)((unsigned)(v + 128) <= 255 ? v : v > 0 ? 127 : -128); }
-template<> inline signed char saturate_cast<signed char>(float v)
-{ return saturate_cast<signed char>((int)__builtin_lrintf(v)); }
-template<> inline signed char saturate_cast<signed char>(double v)
-{ return saturate_cast<signed char>((int)__builtin_lrint(v)); }
-template<> inline unsigned short saturate_cast<unsigned short>(int v)
-{ return (unsigned short)((unsigned)v <= 65535 ? v : v > 0 ? 65535 : 0); }
-template<> inline unsigned short saturate_cast<unsigned short>(float v)
-{ return saturate_cast<unsigned short>((int)__builtin_lrintf(v)); }
-template<> inline unsigned short saturate_cast<unsigned short>(double v)
-{ return saturate_cast<unsigned short>((int)__builtin_lrint(v)); }
-template<> inline short saturate_cast<short>(int v)
-{ return (short)((unsigned)(v + 32768) <= 65535 ? v : v > 0 ? 32767 : -32768); }
-template<> inline short saturate_cast<short>(float v)
-{ return saturate_cast<short>((int)__builtin_lrintf(v)); }
-template<> inline short saturate_cast<short>(double v)
-{ return saturate_cast<short>((int)__builtin_lrint(v)); }
-template<> inline int saturate_cast<int>(float v)  { return (int)__builtin_lrintf(v); }
-template<> inline int saturate_cast<int>(double v) { return (int)__builtin_lrint(v); }
+#include "saturate_ops.inc"
 
 // ── Point_ ──────────────────────────────────────────────────────────────
 template<typename _Tp> requires opencv_m_pick<_Tp> inline bool operator==(const Point_<_Tp>& a, const Point_<_Tp>& b)

@@ -29,6 +29,10 @@ export namespace cv {
     using cv::LevMarq;
     using cv::LocalOptimMethod;
     using cv::MAGSAC;
+    using cv::MSTAlgorithm;
+    using cv::MSTEdge;
+    using cv::MST_KRUSKAL;
+    using cv::MST_PRIM;
     using cv::MatrixType;
     using cv::NEIGH_FLANN_KNN;
     using cv::NEIGH_FLANN_RADIUS;
@@ -82,6 +86,7 @@ export namespace cv {
     using cv::arcLength;
     using cv::boundingRect;
     using cv::boxPoints;
+    using cv::buildMST;
     using cv::calibrationMatrixValues;
     using cv::composeRT;
     using cv::computeCorrespondEpilines;

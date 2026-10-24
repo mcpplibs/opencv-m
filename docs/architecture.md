@@ -76,3 +76,9 @@ GCC 上完整 core.hpp 混用仍有声明合并限制。源码模块数量不能
 
 `.agents/docs` 的验收记录保存 checkpoint 证据与剩余门槛。mcpp 引擎源码只读，
 其文档 PR 独立于本库进度。
+
+## 标量适配的语义验证
+
+`saturate_cast` 适配从固定版本 `saturate.hpp` 生成，保留十三种输入重载及上游特化；私有普通模块函数桥接 TU-local `cvRound`。测试在 import 前捕获原始 SDK 函数指针，对 169 组输入/输出类型独立比较，覆盖饱和边界和舍入。`makePtr` 保留上游自定义 deleter 禁用规则，通过正反编译用例验证。泛型 `cv::min/max` 使用上游导入的标准库实体，并保留图像三参数重载的选择行为。
+
+[Coverage matrices / 覆盖矩阵](coverage.md)

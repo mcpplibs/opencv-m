@@ -36,3 +36,8 @@ export namespace cv {
     using cv::getRecall;
     using cv::goodFeaturesToTrack;
 }
+#if defined(HAVE_OPENCV_DNN)
+export namespace cv {
+    using cv::DISK;
+}
+#endif

@@ -176,6 +176,10 @@ jobs:
         shell: bash
         run: python3 tools/generate_macros.py --check
 
+      - name: Generated scalar conversions match the pinned SDK
+        shell: bash
+        run: python3 tools/generate_saturate.py --check
+
       - name: Build
         shell: bash
         run: mcpp build
@@ -209,6 +213,7 @@ jobs:
         run: |
           mcpp test --features all-modules --strict --timeout 120
           python3 tools/check_interface_flags.py
+          python3 tools/check_cpp_contracts.py
 
       - name: C++ declaration and header coverage inventory
         if: matrix.name == 'linux-llvm-22'
@@ -233,6 +238,11 @@ jobs:
         if: matrix.name == 'linux-llvm-22'
         shell: bash
         run: python3 tools/test_template.py --toolchain llvm@22.1.8
+
+      - name: Features without the optional DNN surface
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: mcpp test --features features --strict --timeout 120
 
       - name: Feature tests (dnn + unifont module interfaces)
         if: matrix.features

@@ -44,6 +44,10 @@
 // not to opencv.core.)
 
 namespace opencv_m_fns_up {
+inline constexpr auto min_mmm = static_cast<void (*)(const cv::Mat&, const cv::Mat&, cv::Mat&)>(&cv::min);
+inline constexpr auto max_mmm = static_cast<void (*)(const cv::Mat&, const cv::Mat&, cv::Mat&)>(&cv::max);
+inline constexpr auto min_uuu = static_cast<void (*)(const cv::UMat&, const cv::UMat&, cv::UMat&)>(&cv::min);
+inline constexpr auto max_uuu = static_cast<void (*)(const cv::UMat&, const cv::UMat&, cv::UMat&)>(&cv::max);
 // ── abs (CV_EXPORTS Mat/MatExpr + external-inline softfloat) ────────────
 inline constexpr auto abs_m   = static_cast<cv::MatExpr   (*)(const cv::Mat&)>(&cv::abs);
 inline constexpr auto abs_e   = static_cast<cv::MatExpr   (*)(const cv::MatExpr&)>(&cv::abs);
@@ -120,43 +124,47 @@ public:
 } // namespace opencv_m_fns_detail
 
 export namespace cv {
+using std::min;
+using std::max;
 inline namespace opencv_m_repl {
 
-// scalar min/max (upstream cvstd.hpp does `using std::min/std::max`). We
-// cannot re-export std::min/std::max here: their 2-arg and 3-arg(Compare)
-// templates out-rank our Mat forwards in overload resolution (exact match vs
-// conversion-to-InputArray) and hijack cv::max(Mat,Mat)/cv::max(a,b,dst).
-// Instead expose arithmetic-only scalar forms — same result for the common
-// case, and is_arithmetic_v cleanly excludes Mat/MatExpr/Matx/softfloat so
-// those resolve to the dedicated overloads below.
-template<class _Tp> requires std::is_arithmetic_v<_Tp>
-inline const _Tp& min(const _Tp& a, const _Tp& b) { return a < b ? a : b; }
-template<class _Tp> requires std::is_arithmetic_v<_Tp>
-inline const _Tp& max(const _Tp& a, const _Tp& b) { return a > b ? a : b; }
+// Scalar/generic overloads retain the actual std entities imported by cvstd.hpp.
+// Mat/UMat three-argument forwards below preserve the SDK overloads that prevent
+// std's comparator overload from capturing image operations.
+template<class _D = void> requires opencv_m_pick<_D>
+inline void min(const Mat& a, const Mat& b, Mat& result) { ::opencv_m_fns_up::min_mmm(a, b, result); }
+template<class _D = void> requires opencv_m_pick<_D>
+inline void max(const Mat& a, const Mat& b, Mat& result) { ::opencv_m_fns_up::max_mmm(a, b, result); }
+template<class _D = void> requires opencv_m_pick<_D>
+inline void min(const UMat& a, const UMat& b, UMat& result) { ::opencv_m_fns_up::min_uuu(a, b, result); }
+template<class _D = void> requires opencv_m_pick<_D>
+inline void max(const UMat& a, const UMat& b, UMat& result) { ::opencv_m_fns_up::max_uuu(a, b, result); }
 
 // ── trivial self-contained reimpls (upstream: static inline) ────────────
 // alignPtr / alignSize / divUp / roundUp / getElemSize — utility.hpp
 template<typename _Tp> requires opencv_m_pick<_Tp>
 inline _Tp* alignPtr(_Tp* ptr, int n = (int)sizeof(_Tp))
-{ return (_Tp*)(((size_t)ptr + n-1) & -n); }
+{ CV_DbgAssert((n & (n - 1)) == 0); return (_Tp*)(((size_t)ptr + n-1) & -n); }
 template<class _D = void> requires opencv_m_pick<_D>
-inline size_t alignSize(size_t sz, int n) { return (sz + n-1) & -n; }
+inline size_t alignSize(size_t sz, int n) { CV_DbgAssert((n & (n - 1)) == 0); return (sz + n-1) & -n; }
 template<class _D = void> requires opencv_m_pick<_D>
-inline int divUp(int a, unsigned int b) { return (a + b - 1) / b; }
+inline int divUp(int a, unsigned int b) { CV_DbgAssert(a >= 0); return (a + b - 1) / b; }
 template<class _D = void> requires opencv_m_pick<_D>
 inline size_t divUp(size_t a, unsigned int b) { return (a + b - 1) / b; }
 template<class _D = void> requires opencv_m_pick<_D>
-inline int roundUp(int a, unsigned int b) { return a + b - 1 - (a + b - 1) % b; }
+inline int roundUp(int a, unsigned int b) { CV_DbgAssert(a >= 0); return a + b - 1 - (a + b - 1) % b; }
 template<class _D = void> requires opencv_m_pick<_D>
 inline size_t roundUp(size_t a, unsigned int b) { return a + b - 1 - (a + b - 1) % b; }
 template<class _D = void> requires opencv_m_pick<_D>
 inline size_t getElemSize(int type) { return (size_t)CV_ELEM_SIZE(type); }
 
-// makePtr — cvstd_wrapper.hpp (static_assert on has_custom_delete dropped:
-// that trait is a TU-local GMF helper; the shared_ptr construction is the
-// operative body and the assert never fires for ordinary user types)
+// makePtr — preserve the upstream custom-deleter contract; the trait is now
+// exported as its original global-module entity.
 template<typename _Tp, typename ... A1> requires opencv_m_pick<_Tp>
-inline Ptr<_Tp> makePtr(const A1&... a1) { return (Ptr<_Tp>)std::make_shared<_Tp>(a1...); }
+inline Ptr<_Tp> makePtr(const A1&... a1) {
+    static_assert(!has_custom_delete<_Tp>::value, "Can't use this makePtr with custom DefaultDeleter");
+    return (Ptr<_Tp>)std::make_shared<_Tp>(a1...);
+}
 
 // to{Lower,Upper}Case — cvstd.hpp (char_tolower/char_toupper inlined as a
 // lambda so the body does not reference the pruned cv::details helpers)

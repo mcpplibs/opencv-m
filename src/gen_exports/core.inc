@@ -17,6 +17,7 @@ export namespace cv {
     using cv::AlgorithmHint;
     using cv::Allocator;
     using cv::AsyncArray;
+    using cv::AsyncPromise;
     using cv::AutoBuffer;
     using cv::AutoLock;
     using cv::BORDER_CONSTANT;
@@ -88,8 +89,12 @@ export namespace cv {
     using cv::DefaultDeleter;
     using cv::DftFlags;
     using cv::DownhillSolver;
+    using cv::DualQuat;
+    using cv::DualQuatd;
+    using cv::DualQuatf;
     using cv::ErrorCallback;
     using cv::Exception;
+    using cv::FPDenormalsIgnoreHintScope;
     using cv::FileNode;
     using cv::FileNodeIterator;
     using cv::FileStorage;
@@ -284,6 +289,9 @@ export namespace cv {
     using cv::SparseMatIterator_;
     using cv::SparseMat_;
     using cv::String;
+    using cv::TLSData;
+    using cv::TLSDataAccumulator;
+    using cv::TLSDataContainer;
     using cv::TermCriteria;
     using cv::TickMeter;
     using cv::UMat;
@@ -350,6 +358,7 @@ export namespace cv {
     using cv::checkRange;
     using cv::compare;
     using cv::completeSymm;
+    using cv::conjugate;
     using cv::convertScaleAbs;
     using cv::copyMakeBorder;
     using cv::copyTo;
@@ -538,11 +547,60 @@ export namespace cv::Error {
     using cv::Error::StsVecLengthErr;
 }
 export namespace cv::cuda {
+    using cv::cuda::BufferPool;
+    using cv::cuda::DYNAMIC_PARALLELISM;
+    using cv::cuda::DevPtr;
+    using cv::cuda::DeviceInfo;
     using cv::cuda::Event;
+    using cv::cuda::FEATURE_SET_COMPUTE_10;
+    using cv::cuda::FEATURE_SET_COMPUTE_11;
+    using cv::cuda::FEATURE_SET_COMPUTE_12;
+    using cv::cuda::FEATURE_SET_COMPUTE_13;
+    using cv::cuda::FEATURE_SET_COMPUTE_20;
+    using cv::cuda::FEATURE_SET_COMPUTE_21;
+    using cv::cuda::FEATURE_SET_COMPUTE_30;
+    using cv::cuda::FEATURE_SET_COMPUTE_32;
+    using cv::cuda::FEATURE_SET_COMPUTE_35;
+    using cv::cuda::FEATURE_SET_COMPUTE_50;
+    using cv::cuda::FeatureSet;
+    using cv::cuda::GLOBAL_ATOMICS;
+    using cv::cuda::GpuData;
     using cv::cuda::GpuMat;
     using cv::cuda::GpuMatND;
     using cv::cuda::HostMem;
+    using cv::cuda::IndexArray;
+    using cv::cuda::NATIVE_DOUBLE;
+    using cv::cuda::PtrStep;
+    using cv::cuda::PtrStepSz;
+    using cv::cuda::PtrStepSzb;
+    using cv::cuda::PtrStepSzf;
+    using cv::cuda::PtrStepSzi;
+    using cv::cuda::PtrStepSzus;
+    using cv::cuda::PtrStepb;
+    using cv::cuda::PtrStepf;
+    using cv::cuda::PtrStepi;
+    using cv::cuda::PtrStepus;
+    using cv::cuda::PtrSz;
+    using cv::cuda::SHARED_ATOMICS;
+    using cv::cuda::SizeArray;
+    using cv::cuda::StepArray;
     using cv::cuda::Stream;
+    using cv::cuda::TargetArchs;
+    using cv::cuda::WARP_SHUFFLE_FUNCTIONS;
+    using cv::cuda::createGpuMatFromCudaMemory;
+    using cv::cuda::deviceSupports;
+    using cv::cuda::getCudaEnabledDeviceCount;
+    using cv::cuda::getDevice;
+    using cv::cuda::printCudaDeviceInfo;
+    using cv::cuda::printShortCudaDeviceInfo;
+    using cv::cuda::registerPageLocked;
+    using cv::cuda::resetDevice;
+    using cv::cuda::setBufferPoolConfig;
+    using cv::cuda::setBufferPoolUsage;
+    using cv::cuda::setDevice;
+    using cv::cuda::setGlDevice;
+    using cv::cuda::unregisterPageLocked;
+    using cv::cuda::wrapStream;
 }
 export namespace cv::details {
 }
@@ -602,9 +660,30 @@ export namespace cv::ocl {
 export namespace cv::ogl {
     using cv::ogl::Arrays;
     using cv::ogl::Buffer;
+    using cv::ogl::LINES;
+    using cv::ogl::LINE_LOOP;
+    using cv::ogl::LINE_STRIP;
+    using cv::ogl::POINTS;
+    using cv::ogl::POLYGON;
+    using cv::ogl::QUADS;
+    using cv::ogl::QUAD_STRIP;
+    using cv::ogl::RenderModes;
+    using cv::ogl::TRIANGLES;
+    using cv::ogl::TRIANGLE_FAN;
+    using cv::ogl::TRIANGLE_STRIP;
     using cv::ogl::Texture2D;
+    using cv::ogl::convertFromGLTexture2D;
+    using cv::ogl::convertToGLTexture2D;
+    using cv::ogl::mapGLBuffer;
+    using cv::ogl::render;
+    using cv::ogl::unmapGLBuffer;
 }
 export namespace cv::ogl::ocl {
+    using cv::ogl::ocl::initializeContextFromGL;
+}
+export namespace cv::parallel {
+    using cv::parallel::ParallelForAPI;
+    using cv::parallel::setParallelForBackend;
 }
 export namespace cv::samples {
     using cv::samples::addSamplesDataSearchPath;
@@ -617,6 +696,22 @@ export namespace cv::traits {
     using cv::traits::SafeFmt;
     using cv::traits::SafeType;
     using cv::traits::Type;
+}
+export namespace cv::utils {
+    using cv::utils::AllocatorStatisticsInterface;
+}
+export namespace cv::utils::fs {
+    using cv::utils::fs::canonical;
+    using cv::utils::fs::createDirectories;
+    using cv::utils::fs::createDirectory;
+    using cv::utils::fs::exists;
+    using cv::utils::fs::getParent;
+    using cv::utils::fs::getcwd;
+    using cv::utils::fs::glob;
+    using cv::utils::fs::glob_relative;
+    using cv::utils::fs::isDirectory;
+    using cv::utils::fs::join;
+    using cv::utils::fs::remove_all;
 }
 export namespace cv::utils::logging {
     using cv::utils::logging::ENUM_LOG_LEVEL_FORCE_INT;

@@ -79,7 +79,14 @@ resolved all-modules Clang configuration. It compiles a root-import consumer and
 one consumer for each public module. CI uploads the report and consumer log.
 
 Unloaded headers, unlisted entities, static-inline adaptations, SDK-dependent
-surfaces and template/overload behavior remain separately reviewed. Exporting a
+surfaces and template/overload behavior remain separately reviewed.
+The scalar conversion adapter is generated from the pinned saturate.hpp, keeping
+all thirteen input overloads and their upstream specializations; a private
+ordinary module function bridges TU-local cvRound. Independent SDK function
+pointers captured before imports check all 169 source/destination type pairs.
+The makePtr custom-deleter rejection is checked with both successful and rejected
+consumer compilations. Generic cv::min/max use the original std entities, with
+explicit image overloads to preserve overload selection. Exporting a
 class makes its definition reachable but does not prove every method works in
 every backend configuration. Module-only use and textual-header mixing have
 separate tests; full core.hpp mixing on GCC still has its upstream-declaration
@@ -101,3 +108,5 @@ application runtime checks, independent of package-internal tests.
 
 The readiness ledger under `.agents/docs` records checkpoint evidence and open
 gates. mcpp engine source stays read-only; its documentation PR is independent.
+
+[Coverage matrices / 覆盖矩阵](coverage.md)

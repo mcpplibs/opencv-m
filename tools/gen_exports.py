@@ -204,6 +204,23 @@ def main() -> None:
                 lines.append(f"    using {namespace}::{name};")
                 total += 1
             lines.append("}")
+        conditional_file = REPO / "tools" / "curated" / f"{mod}.conditional.txt"
+        if conditional_file.exists():
+            for raw in conditional_file.read_text().splitlines():
+                entry = raw.split("#", 1)[0].strip()
+                if not entry:
+                    continue
+                guard, name = entry.split()
+                if not re.fullmatch(r"[A-Z_][A-Z0-9_]*", guard) or not re.fullmatch(r"[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*", name):
+                    raise ValueError(f"Invalid conditional export in {conditional_file}: {entry}")
+                fq = "cv::" + name
+                if fq in claimed:
+                    raise ValueError(f"Conditional export also generated unconditionally: {fq}")
+                claimed[fq] = mod
+                namespace, leaf = fq.rsplit("::", 1)
+                lines += [f"#if defined({guard})", f"export namespace {namespace} {{",
+                          f"    using {fq};", "}", "#endif"]
+                total += 1
         # OpenCV also owns public global aliases, CPU enums and helper types.
         # Their original namespace must survive the module facade unchanged.
         globals_file = REPO / "tools" / "curated" / f"{mod}.globals.txt"

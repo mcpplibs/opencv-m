@@ -139,3 +139,23 @@ TEST(MainModules, VideoKalmanPredictionAndOpticalFlow) {
     EXPECT_LE(cv::norm(flow, cv::NORM_INF), 1e-6);
 }
 #endif
+
+#if defined(MCPP_FEATURE_GEOMETRY)
+TEST(MainModules, GeometryBuildsTheMinimumSpanningTree) {
+    const std::vector<cv::MSTEdge> edges{{0, 1, 1}, {1, 2, 2}, {0, 2, 9}};
+    for (const auto algorithm : {cv::MST_PRIM, cv::MST_KRUSKAL}) {
+        std::vector<cv::MSTEdge> tree;
+        ASSERT_TRUE(cv::buildMST(3, edges, tree, algorithm));
+        ASSERT_EQ(tree.size(), 2u);
+        double weight = 0;
+        for (const auto& edge : tree) weight += edge.weight;
+        EXPECT_DOUBLE_EQ(weight, 3);
+    }
+}
+#endif
+
+#if defined(MCPP_FEATURE_FEATURES) && defined(MCPP_FEATURE_DNN)
+TEST(MainModules, DiskApiRejectsAnAbsentModel) {
+    EXPECT_THROW(cv::DISK::create(""), cv::Exception);
+}
+#endif
