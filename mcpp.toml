@@ -405,6 +405,9 @@ linkage = "static"
 [target."cfg(all(arch = \"x86_64\", any(os = \"linux\", os = \"windows\")))".feature-xlings.videoio-ffmpeg]
 "xim:nasm" = "3.02"
 
+[target.x86_64-linux-gnu]
+cxx_runtime = "toolchain-coupled"
+
 [runtime]
 
 [[runtime.deploy]]

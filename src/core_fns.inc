@@ -32,12 +32,10 @@
 //
 // PRUNED (see tools/curated/core.prune.txt): cv::details::char_tolower /
 // char_toupper and cv::ipp::{setUseIPP_NE,useIPP_NE} (internal helpers, not
-// user API); the read()/write() FileStorage *convenience wrappers* over
-// geometry types (Matx/Vec/Point/Rect/…) — those are `static inline`
-// templates over TU-local cv::internal::{WriteStructContext,Vec*Proxy}
-// helpers that cannot be reached self-containedly; the CV_EXPORTS read()/
-// write() *primitives* (scalars/String/Mat/SparseMat/KeyPoint/DMatch) ARE
-// forwarded below.
+// user API). FileStorage's static-inline geometry/vector/enum and stream
+// helpers are adapted separately in generated persistence_ops.inc, including
+// module-private SDK vector proxies and custom-type ADL dispatch. The
+// CV_EXPORTS read()/write() primitives are forwarded below.
 
 // (cstdarg/cstdio are included in core.cppm's global module fragment so the
 // std::va_list / FILE machinery used below is attached to the global module,

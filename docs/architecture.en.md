@@ -110,6 +110,17 @@ application runtime checks, independent of package-internal tests.
 4. Re-run AST/direct-import, behavior, backend, archive and native CI gates.
 5. Use the upstream version, optionally followed by one numeric wrapper revision.
 
+Persistence adapters preserve all 65 pinned SDK inline bodies, with qualified
+internal calls and module-private vector proxies. Existing primitive functions
+remain original SDK calls; custom serializers retain ADL. The enum adapter keeps
+the SDK's optional void-pointer template argument without exporting a dependent
+enable_if type that crashes Clang. Separate textual-header and module consumers
+verify identical XML/YAML/JSON and Base64 output on every native CI platform.
+
+Linux glibc project targets explicitly use the toolchain-coupled C++ runtime,
+matching the ORT template. The actual SDK process must preserve typed OpenCV
+exception catches as well as successful inference. The template tests both.
+
 The readiness ledger under `.agents/docs` records checkpoint evidence and open
 gates. mcpp engine source stays read-only; its documentation PR is independent.
 

@@ -86,3 +86,9 @@ GCC 上完整 core.hpp 混用仍有声明合并限制。源码模块数量不能
 ## 分发文件
 
 生成清单通过 `runtime.deploy` 显式保留十四份 wrapper/上游许可与版权文件，并保持来源路径，避免组件同名 LICENSE 覆盖。静态实现不依赖共享库扫描发现通知。索引中的实际模板打包测试逐字节检查这些文件，并从独立目录运行搬迁后的程序。
+
+## FileStorage 与共享运行时
+
+序列化适配保留固定 SDK 的 65 份 inline 函数体，内部调用显式限定到适配层，向量代理放入模块私有 namespace。基础函数仍调用原始 SDK，用户自定义序列化仍支持 ADL。枚举保留可选 void* 模板参数，同时避免向模块导出会触发 Clang 崩溃的 dependent enable_if 类型。独立的原始头文件程序和模块程序逐字节比较 XML/YAML/JSON 及 Base64 六种输出。
+
+Linux glibc 项目目标显式选择 toolchain-coupled C++ 运行时，与 ORT 模板一致。实际复现显示加载 SDK 时嵌入另一份静态异常运行时会导致 cv::Exception 捕获终止；改为共享运行时后，同一组测试通过。ORT 模板同时验证推理和异常捕获。

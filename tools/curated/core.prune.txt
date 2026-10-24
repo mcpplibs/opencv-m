@@ -43,13 +43,13 @@ norm   # static-inline Matx/Point overloads in the set → matx_ops.inc + core_f
 parallel_for_   # static-inline std::function overload in the set → core_fns.inc
 print   # static inline operations.hpp → core_fns.inc
 randu   # static-inline randu<_Tp>() in the set → core_fns.inc
-read   # FileStorage primitives forwarded in core_fns.inc; geometry-type convenience wrappers pruned (see below)
+read   # primitives in core_fns.inc; static-inline helpers in generated persistence_ops.inc
 roundUp   # static inline utility.hpp → core_fns.inc
 swap   # static-inline MatExpr overload in the set → core_fns.inc
 toLowerCase   # static inline cvstd.hpp → core_fns.inc
 toUpperCase   # static inline cvstd.hpp → core_fns.inc
 trace   # static-inline Matx overload in the set → matx_ops.inc + core_fns.inc
-write   # FileStorage primitives forwarded in core_fns.inc; geometry-type convenience wrappers pruned (see below)
+write   # primitives in core_fns.inc; static-inline helpers in generated persistence_ops.inc
 # internal helpers, NOT user API — dropped outright (no replacement):
 details::char_tolower   # internal cvstd.hpp helper behind toLowerCase
 details::char_toupper   # internal cvstd.hpp helper behind toUpperCase

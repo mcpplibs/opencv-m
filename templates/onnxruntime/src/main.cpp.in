@@ -21,5 +21,12 @@ int main() {
     if (output.total() != 3) return 1;
     for (int i = 0; i < 3; ++i)
         if (output.ptr<float>()[i] != float(2 * (i + 1))) return 2;
+    // Exercise the exception ABI as well as inference in the SDK process.
+    try {
+        cv::error(cv::Error::StsBadArg, "runtime contract", __func__, __FILE__, __LINE__);
+        return 3;
+    } catch (const cv::Exception& error) {
+        if (error.code != cv::Error::StsBadArg) return 4;
+    }
     std::println("OpenCV {} -> ONNX Runtime {}: CPU Add inference passed", cv::getVersionString(), Ort::GetVersionString());
 }

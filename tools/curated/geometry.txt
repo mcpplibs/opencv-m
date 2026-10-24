@@ -9,3 +9,5 @@ MSTEdge
 MST_KRUSKAL
 MST_PRIM
 buildMST
+detail::LevMarqBackend
+detail::LevMarqBase

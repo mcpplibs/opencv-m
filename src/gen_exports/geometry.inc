@@ -150,6 +150,10 @@ export namespace cv {
     using cv::undistortPoints;
     using cv::voxelGridSampling;
 }
+export namespace cv::detail {
+    using cv::detail::LevMarqBackend;
+    using cv::detail::LevMarqBase;
+}
 export namespace cv::fisheye {
     using cv::fisheye::distortPoints;
     using cv::fisheye::estimateNewCameraMatrixForUndistortRectify;

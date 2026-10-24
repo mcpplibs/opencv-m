@@ -23,6 +23,7 @@ import re
 import sys
 from collections import defaultdict
 from pathlib import Path
+from _files import write_if_changed
 
 REPO = Path(__file__).resolve().parent.parent
 MODULE_ORDER = ["core", "imgproc", "imgcodecs", "videoio", "highgui", "flann", "geometry", "dnn",
@@ -232,8 +233,8 @@ def main() -> None:
                         raise ValueError(f"Invalid global export in {globals_file}: {name}")
                     lines.append(f"export using ::{name};")
                     total += 1
-        (out_dir / f"{mod}.inc").write_text("\n".join(lines) + "\n")
-        (out_dir / f"{mod}.skipped.txt").write_text("\n".join(sorted(set(skipped))) + "\n")
+        write_if_changed(out_dir / f"{mod}.inc", "\n".join(lines) + "\n")
+        write_if_changed(out_dir / f"{mod}.skipped.txt", "\n".join(sorted(set(skipped))) + "\n")
         print(f"{mod:10} {total:4} names   ({len(skipped)} skipped notes)")
 
 

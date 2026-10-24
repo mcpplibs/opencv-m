@@ -2,6 +2,7 @@
 module;
 #include <opencv2/geometry.hpp>
 #include <opencv2/geometry/mst.hpp>
+#include <opencv2/geometry/detail/optimizer.hpp>
 
 export module mcpplibs.mwrap.opencv.detail.geometry;
 

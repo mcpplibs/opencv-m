@@ -30,4 +30,5 @@ export module mcpplibs.mwrap.opencv.core;
 #include "core_ops.inc"
 #include "matx_ops.inc"
 #include "core_fns.inc"
+#include "persistence_ops.inc"
 #include "affine_ops.inc"

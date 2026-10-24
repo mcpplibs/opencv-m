@@ -35,16 +35,17 @@ features and their required dependency closure. Every module also depends on cor
 
 | Surface | Evidence | Remaining boundary |
 |---|---|---|
-| Root and sixteen direct modules | 3,215 export-list names compile in the latest local all-module Clang audit | Name lookup does not prove every overload/template/backend |
+| Root and sixteen direct modules | 3,217 export-list names compile in the latest local all-module Clang audit | Name lookup does not prove every overload/template/backend |
 | Public core types, filesystem, TLS, parallel backend, dual quaternions, async promise | Actual behavior tests; LLVM/GCC strict suites | Full core.hpp mixing on GCC has a declaration-merge limitation |
 | Scalar conversion adapters | Independent pinned SDK oracle, 169 type pairs; saturation/rounding boundaries | Platform rounding bridge needs current native matrix |
 | Generic min/max and makePtr | Reference/tie and image behavior; positive/negative custom-deleter compilation | GCC shared_ptr probes include the standard memory header |
 | FLANN and stitching detail | Direct-import algorithm and factory consumers | Other portable helper headers still require inventory review |
 | Macro constants and pure calculations | Generated `.macros` mapping and optional textual macro header; ROI behavior | Preprocessor flow controls remain textual; no fake exported preprocessor state |
 | DNN-dependent DISK | Conditional export and missing-model rejection; features-only build without DNN | Trained DISK inference is not verified |
-| Remaining API/header inventory | 3,393 facade-visible entities; 179 not in export lists; 120 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
+| Remaining API/header inventory | 3,395 facade-visible entities; 179 not in export lists; 119 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
 | DNN shape helpers | Twenty generated overloads retain pinned bodies; direct-import tensor/axis/formatting behavior passes LLVM/GCC | Static-inline bodies use a constrained named-module adapter |
-| Persistence convenience overloads | Known adaptation work | Not claimed complete |
+| Persistence helpers | 65 pinned SDK bodies plus typed forwards; native header/module XML/YAML/JSON and Base64 bytes match on GCC/LLVM | Private vector proxies stay internal; original FileStorage/WriteStructContext types retain their SDK identity |
+| Geometry optimizer extension | Public LevMarqBase/Backend imported; callback rejection/geodesic report contracts execute original SDK code | Device acceleration is separate |
 
 ## Runtime capabilities
 
@@ -70,6 +71,11 @@ features and their required dependency closure. Every module also depends on cor
 | macOS arm64 | LLVM 23.1.3; native frameworks | All modules, codecs, Cocoa, AVFoundation/FFmpeg, ORT CPU |
 | Windows x86_64 MSVC ABI | LLVM 23.1.3 | All modules, codecs, Win32, MSMF/FFmpeg, ORT CPU |
 | Other triples / ABI / shared-library configurations | Not certified | No inference from the target rows above |
+
+The Linux x86_64 glibc source project and the ORT template explicitly select
+`cxx_runtime = "toolchain-coupled"`. A verified negative test showed that embedding
+a static exception runtime while loading the SDK could terminate typed catches;
+the shared-runtime configuration passed the same tests.
 
 Installed immutable OpenCV archives, relocated deployment/runtime closure and
 all final source/index CI heads remain release gates. Main-module CI does not
