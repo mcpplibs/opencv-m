@@ -9,7 +9,6 @@ odd-name: cv.dnn.Layer.void forward
 odd-name: cv.dnn.Model.operator Net&
 odd-name: cv.dnn.Model.operator=
 odd-name: cv.dnn.std.ostream operator <<
-pruned (compile-verify): cv::dnn::_Range
 pruned (compile-verify): cv::dnn::concat
 pruned (compile-verify): cv::dnn::getLayerFactoryImpl
 pruned (compile-verify): cv::dnn::getLayerFactoryMutex

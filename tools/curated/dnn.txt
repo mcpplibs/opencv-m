@@ -4,3 +4,4 @@ dnn::ActivationFunc
 dnn::MatType
 dnn::SoftNMSMethod
 dnn::getActivationFunc
+dnn::_Range

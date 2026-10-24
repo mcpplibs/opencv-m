@@ -287,6 +287,7 @@ export namespace cv::dnn {
     using cv::dnn::TriluLayer;
     using cv::dnn::UniqueLayer;
     using cv::dnn::UnsqueezeLayer;
+    using cv::dnn::_Range;
     using cv::dnn::argKindToString;
     using cv::dnn::blobFromImage;
     using cv::dnn::blobFromImageWithParams;

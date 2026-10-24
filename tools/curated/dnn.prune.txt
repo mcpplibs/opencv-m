@@ -1,6 +1,6 @@
-# names failing compile-verification for opencv.dnn — internal shape_utils.hpp
-# / layer-factory helpers that hdr_parser collected but that are not part of
-# the public surface reachable through <opencv2/dnn.hpp> + all_layers.hpp.
+# Static-inline public shape helpers are adapted in src/dnn_shapes.inc rather
+# than exported with using declarations. Private layer-factory helpers remain
+# unavailable; their names are not part of the public contract.
 dnn::concat
 dnn::getLayerFactoryImpl
 dnn::getLayerFactoryMutex
@@ -12,4 +12,3 @@ dnn::shape
 dnn::slice
 dnn::toString
 dnn::total
-dnn::_Range

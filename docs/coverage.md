@@ -35,15 +35,16 @@ features and their required dependency closure. Every module also depends on cor
 
 | Surface | Evidence | Remaining boundary |
 |---|---|---|
-| Root and sixteen direct modules | 3,214 export-list names compile in the latest local all-module Clang audit | Name lookup does not prove every overload/template/backend |
+| Root and sixteen direct modules | 3,215 export-list names compile in the latest local all-module Clang audit | Name lookup does not prove every overload/template/backend |
 | Public core types, filesystem, TLS, parallel backend, dual quaternions, async promise | Actual behavior tests; LLVM/GCC strict suites | Full core.hpp mixing on GCC has a declaration-merge limitation |
 | Scalar conversion adapters | Independent pinned SDK oracle, 169 type pairs; saturation/rounding boundaries | Platform rounding bridge needs current native matrix |
 | Generic min/max and makePtr | Reference/tie and image behavior; positive/negative custom-deleter compilation | GCC shared_ptr probes include the standard memory header |
 | FLANN and stitching detail | Direct-import algorithm and factory consumers | Other portable helper headers still require inventory review |
 | Macro constants and pure calculations | Generated `.macros` mapping and optional textual macro header; ROI behavior | Preprocessor flow controls remain textual; no fake exported preprocessor state |
 | DNN-dependent DISK | Conditional export and missing-model rejection; features-only build without DNN | Trained DISK inference is not verified |
-| Remaining API/header inventory | 3,382 facade-visible entities; 169 not in export lists; 121 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
-| DNN shape helpers and persistence convenience overloads | Known adaptation work | Not claimed complete |
+| Remaining API/header inventory | 3,393 facade-visible entities; 179 not in export lists; 120 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
+| DNN shape helpers | Twenty generated overloads retain pinned bodies; direct-import tensor/axis/formatting behavior passes LLVM/GCC | Static-inline bodies use a constrained named-module adapter |
+| Persistence convenience overloads | Known adaptation work | Not claimed complete |
 
 ## Runtime capabilities
 

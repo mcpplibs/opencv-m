@@ -180,6 +180,10 @@ jobs:
         shell: bash
         run: python3 tools/generate_saturate.py --check
 
+      - name: Generated DNN shape helpers match the pinned SDK
+        shell: bash
+        run: python3 tools/generate_dnn_shapes.py --check
+
       - name: Build
         shell: bash
         run: mcpp build
