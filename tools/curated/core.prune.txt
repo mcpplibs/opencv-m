@@ -15,8 +15,8 @@ unsigned   # expected unqualified-id before 'unsigned'
 ushort   # 'ushort' has not been declared in 'cv'
 cuda::EventAccessor   # 'EventAccessor' has not been declared in 'cv::cuda'
 cuda::StreamAccessor   # 'StreamAccessor' has not been declared in 'cv::cuda'
-cuda::createContinuous   # 'createContinuous' has not been declared in 'cv::cuda'
-cuda::ensureSizeIsEnough   # 'ensureSizeIsEnough' has not been declared in 'cv::cuda'
+cuda::createContinuous   # mixed TU-local/external overload set: exact SDK adapters in cuda_helpers.inc
+cuda::ensureSizeIsEnough   # mixed TU-local/external overload set: exact SDK adapters in cuda_helpers.inc
 cuda::getCudaDriverApiErrorMessage   # 'getCudaDriverApiErrorMessage' has not been declared in 'cv::cuda'
 cuda::getInputMat   # 'getInputMat' has not been declared in 'cv::cuda'
 cuda::getNppErrorMessage   # 'getNppErrorMessage' has not been declared in 'cv::cuda'

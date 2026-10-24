@@ -177,8 +177,8 @@ reviewed using exception: cv::allocSingletonNewBuffer -- 'allocSingletonNewBuffe
 reviewed using exception: cv::cubeRoot -- static-inline double overload in the set → core_fns.inc
 reviewed using exception: cv::cuda::EventAccessor -- 'EventAccessor' has not been declared in 'cv::cuda'
 reviewed using exception: cv::cuda::StreamAccessor -- 'StreamAccessor' has not been declared in 'cv::cuda'
-reviewed using exception: cv::cuda::createContinuous -- 'createContinuous' has not been declared in 'cv::cuda'
-reviewed using exception: cv::cuda::ensureSizeIsEnough -- 'ensureSizeIsEnough' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::createContinuous -- mixed TU-local/external overload set: exact SDK adapters in cuda_helpers.inc
+reviewed using exception: cv::cuda::ensureSizeIsEnough -- mixed TU-local/external overload set: exact SDK adapters in cuda_helpers.inc
 reviewed using exception: cv::cuda::getCudaDriverApiErrorMessage -- 'getCudaDriverApiErrorMessage' has not been declared in 'cv::cuda'
 reviewed using exception: cv::cuda::getInputMat -- 'getInputMat' has not been declared in 'cv::cuda'
 reviewed using exception: cv::cuda::getNppErrorMessage -- 'getNppErrorMessage' has not been declared in 'cv::cuda'

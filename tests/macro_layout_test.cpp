@@ -1,10 +1,27 @@
 #include <gtest/gtest.h>
 #include <array>
 #include <cstdint>
+#include <type_traits>
 
 import mcpplibs.mwrap.opencv;
 
 namespace macros = mcpplibs::mwrap::opencv::macros;
+
+TEST(MacroLayout, FourccPackingPreservesSignednessAndHalConstants) {
+    static_assert(macros::CV_FOURCC_MACRO('M', 'J', 'P', 'G') == 0x47504a4d);
+    static_assert(macros::CV_FOURCC_MACRO(0xff, 'A', 'B', 0x7f) == 0x7f4241ff);
+    static_assert(std::is_same_v<decltype(macros::CV_FOURCC_MACRO(0U, 0U, 0U, 0U)), unsigned>);
+    static_assert(macros::CV_FOURCC_MACRO(0U, 0U, 0U, 0xffU) == 0xff000000U);
+    EXPECT_EQ(macros::CV_FOURCC_MACRO('M', 'J', 'P', 'G'), ::CV_FOURCC('M', 'J', 'P', 'G'));
+    EXPECT_EQ(macros::CV_HAL_TYPE_5_8, 0);
+    EXPECT_EQ(macros::CV_HAL_TYPE_7_12, 1);
+    EXPECT_EQ(macros::CV_HAL_TYPE_9_16, 2);
+    EXPECT_EQ(macros::CV_HAL_INTER_LINEAR, 1);
+    EXPECT_EQ(macros::CV_HAL_INTER_NEAREST_EXACT, 6);
+    EXPECT_EQ(macros::CV_HAL_MORPH_DILATE, 1);
+    EXPECT_EQ(macros::CV_HAL_THRESH_OTSU, 8);
+    EXPECT_EQ(macros::CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C, 1);
+}
 
 TEST(MacroLayout, EveryOpenCv5DepthMatchesActualMatStorage) {
     constexpr std::array depths{macros::CV_8U, macros::CV_8S, macros::CV_16U,

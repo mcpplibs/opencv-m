@@ -161,6 +161,44 @@ inline void emit(const char* consumer) {
             same_header->opencv_version_major == 5 && same_code == 0 && CV_ERROR_FAIL == -1 &&
             std::string(same_header->api_description) == "mwrap fixture", "original preview plugin ABI types");
     result << "plugin ABI: " << sizeof(header) << ',' << sizeof(code) << ',' << CV_ERROR_FAIL << '\n';
+    const int float_type = cv::traits::Type<float>::value;
+    cv::Mat parent(4, 6, float_type), contiguous = parent(cv::Rect(1, 1, 4, 3));
+    require(!contiguous.isContinuous(), "CPU input has row gaps");
+    cv::cuda::createContinuous(cv::Size(4, 3), float_type, contiguous);
+    require(contiguous.isContinuous() && contiguous.rows == 3 && contiguous.cols == 4 &&
+            contiguous.type() == float_type, "CUDA namespace helper supports CPU Mat");
+    auto* original_storage = contiguous.data;
+    cv::cuda::ensureSizeIsEnough(cv::Size(3, 2), float_type, contiguous);
+    require(contiguous.data == original_storage && contiguous.rows == 2 && contiguous.cols == 3,
+            "CPU buffer reuse through Size overload");
+    cv::cuda::ensureSizeIsEnough(5, 7, float_type, contiguous);
+    require(contiguous.rows == 5 && contiguous.cols == 7 && contiguous.type() == float_type,
+            "CPU buffer grows through dimensions overload");
+    cv::cuda::createContinuous(7, 5, float_type, contiguous);
+    require(contiguous.isContinuous() && contiguous.rows == 7 && contiguous.cols == 5,
+            "CPU continuous buffer reshape");
+    auto return_by_size = static_cast<cv::cuda::GpuMat (*)(cv::Size, int)>(&cv::cuda::createContinuous);
+    auto return_by_dims = static_cast<cv::cuda::GpuMat (*)(int, int, int)>(&cv::cuda::createContinuous);
+    require(return_by_size && return_by_dims, "GPU-returning overload signatures available");
+    cv::cuda::GpuMat empty_first(nullptr), empty_second(nullptr);
+    cv::cuda::swap(empty_first, empty_second);
+    require(empty_first.empty() && empty_second.empty(), "empty GPU headers swap without device allocation");
+    cv::cuda::HostMem locked(cv::cuda::HostMem::PAGE_LOCKED), shared(cv::cuda::HostMem::SHARED);
+    cv::cuda::swap(locked, shared);
+    require(locked.alloc_type == cv::cuda::HostMem::SHARED &&
+            shared.alloc_type == cv::cuda::HostMem::PAGE_LOCKED, "host header allocation modes swap");
+    using Event = cv::cuda::Event;
+    Event::CreateFlags flags = Event::DEFAULT;
+    require(!flags, "zero event flags");
+    flags = Event::BLOCKING_SYNC | Event::DISABLE_TIMING;
+    require(flags == 3 && flags != 0 && !(!flags), "event flags OR and logical comparisons");
+    require((flags & Event::DISABLE_TIMING) == 2 && (flags ^ Event::DISABLE_TIMING) == 1 &&
+            (~Event::DEFAULT) != 0, "event flags AND/XOR/NOT");
+    flags &= Event::DISABLE_TIMING;
+    flags |= Event::INTERPROCESS;
+    flags ^= Event::DISABLE_TIMING;
+    require(flags == 4, "event flag compound operators preserve enum type");
+    result << "cuda CPU helpers: " << contiguous.rows << ',' << contiguous.cols << ',' << static_cast<int>(flags) << '\n';
     if (const char* directory = std::getenv("OPENCV_M_UTILITY_OUTPUT")) {
         std::ofstream file(std::filesystem::path(directory) / (std::string(consumer) + ".txt"), std::ios::binary);
         file << result.str();

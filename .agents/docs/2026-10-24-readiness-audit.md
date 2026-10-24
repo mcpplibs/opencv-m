@@ -135,13 +135,13 @@ The public repository listing proves repository creation/forking, not merge or r
 ## User resource and README constraints
 
 - All -m root READMEs use the same concise entry structure and normally stay within 100 lines per language. Detailed usage moves to docs/; prerequisites, candidate status and critical scope limits remain visible. The index's bilingual mwrap spec and package-authoring skill record the rule.
-- Local tests and subprocesses collectively stay below 80% of effective CPU/memory. This host currently has 32 logical CPUs and about 62 GiB RAM. The task-specific mwrap-tests.slice has CPUQuota=1600%, MemoryHigh=28G, MemoryMax=32G and TasksMax=512; future local heavy checks use that shared slice, MCPP_JOBS=3 and one heavy task at a time. These limits apply only to this task's processes, with unrelated user jobs untouched. Check current load/available memory before further heavy work.
+- Local tests and subprocesses collectively stay below 80% of effective CPU/memory. This host currently has 32 logical CPUs and about 62 GiB RAM. The task-specific mwrap-tests.slice has CPUQuota=800%, MemoryHigh=28G, MemoryMax=32G and TasksMax=512; future local heavy checks use that shared slice with the stricter eight-core quota, MCPP_JOBS=2 and one heavy task at a time. These limits apply only to this task's processes, with unrelated user jobs untouched. Check current load/available memory before further heavy work.
 
-The kernel cgroup files confirm cpu.max=1600000/100000, memory.high=28 GiB and memory.max=32 GiB. This user hierarchy does not delegate cpuset, so test commands additionally use taskset -c 0-15; an actual scoped process reported exactly those sixteen CPUs. Local heavy checks run as:
+The current kernel cgroup limits are cpu.max=800000/100000, memory.high=28 GiB and memory.max=32 GiB. This user hierarchy does not delegate cpuset, so test commands additionally use taskset -c 0-7. Local heavy checks run as:
 
 ```sh
 systemd-run --user --scope --slice=mwrap-tests.slice --quiet \
-  taskset -c 0-15 env MCPP_JOBS=3 <check-command>
+  taskset -c 0-7 env MCPP_JOBS=2 <check-command>
 ```
 
 README rewrites cover OpenCV (EN/ZH), ORT, llama.cpp, FFmpeg, gRPC (EN/ZH) and ImGui. Each entry is below 100 lines, with its detailed prior content retained in docs/usage*.md and local links checked.
@@ -326,3 +326,55 @@ and target/public-abi-rendering-api-audit.log. The initial local curated-name
 spelling error was corrected; generation now rejects malformed C++ names early.
 The failed initial run is not acceptance evidence. The read-only export
 diagnostic regression still passes and no API was automatically pruned.
+
+## CPU-usable CUDA helpers, HAL and explicit header decisions
+
+Eight generated cuda.hpp helper overloads preserve original SDK bodies or exact
+external function forwards. They restore createContinuous/ensureSizeIsEnough
+for ordinary CPU Mat, GPU-returning overload signatures and header-only swaps.
+Ten Event::CreateFlags operators are generated from the pinned CV_ENUM_FLAGS
+macro definitions, preserving enum results and compound assignments. The SDK
+oracle checks non-contiguous CPU input, continuous reshape, storage reuse/growth,
+empty GPU header swaps, HostMem allocation mode swaps and every flag operation.
+No GPU allocation or device execution is claimed. Original cvhalKeyPoint and 26
+feature/imgproc HAL macro values are exported/mapped. Typed CV_FOURCC_MACRO
+preserves integer/unsigned expression types, checked in constant expressions.
+
+The initial all-module run was terminated by the host resource guard and is not
+a pass. Later runs reduce the shared slice to CPUQuota=800% (eight of 32 cores),
+CPU affinity 0-7 and MCPP_JOBS=2; memory high/max stay 28/32 GiB. The runner now
+records CPU, available-memory and disk metrics when a protection threshold fires.
+Only completed/stopped task-owned binaries are cleaned; user processes and
+original files are untouched. This stricter cap is the current local default.
+
+The capped rerun passed all 26 strict programs on LLVM23 (18.40s), GCC16 (80.77s)
+and LLVM22 (32.75s). Each independent SDK/module utility output matches exactly
+at 424 bytes. Log: target/cuda-hal-all-compilers-capped.log. Compiler-derived
+lookup resolves 3,466 listed root exports and sixteen direct module surfaces;
+inventory is 3,654 entities, 199 not in using lists and 112 headers not in
+facades, plus fourteen implementation headers. Log: target/cuda-hal-api-audit.log.
+
+The initial 113-header gap list is now explicitly reviewed in
+port/api/header-review.toml. A coverage checker is included in native inventory
+CI and does not edit exports or erase implementation gaps. Its full-support
+acceptance mode correctly refuses the 23 remaining public-gap records: universal
+intrinsics, public core dump utilities (not the ignored binding tests), and
+original legacy global enum spellings. SDK/platform and implementation headers
+have separate source-based reasons; classification does not make them supported.
+These remaining public APIs, final archive/index alignment and exact-head CI
+still prevent a complete-support/release-readiness claim.
+
+The minimal default-feature macro consumer also passed all four tests with LLVM23 (40.39s); no algorithm module was enabled to obtain the additional HAL values.
+
+## Windows notice ordering regression
+
+Native 27d0b50 Windows CI failed the embedded notice drift check before
+compilation. The repository already forces generated text to LF and preserves
+upstream bytes. The actual defect was WindowsPath case-insensitive ordering
+versus PosixPath ordering. Explicit case-sensitive relative path components now
+produce one order on both hosts without changing the existing notice artifact.
+A regression test emulates Windows path comparisons, preserves CRLF comment
+bytes and rejects apparent license comments inside ordinary/raw string literals.
+It reproduces the old failure in an isolated copy and passes with the fix.
+The original 791,266-byte notice supplement still passes its drift check.
+The new Windows native CI result remains required.

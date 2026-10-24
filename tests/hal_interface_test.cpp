@@ -7,6 +7,20 @@ import mcpplibs.mwrap.opencv.macros;
 #if defined(MCPP_FEATURE_IMGPROC)
 import mcpplibs.mwrap.opencv.imgproc;
 #endif
+#if defined(MCPP_FEATURE_FEATURES)
+import mcpplibs.mwrap.opencv.features;
+
+TEST(HalInterface, OriginalKeyPointRecordRetainsItsFields) {
+    cvhalKeyPoint point{2.5f, 3.5f, 7.f, -1.f, 0.75f, 2, 19};
+    EXPECT_FLOAT_EQ(point.x, 2.5f);
+    EXPECT_FLOAT_EQ(point.y, 3.5f);
+    EXPECT_FLOAT_EQ(point.size, 7.f);
+    EXPECT_FLOAT_EQ(point.angle, -1.f);
+    EXPECT_FLOAT_EQ(point.response, 0.75f);
+    EXPECT_EQ(point.octave, 2);
+    EXPECT_EQ(point.class_id, 19);
+}
+#endif
 
 TEST(HalInterface, CoreArithmeticDispatchRetainsSaturationAndNorms) {
     const std::array<uchar, 4> first{0, 255, 10, 250}, second{1, 1, 20, 20};

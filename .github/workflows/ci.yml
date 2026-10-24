@@ -198,6 +198,7 @@ jobs:
         shell: bash
         run: |
           python3 tools/generate_inline_helpers.py --check
+          python3 tools/generate_cuda_helpers.py --check
           python3 tools/generate_type_ops.py --check
           python3 tools/test_export_diagnostics.py
 
@@ -264,6 +265,7 @@ jobs:
           python3 tools/test_audit_api.py
           python3 tools/check_interface_flags.py
           python3 tools/audit_api.py --verify-exports
+          python3 tools/check_header_review.py
 
       - name: Preserve C++ inventory for review
         if: matrix.name == 'linux-llvm-22' && always()

@@ -37,6 +37,7 @@ export module mcpplibs.mwrap.opencv.core;
 #include "core_fns.inc"
 #include "portable_helpers.inc"
 #include "fast_math_helpers.inc"
+#include "cuda_helpers.inc"
 #include "persistence_ops.inc"
 #include "instrumentation_ops.inc"
 #include "affine_ops.inc"

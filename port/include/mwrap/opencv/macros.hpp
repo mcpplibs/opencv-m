@@ -15,6 +15,8 @@
 #include <opencv2/core/check.hpp>
 #include <opencv2/core/cvdef.h>
 #include <opencv2/core/version.hpp>
+#include <opencv2/features/hal/interface.h>
+#include <opencv2/imgproc/hal/interface.h>
 
 // OpenCV 5.0.0 spells the flag CV_MAT_SUBMAT_FLAG in this macro, but only
 // CV_SUBMAT_FLAG exists. Keep the vendor file intact and repair the optional

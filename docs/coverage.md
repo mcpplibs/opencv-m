@@ -42,12 +42,13 @@ features and their required dependency closure. Every module also depends on cor
 | FLANN and stitching detail | Direct-import algorithm and factory consumers | Other portable helper headers still require inventory review |
 | Macro constants and pure calculations | Generated `.macros` mapping and optional textual macro header; ROI behavior | Preprocessor flow controls remain textual; no fake exported preprocessor state |
 | DNN-dependent DISK | Conditional export and missing-model rejection; features-only build without DNN | Trained DISK inference is not verified |
-| Remaining API/header inventory | 3,653 facade-visible entities; 199 not in export lists; 113 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
+| Remaining API/header inventory | 3,654 facade-visible entities; 199 not in export lists; 112 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
 | DNN shape helpers | Twenty generated overloads retain pinned bodies; direct-import tensor/axis/formatting behavior passes LLVM/GCC | Static-inline bodies use a constrained named-module adapter |
 | Persistence helpers | 65 pinned SDK bodies plus typed forwards; native header/module XML/YAML/JSON and Base64 bytes match on GCC/LLVM | Private vector proxies stay internal; original FileStorage/WriteStructContext types retain their SDK identity |
 | Geometry optimizer extension | Public LevMarqBase/Backend imported; callback rejection/geodesic report contracts execute original SDK code | Device acceleration is separate |
 | Value operators and portable helpers | 122 pinned types.hpp operator bodies, fifteen core helper bodies and image conveniences; independent SDK/module results match on LLVM/GCC | rawInOut(std::array) uses the original non-static SDK member through an instance to repair the broken free-wrapper call |
 | Preview plugin ABI and point-cloud rendering | Original CvResult/OpenCV_API_Header entities and two CPU rendering functions; three-compiler SDK/module and rendering checks pass | Preview ABI follows upstream compatibility limits; declaration availability does not enable a plugin backend |
+| CPU-usable CUDA helpers and feature HAL | Eight helper overloads plus ten SDK Event flag operators; CPU Mat reuse/reshape and 424-byte SDK/module oracle pass on GCC16/LLVM22/LLVM23; original cvhalKeyPoint is exported | No CUDA device backend or GPU allocation is certified; 26 extra HAL macro values and typed FOURCC mapping are tested separately |
 | Global fast math | Twenty exact SDK forwards cover cvRound/cvFloor/cvCeil, cvIsInf/cvIsNaN and CV_FOURCC; SDK/module output matches on GCC16 and LLVM22/23, including mixed-header checks | Platform rounding follows the SDK; native CI on the current checkpoint remains required |
 | Public scalar/constant aliases | Original cvTrunc/cvRound64 and utils::getThreadID; ArUco threshold matches the SDK detector and supports address access | Naming the ArUco threshold after both its original header and module import is ambiguous; use module-only access for that value |
 | Core/imgproc HAL | 172 core and 34 imgproc public names; saturating arithmetic/norms/exp and color conversions execute the SDK | SDK IGNORED legacy aliases and private filter classes stay outside this surface; ISA intrinsics remain separate |
@@ -88,3 +89,14 @@ the shared-runtime configuration passed the same tests.
 Installed immutable OpenCV archives, relocated deployment/runtime closure and
 all final source/index CI heads remain release gates. Main-module CI does not
 establish those distribution properties. No tag, release or merge is created.
+
+## Reviewed header decisions
+
+`port/api/header-review.toml` records every header from the initial 113-header
+facade gap list with an explicit reason. It distinguishes compatibility
+forwarders, SDK/platform code, upstream internals, textual macros and actual
+public gaps. HAL record/value coverage has since been implemented.
+`tools/check_header_review.py` checks review coverage against the compiler
+inventory; `--require-complete` additionally rejects the 23 remaining public-gap
+records (universal intrinsics, public core dump utilities and legacy enum
+spellings). Review coverage does not mean these APIs are implemented.

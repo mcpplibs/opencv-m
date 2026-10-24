@@ -41,3 +41,4 @@ export namespace cv {
     using cv::DISK;
 }
 #endif
+export using ::cvhalKeyPoint;

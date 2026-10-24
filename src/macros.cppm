@@ -2,6 +2,8 @@
 module;
 #include <opencv2/core.hpp>
 #include <opencv2/core/version.hpp>
+#include <opencv2/features/hal/interface.h>
+#include <opencv2/imgproc/hal/interface.h>
 
 export module mcpplibs.mwrap.opencv.macros;
 
@@ -124,6 +126,32 @@ inline constexpr auto k_CV_MAT_CONT_FLAG = CV_MAT_CONT_FLAG;
 inline constexpr auto k_CV_SUBMAT_FLAG_SHIFT = CV_SUBMAT_FLAG_SHIFT;
 inline constexpr auto k_CV_SUBMAT_FLAG = CV_SUBMAT_FLAG;
 inline constexpr auto k_CV_AUTOSTEP = CV_AUTOSTEP;
+inline constexpr auto k_CV_HAL_TYPE_5_8 = CV_HAL_TYPE_5_8;
+inline constexpr auto k_CV_HAL_TYPE_7_12 = CV_HAL_TYPE_7_12;
+inline constexpr auto k_CV_HAL_TYPE_9_16 = CV_HAL_TYPE_9_16;
+inline constexpr auto k_CV_HAL_INTER_NEAREST = CV_HAL_INTER_NEAREST;
+inline constexpr auto k_CV_HAL_INTER_LINEAR = CV_HAL_INTER_LINEAR;
+inline constexpr auto k_CV_HAL_INTER_CUBIC = CV_HAL_INTER_CUBIC;
+inline constexpr auto k_CV_HAL_INTER_AREA = CV_HAL_INTER_AREA;
+inline constexpr auto k_CV_HAL_INTER_LANCZOS4 = CV_HAL_INTER_LANCZOS4;
+inline constexpr auto k_CV_HAL_INTER_LINEAR_EXACT = CV_HAL_INTER_LINEAR_EXACT;
+inline constexpr auto k_CV_HAL_INTER_NEAREST_EXACT = CV_HAL_INTER_NEAREST_EXACT;
+inline constexpr auto k_CV_HAL_INTER_MAX = CV_HAL_INTER_MAX;
+inline constexpr auto k_CV_HAL_WARP_FILL_OUTLIERS = CV_HAL_WARP_FILL_OUTLIERS;
+inline constexpr auto k_CV_HAL_WARP_INVERSE_MAP = CV_HAL_WARP_INVERSE_MAP;
+inline constexpr auto k_CV_HAL_WARP_RELATIVE_MAP = CV_HAL_WARP_RELATIVE_MAP;
+inline constexpr auto k_CV_HAL_MORPH_ERODE = CV_HAL_MORPH_ERODE;
+inline constexpr auto k_CV_HAL_MORPH_DILATE = CV_HAL_MORPH_DILATE;
+inline constexpr auto k_CV_HAL_THRESH_BINARY = CV_HAL_THRESH_BINARY;
+inline constexpr auto k_CV_HAL_THRESH_BINARY_INV = CV_HAL_THRESH_BINARY_INV;
+inline constexpr auto k_CV_HAL_THRESH_TRUNC = CV_HAL_THRESH_TRUNC;
+inline constexpr auto k_CV_HAL_THRESH_TOZERO = CV_HAL_THRESH_TOZERO;
+inline constexpr auto k_CV_HAL_THRESH_TOZERO_INV = CV_HAL_THRESH_TOZERO_INV;
+inline constexpr auto k_CV_HAL_THRESH_MASK = CV_HAL_THRESH_MASK;
+inline constexpr auto k_CV_HAL_THRESH_OTSU = CV_HAL_THRESH_OTSU;
+inline constexpr auto k_CV_HAL_THRESH_TRIANGLE = CV_HAL_THRESH_TRIANGLE;
+inline constexpr auto k_CV_HAL_ADAPTIVE_THRESH_MEAN_C = CV_HAL_ADAPTIVE_THRESH_MEAN_C;
+inline constexpr auto k_CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C = CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C;
 constexpr int k_CV_MAT_DEPTH(int value) { return CV_MAT_DEPTH(value); }
 constexpr int k_CV_IS_INT_TYPE(int value) { return CV_IS_INT_TYPE(value); }
 constexpr int k_CV_IS_FLOAT_TYPE(int value) { return CV_IS_FLOAT_TYPE(value); }
@@ -148,6 +176,8 @@ constexpr int k_CV_32UC(int value) { return CV_32UC(value); }
 constexpr int k_CV_16BFC(int value) { return CV_16BFC(value); }
 constexpr int k_CV_MAKETYPE(int depth, int channels) { return CV_MAKETYPE(depth, channels); }
 constexpr int k_CV_MAKE_TYPE(int depth, int channels) { return CV_MAKE_TYPE(depth, channels); }
+template<class A, class B, class C, class D>
+constexpr auto k_CV_FOURCC_MACRO(A a, B b, C c, D d) { return CV_FOURCC_MACRO(a, b, c, d); }
 constexpr int k_CV_IS_SUBMAT(int flags) { return flags & CV_SUBMAT_FLAG; }
 }
 
@@ -269,6 +299,32 @@ constexpr int k_CV_IS_SUBMAT(int flags) { return flags & CV_SUBMAT_FLAG; }
 #undef CV_SUBMAT_FLAG_SHIFT
 #undef CV_SUBMAT_FLAG
 #undef CV_AUTOSTEP
+#undef CV_HAL_TYPE_5_8
+#undef CV_HAL_TYPE_7_12
+#undef CV_HAL_TYPE_9_16
+#undef CV_HAL_INTER_NEAREST
+#undef CV_HAL_INTER_LINEAR
+#undef CV_HAL_INTER_CUBIC
+#undef CV_HAL_INTER_AREA
+#undef CV_HAL_INTER_LANCZOS4
+#undef CV_HAL_INTER_LINEAR_EXACT
+#undef CV_HAL_INTER_NEAREST_EXACT
+#undef CV_HAL_INTER_MAX
+#undef CV_HAL_WARP_FILL_OUTLIERS
+#undef CV_HAL_WARP_INVERSE_MAP
+#undef CV_HAL_WARP_RELATIVE_MAP
+#undef CV_HAL_MORPH_ERODE
+#undef CV_HAL_MORPH_DILATE
+#undef CV_HAL_THRESH_BINARY
+#undef CV_HAL_THRESH_BINARY_INV
+#undef CV_HAL_THRESH_TRUNC
+#undef CV_HAL_THRESH_TOZERO
+#undef CV_HAL_THRESH_TOZERO_INV
+#undef CV_HAL_THRESH_MASK
+#undef CV_HAL_THRESH_OTSU
+#undef CV_HAL_THRESH_TRIANGLE
+#undef CV_HAL_ADAPTIVE_THRESH_MEAN_C
+#undef CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C
 #undef CV_MAT_DEPTH
 #undef CV_IS_INT_TYPE
 #undef CV_IS_FLOAT_TYPE
@@ -294,6 +350,7 @@ constexpr int k_CV_IS_SUBMAT(int flags) { return flags & CV_SUBMAT_FLAG; }
 #undef CV_MAKETYPE
 #undef CV_MAKE_TYPE
 #undef CV_IS_SUBMAT
+#undef CV_FOURCC_MACRO
 
 export namespace mcpplibs::mwrap::opencv::macros {
 inline constexpr auto CV_HAL_ERROR_OK = opencv_m_macro_detail::k_CV_HAL_ERROR_OK;
@@ -414,6 +471,32 @@ inline constexpr auto CV_MAT_CONT_FLAG = opencv_m_macro_detail::k_CV_MAT_CONT_FL
 inline constexpr auto CV_SUBMAT_FLAG_SHIFT = opencv_m_macro_detail::k_CV_SUBMAT_FLAG_SHIFT;
 inline constexpr auto CV_SUBMAT_FLAG = opencv_m_macro_detail::k_CV_SUBMAT_FLAG;
 inline constexpr auto CV_AUTOSTEP = opencv_m_macro_detail::k_CV_AUTOSTEP;
+inline constexpr auto CV_HAL_TYPE_5_8 = opencv_m_macro_detail::k_CV_HAL_TYPE_5_8;
+inline constexpr auto CV_HAL_TYPE_7_12 = opencv_m_macro_detail::k_CV_HAL_TYPE_7_12;
+inline constexpr auto CV_HAL_TYPE_9_16 = opencv_m_macro_detail::k_CV_HAL_TYPE_9_16;
+inline constexpr auto CV_HAL_INTER_NEAREST = opencv_m_macro_detail::k_CV_HAL_INTER_NEAREST;
+inline constexpr auto CV_HAL_INTER_LINEAR = opencv_m_macro_detail::k_CV_HAL_INTER_LINEAR;
+inline constexpr auto CV_HAL_INTER_CUBIC = opencv_m_macro_detail::k_CV_HAL_INTER_CUBIC;
+inline constexpr auto CV_HAL_INTER_AREA = opencv_m_macro_detail::k_CV_HAL_INTER_AREA;
+inline constexpr auto CV_HAL_INTER_LANCZOS4 = opencv_m_macro_detail::k_CV_HAL_INTER_LANCZOS4;
+inline constexpr auto CV_HAL_INTER_LINEAR_EXACT = opencv_m_macro_detail::k_CV_HAL_INTER_LINEAR_EXACT;
+inline constexpr auto CV_HAL_INTER_NEAREST_EXACT = opencv_m_macro_detail::k_CV_HAL_INTER_NEAREST_EXACT;
+inline constexpr auto CV_HAL_INTER_MAX = opencv_m_macro_detail::k_CV_HAL_INTER_MAX;
+inline constexpr auto CV_HAL_WARP_FILL_OUTLIERS = opencv_m_macro_detail::k_CV_HAL_WARP_FILL_OUTLIERS;
+inline constexpr auto CV_HAL_WARP_INVERSE_MAP = opencv_m_macro_detail::k_CV_HAL_WARP_INVERSE_MAP;
+inline constexpr auto CV_HAL_WARP_RELATIVE_MAP = opencv_m_macro_detail::k_CV_HAL_WARP_RELATIVE_MAP;
+inline constexpr auto CV_HAL_MORPH_ERODE = opencv_m_macro_detail::k_CV_HAL_MORPH_ERODE;
+inline constexpr auto CV_HAL_MORPH_DILATE = opencv_m_macro_detail::k_CV_HAL_MORPH_DILATE;
+inline constexpr auto CV_HAL_THRESH_BINARY = opencv_m_macro_detail::k_CV_HAL_THRESH_BINARY;
+inline constexpr auto CV_HAL_THRESH_BINARY_INV = opencv_m_macro_detail::k_CV_HAL_THRESH_BINARY_INV;
+inline constexpr auto CV_HAL_THRESH_TRUNC = opencv_m_macro_detail::k_CV_HAL_THRESH_TRUNC;
+inline constexpr auto CV_HAL_THRESH_TOZERO = opencv_m_macro_detail::k_CV_HAL_THRESH_TOZERO;
+inline constexpr auto CV_HAL_THRESH_TOZERO_INV = opencv_m_macro_detail::k_CV_HAL_THRESH_TOZERO_INV;
+inline constexpr auto CV_HAL_THRESH_MASK = opencv_m_macro_detail::k_CV_HAL_THRESH_MASK;
+inline constexpr auto CV_HAL_THRESH_OTSU = opencv_m_macro_detail::k_CV_HAL_THRESH_OTSU;
+inline constexpr auto CV_HAL_THRESH_TRIANGLE = opencv_m_macro_detail::k_CV_HAL_THRESH_TRIANGLE;
+inline constexpr auto CV_HAL_ADAPTIVE_THRESH_MEAN_C = opencv_m_macro_detail::k_CV_HAL_ADAPTIVE_THRESH_MEAN_C;
+inline constexpr auto CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C = opencv_m_macro_detail::k_CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C;
 constexpr int CV_MAT_DEPTH(int value) { return opencv_m_macro_detail::k_CV_MAT_DEPTH(value); }
 constexpr int CV_IS_INT_TYPE(int value) { return opencv_m_macro_detail::k_CV_IS_INT_TYPE(value); }
 constexpr int CV_IS_FLOAT_TYPE(int value) { return opencv_m_macro_detail::k_CV_IS_FLOAT_TYPE(value); }
@@ -438,6 +521,8 @@ constexpr int CV_32UC(int value) { return opencv_m_macro_detail::k_CV_32UC(value
 constexpr int CV_16BFC(int value) { return opencv_m_macro_detail::k_CV_16BFC(value); }
 constexpr int CV_MAKETYPE(int depth, int channels) { return opencv_m_macro_detail::k_CV_MAKETYPE(depth, channels); }
 constexpr int CV_MAKE_TYPE(int depth, int channels) { return opencv_m_macro_detail::k_CV_MAKE_TYPE(depth, channels); }
+template<class A, class B, class C, class D>
+constexpr auto CV_FOURCC_MACRO(A a, B b, C c, D d) { return opencv_m_macro_detail::k_CV_FOURCC_MACRO(a, b, c, d); }
 // Repair the upstream 5.0.0 CV_MAT_SUBMAT_FLAG typo for the typed mapping.
 constexpr int CV_IS_SUBMAT(int flags) { return opencv_m_macro_detail::k_CV_IS_SUBMAT(flags); }
 }
