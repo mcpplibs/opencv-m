@@ -117,13 +117,13 @@ The public repository listing proves repository creation/forking, not merge or r
 ## User resource and README constraints
 
 - All -m root READMEs use the same concise entry structure and normally stay within 100 lines per language. Detailed usage moves to docs/; prerequisites, candidate status and critical scope limits remain visible. The index's bilingual mwrap spec and package-authoring skill record the rule.
-- Local tests and subprocesses collectively stay below 80% of effective CPU/memory. This host currently has 32 logical CPUs and about 62 GiB RAM. The task-specific mwrap-tests.slice has CPUQuota=1600%, MemoryHigh=28G, MemoryMax=32G and TasksMax=512; future local heavy checks use that shared slice, MCPP_JOBS=6 and one heavy task at a time. These limits apply only to this task's processes, with unrelated user jobs untouched. Check current load/available memory before further heavy work.
+- Local tests and subprocesses collectively stay below 80% of effective CPU/memory. This host currently has 32 logical CPUs and about 62 GiB RAM. The task-specific mwrap-tests.slice has CPUQuota=1600%, MemoryHigh=28G, MemoryMax=32G and TasksMax=512; future local heavy checks use that shared slice, MCPP_JOBS=3 and one heavy task at a time. These limits apply only to this task's processes, with unrelated user jobs untouched. Check current load/available memory before further heavy work.
 
 The kernel cgroup files confirm cpu.max=1600000/100000, memory.high=28 GiB and memory.max=32 GiB. This user hierarchy does not delegate cpuset, so test commands additionally use taskset -c 0-15; an actual scoped process reported exactly those sixteen CPUs. Local heavy checks run as:
 
 ```sh
 systemd-run --user --scope --slice=mwrap-tests.slice --quiet \
-  taskset -c 0-15 env MCPP_JOBS=6 <check-command>
+  taskset -c 0-15 env MCPP_JOBS=3 <check-command>
 ```
 
 README rewrites cover OpenCV (EN/ZH), ORT, llama.cpp, FFmpeg, gRPC (EN/ZH) and ImGui. Each entry is below 100 lines, with its detailed prior content retained in docs/usage*.md and local links checked.
@@ -185,7 +185,7 @@ The current native matrix and immutable archive/index gates must validate this n
 
 The current coupled-runtime ORT candidate passed all nineteen strict test binaries with LLVM23 in 138.66 seconds (114.50 seconds build). Generated build inputs now preserve unchanged bytes and modification times: regeneration preserved 134 files, and the same GCC persistence check completed in 1.94 seconds after its prior 202.64-second rebuild. This avoids needless SDK recompilation and reduces local resource pressure.
 
-The resource ceiling remains mandatory for every local heavy check: the shared slice caps total task CPU at sixteen cores (50% of this 32-thread host), memory at 32 GiB (about 52% of 62 GiB), with a 28 GiB pressure threshold. CPU affinity is additionally enforced with taskset 0-15 because this user slice does not delegate cpuset. MCPP_JOBS=6, serial heavy checks and available-memory/disk monitoring reserve room for other user applications; unrelated processes are never stopped.
+The resource ceiling remains mandatory for every local heavy check: the shared slice caps total task CPU at sixteen cores (50% of this 32-thread host), memory at 32 GiB (about 52% of 62 GiB), with a 28 GiB pressure threshold. CPU affinity is additionally enforced with taskset 0-15 because this user slice does not delegate cpuset. MCPP_JOBS=3, serial heavy checks and available-memory/disk monitoring reserve room for other user applications; unrelated processes are never stopped.
 
 Index updater run 40062594528 at 9f41559 completed all 28 candidate jobs successfully across the applicable Linux/GCC/LLVM, Windows and macOS combinations; scan passed and propose was intentionally skipped on the PR. This verifies that reapplying the candidate index after registry refresh fixes the actual published-index overwrite. The upcoming OpenCV source/archive checkpoint still needs its own checks.
 
@@ -230,3 +230,13 @@ The old prune loop no longer rewrites API lists. It builds once or replays a log
 A separate staged LLVM22.1.8 dnn-onnxruntime build passed all thirteen CoreCppTypes cases, including typed OpenCV exception capture, in 188.10 seconds (165.76 seconds build). Log: target/portable-types-ort-llvm22.log. The previous remote source checkpoint 16baa03 currently has GCC, Windows, macOS and musl native jobs green; its LLVM22 ORT/template step is still live. These are separate from the upcoming helper/operator checkpoint.
 
 Final distribution review must also account for embedded legacy source/header licence preambles, beyond the fourteen named OpenCV notice files and selected provider notices already checked. COPYRIGHT alone does not contain those complete preambles; aggregate and verify them before claiming complete notice coverage. This remains a release gate rather than being hidden by the existing byte-identity notice checks.
+
+## Local resource guard clarification
+
+All local heavy checks share the existing capped slice and run serially with
+MCPP_JOBS=3. The local runner samples whole-host CPU and available memory every
+second: it refuses to start at 80% CPU or below 20% available memory and stops only
+its own test process group when those thresholds are reached during a run. The
+16-core quota and 32 GiB memory limit additionally cap this task's aggregate
+usage. Host sampling is reactive and cannot guarantee that unrelated processes
+never cause a brief whole-machine spike; unrelated processes are never stopped.
