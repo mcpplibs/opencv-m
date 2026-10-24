@@ -98,3 +98,16 @@ core/imgproc HAL 的公共函数与类型保持 `cv::hal` 名称及上游运行�
 原始节点类型与外部接口，保持当前 SDK 未启用采集时的 no-op 行为；整数 setFlags
 转发给原始枚举函数。video 补上文档公开的 tracking 扩展接口，并以用户派生特征
 类验证上游 TrackerFeatureSet 的真实派发。
+
+types.hpp 的 122 个自由值类型运算符改由固定 SDK 生成，替换旧的部分手写实现，
+保留完整重载及矩形求交的防溢出处理；INT_MAX 附近的 Jaccard 距离已通过独立
+头文件/module 对照。十五个 core 辅助函数及图像便利接口保留 SDK 函数体并调整
+模块查找。rawInOut 通过对象调用原始 SDK 成员：5.0.0 的 std::array 成员遗漏了
+static，使原始自由包装函数无法编译该参数；vector 行为保持一致。
+
+ArUco 默认阈值在 SDK 中具有内部链接，封装按值捕获并保留限定名、值及地址访问。
+同时包含原始 ArUco 头并导入模块后再引用该同名常量会有歧义；该值应采用纯模块
+访问。此边界已单独编译验证，不用正常接口测试掩盖。
+
+每项 using 导出例外必须有明确理由。历史 tools/prune_loop.py 现只构建一次并输出
+JSON/日志诊断，不再修改 curated/export 文件，不通过自动删接口获得绿色构建。

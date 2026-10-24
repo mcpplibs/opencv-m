@@ -2,7 +2,7 @@ odd-name: cv.Filter2DParams.Scalar borderValue = Scalar
 odd-name: cv.FontFace.operator ->
 odd-name: cv.LineIterator.operator *
 odd-name: cv.LineIterator.operator ++
-pruned (compile-verify): cv::HoughCirclesWithAccumulator
-pruned (compile-verify): cv::HoughLinesWithAccumulator
-pruned (compile-verify): cv::initWideAngleProjMap
-pruned (compile-verify): cv::morphologyDefaultBorderValue
+reviewed using exception: cv::HoughCirclesWithAccumulator -- 'HoughCirclesWithAccumulator' has not been declared in 'cv'
+reviewed using exception: cv::HoughLinesWithAccumulator -- 'HoughLinesWithAccumulator' has not been declared in 'cv'
+reviewed using exception: cv::initWideAngleProjMap -- both SDK overloads adapted in generated imgproc_helpers.inc
+reviewed using exception: cv::morphologyDefaultBorderValue -- SDK body adapted in generated imgproc_helpers.inc

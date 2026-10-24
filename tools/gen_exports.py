@@ -171,19 +171,22 @@ def main() -> None:
                     namespace, leaf = name.rsplit("::", 1)
                     qualified_names[namespace].add(leaf)
 
-        # prune list: names that fail compile-verification (internal linkage,
-        # header not in the module's GMF, …) — maintained by tools/prune_loop.py
+        # Reviewed exceptions to using-declarations: explicit adapters or an
+        # excluded/private surface. Compile failures never edit these lists.
         prune = REPO / "tools" / "curated" / f"{mod}.prune.txt"
         if prune.exists():
-            for line in prune.read_text().splitlines():
-                line = line.split("#", 1)[0].strip()
+            for raw in prune.read_text().splitlines():
+                line, _, reason = raw.partition("#")
+                line, reason = line.strip(), reason.strip()
                 if not line:
                     continue
+                if not reason:
+                    raise ValueError(f"Export exception needs a reason: {prune}: {line}")
                 parts = line.split("::")
                 ns, leaf = "::".join(parts[:-1]), parts[-1]
                 if leaf in names[ns]:
                     names[ns].discard(leaf)
-                    skipped.append(f"pruned (compile-verify): cv::{line}")
+                    skipped.append(f"reviewed using exception: cv::{line} -- {reason}")
 
         per_mod[mod] = {"names": names, "qualified": qualified_names, "skipped": skipped}
 

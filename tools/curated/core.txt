@@ -607,3 +607,5 @@ hal::sub64u
 hal::sub8s
 hal::sub8u
 hal::xor8u
+
+utils::getThreadID

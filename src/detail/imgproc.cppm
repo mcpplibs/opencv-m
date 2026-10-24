@@ -6,3 +6,4 @@ module;
 export module mcpplibs.mwrap.opencv.detail.imgproc;
 
 #include "../gen_exports/imgproc.inc"
+#include "../imgproc_helpers.inc"

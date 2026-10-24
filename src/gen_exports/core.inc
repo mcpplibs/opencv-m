@@ -896,6 +896,7 @@ export namespace cv::traits {
 }
 export namespace cv::utils {
     using cv::utils::AllocatorStatisticsInterface;
+    using cv::utils::getThreadID;
 }
 export namespace cv::utils::fs {
     using cv::utils::fs::canonical;
@@ -990,3 +991,5 @@ export using ::uchar;
 export using ::uint;
 export using ::uint64;
 export using ::ushort;
+export using ::cvRound64;
+export using ::cvTrunc;

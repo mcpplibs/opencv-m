@@ -167,55 +167,55 @@ odd-name: cv.softfloat.operator softdouble
 odd-name: cv.softfloat.operator=
 odd-name: cv.void error
 odd-name: cv.void terminate
-pruned (compile-verify): cv::BlockedRange
-pruned (compile-verify): cv::Split
-pruned (compile-verify): cv::abs
-pruned (compile-verify): cv::alignPtr
-pruned (compile-verify): cv::alignSize
-pruned (compile-verify): cv::allocSingletonBuffer
-pruned (compile-verify): cv::allocSingletonNewBuffer
-pruned (compile-verify): cv::cubeRoot
-pruned (compile-verify): cv::cuda::EventAccessor
-pruned (compile-verify): cv::cuda::StreamAccessor
-pruned (compile-verify): cv::cuda::createContinuous
-pruned (compile-verify): cv::cuda::ensureSizeIsEnough
-pruned (compile-verify): cv::cuda::getCudaDriverApiErrorMessage
-pruned (compile-verify): cv::cuda::getInputMat
-pruned (compile-verify): cv::cuda::getNppErrorMessage
-pruned (compile-verify): cv::cuda::getOutputMat
-pruned (compile-verify): cv::cuda::syncOutput
-pruned (compile-verify): cv::currentParallelFramework
-pruned (compile-verify): cv::details::char_tolower
-pruned (compile-verify): cv::details::char_toupper
-pruned (compile-verify): cv::determinant
-pruned (compile-verify): cv::divUp
-pruned (compile-verify): cv::double
-pruned (compile-verify): cv::float
-pruned (compile-verify): cv::format
-pruned (compile-verify): cv::getElemSize
-pruned (compile-verify): cv::int
-pruned (compile-verify): cv::ipp::setUseIPP_NE
-pruned (compile-verify): cv::ipp::useIPP_NE
-pruned (compile-verify): cv::makePtr
-pruned (compile-verify): cv::max
-pruned (compile-verify): cv::min
-pruned (compile-verify): cv::norm
-pruned (compile-verify): cv::parallel_for_
-pruned (compile-verify): cv::print
-pruned (compile-verify): cv::randu
-pruned (compile-verify): cv::read
-pruned (compile-verify): cv::roundUp
-pruned (compile-verify): cv::scalarToRawData
-pruned (compile-verify): cv::schar
-pruned (compile-verify): cv::short
-pruned (compile-verify): cv::swap
-pruned (compile-verify): cv::toLowerCase
-pruned (compile-verify): cv::toUpperCase
-pruned (compile-verify): cv::trace
-pruned (compile-verify): cv::uchar
-pruned (compile-verify): cv::unsigned
-pruned (compile-verify): cv::ushort
-pruned (compile-verify): cv::write
+reviewed using exception: cv::BlockedRange -- 'BlockedRange' has not been declared in 'cv'
+reviewed using exception: cv::Split -- 'Split' has not been declared in 'cv'
+reviewed using exception: cv::abs -- static-inline overloads (int/Complex/Mat_) in the set → core_fns.inc
+reviewed using exception: cv::alignPtr -- static inline utility.hpp → core_fns.inc
+reviewed using exception: cv::alignSize -- static inline utility.hpp → core_fns.inc
+reviewed using exception: cv::allocSingletonBuffer -- 'allocSingletonBuffer' has not been declared in 'cv'
+reviewed using exception: cv::allocSingletonNewBuffer -- 'allocSingletonNewBuffer' has not been declared in 'cv'
+reviewed using exception: cv::cubeRoot -- static-inline double overload in the set → core_fns.inc
+reviewed using exception: cv::cuda::EventAccessor -- 'EventAccessor' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::StreamAccessor -- 'StreamAccessor' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::createContinuous -- 'createContinuous' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::ensureSizeIsEnough -- 'ensureSizeIsEnough' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::getCudaDriverApiErrorMessage -- 'getCudaDriverApiErrorMessage' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::getInputMat -- 'getInputMat' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::getNppErrorMessage -- 'getNppErrorMessage' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::getOutputMat -- 'getOutputMat' has not been declared in 'cv::cuda'
+reviewed using exception: cv::cuda::syncOutput -- 'syncOutput' has not been declared in 'cv::cuda'
+reviewed using exception: cv::currentParallelFramework -- 'currentParallelFramework' has not been declared in 'cv'
+reviewed using exception: cv::details::char_tolower -- internal cvstd.hpp helper behind toLowerCase
+reviewed using exception: cv::details::char_toupper -- internal cvstd.hpp helper behind toUpperCase
+reviewed using exception: cv::determinant -- static-inline Matx overload in the set → matx_ops.inc + core_fns.inc
+reviewed using exception: cv::divUp -- static inline utility.hpp → core_fns.inc
+reviewed using exception: cv::double -- expected unqualified-id before 'double'
+reviewed using exception: cv::float -- expected unqualified-id before 'float'
+reviewed using exception: cv::format -- static-inline Mat/Formatter overload in the set → core_fns.inc
+reviewed using exception: cv::getElemSize -- static inline utility.hpp → core_fns.inc
+reviewed using exception: cv::int -- expected unqualified-id before 'int'
+reviewed using exception: cv::ipp::setUseIPP_NE -- internal IPP not-exact toggle
+reviewed using exception: cv::ipp::useIPP_NE -- internal IPP not-exact query
+reviewed using exception: cv::makePtr -- static inline cvstd_wrapper.hpp → core_fns.inc
+reviewed using exception: cv::max -- static-inline Mat×Matx / Mat_ overloads in the set → core_fns.inc
+reviewed using exception: cv::min -- static-inline Mat×Matx / Mat_ overloads in the set → core_fns.inc
+reviewed using exception: cv::norm -- static-inline Matx/Point overloads in the set → matx_ops.inc + core_fns.inc
+reviewed using exception: cv::parallel_for_ -- static-inline std::function overload in the set → core_fns.inc
+reviewed using exception: cv::print -- static inline operations.hpp → core_fns.inc
+reviewed using exception: cv::randu -- static-inline randu<_Tp>() in the set → core_fns.inc
+reviewed using exception: cv::read -- primitives in core_fns.inc; static-inline helpers in generated persistence_ops.inc
+reviewed using exception: cv::roundUp -- static inline utility.hpp → core_fns.inc
+reviewed using exception: cv::scalarToRawData -- 'scalarToRawData' has not been declared in 'cv'
+reviewed using exception: cv::schar -- 'schar' has not been declared in 'cv'
+reviewed using exception: cv::short -- expected unqualified-id before 'short'
+reviewed using exception: cv::swap -- static-inline MatExpr overload in the set → core_fns.inc
+reviewed using exception: cv::toLowerCase -- static inline cvstd.hpp → core_fns.inc
+reviewed using exception: cv::toUpperCase -- static inline cvstd.hpp → core_fns.inc
+reviewed using exception: cv::trace -- static-inline Matx overload in the set → matx_ops.inc + core_fns.inc
+reviewed using exception: cv::uchar -- 'uchar' has not been declared in 'cv'
+reviewed using exception: cv::unsigned -- expected unqualified-id before 'unsigned'
+reviewed using exception: cv::ushort -- 'ushort' has not been declared in 'cv'
+reviewed using exception: cv::write -- primitives in core_fns.inc; static-inline helpers in generated persistence_ops.inc
 skipped-ns: cv.detail.TEST_CUSTOM
 skipped-ns: cv.detail.TEST_EQ
 skipped-ns: cv.detail.TEST_GE

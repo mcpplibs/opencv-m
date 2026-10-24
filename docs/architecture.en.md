@@ -134,3 +134,21 @@ in the selected SDK configuration. Its integer setFlags overload forwards to the
 original enum function. The video adapter additionally includes the documented
 tracking extension interfaces, tested with a user-derived feature and original
 SDK feature-set dispatch.
+
+All 122 free value operators from the pinned types.hpp now use generated SDK
+bodies, replacing the old partial handwritten implementations. This preserves
+overload coverage and the SDK's overflow-safe rectangle intersection, including
+Jaccard distances near INT_MAX. Fifteen core helpers and image conveniences
+retain their upstream bodies with module-safe lookup. rawInOut calls the SDK
+member through an instance: OpenCV 5 omitted static on its std::array overload,
+making the original free wrapper uncompilable for that argument. Vector behavior
+is unchanged. Independent header/member and module consumers compare results.
+
+The ArUco default threshold is captured by value because its SDK declaration has
+internal linkage. Module-only access retains its qualified name/value and address
+use; naming that value after including the original ArUco header and importing
+the module is ambiguous. This limitation is verified separately from API behavior.
+
+Every using-declaration exception requires an explicit reason. The historical
+tools/prune_loop.py now builds once and emits a JSON/log report without changing
+curated lists or exports; it cannot shrink the API until compilation turns green.

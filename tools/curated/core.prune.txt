@@ -1,4 +1,4 @@
-# names failing compile-verification — maintained by tools/prune_loop.py
+# Reviewed using-declaration exceptions; compilation never rewrites this list.
 BlockedRange   # 'BlockedRange' has not been declared in 'cv'
 Split   # 'Split' has not been declared in 'cv'
 allocSingletonBuffer   # 'allocSingletonBuffer' has not been declared in 'cv'

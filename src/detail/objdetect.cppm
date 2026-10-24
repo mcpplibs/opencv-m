@@ -5,3 +5,4 @@ module;
 export module mcpplibs.mwrap.opencv.detail.objdetect;
 
 #include "../gen_exports/objdetect.inc"
+#include "../objdetect_constants.inc"

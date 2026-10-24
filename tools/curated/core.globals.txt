@@ -61,3 +61,7 @@ uchar
 uint
 uint64
 ushort
+
+# Public softfloat scalar conversions.
+cvRound64
+cvTrunc

@@ -5,3 +5,4 @@ module;
 export module mcpplibs.mwrap.opencv.detail.imgcodecs;
 
 #include "../gen_exports/imgcodecs.inc"
+#include "../imgcodecs_helpers.inc"

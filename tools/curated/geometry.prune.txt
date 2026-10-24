@@ -1,1 +1,1 @@
-# names failing compile-verification — maintained by tools/prune_loop.py
+# Reviewed using-declaration exceptions; compilation never rewrites this list.

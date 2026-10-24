@@ -1,25 +1,25 @@
 odd-name: cv.<unnamed>
 odd-name: cv.VideoCapture.operator >>
 odd-name: cv.VideoWriter.operator <<
-pruned (compile-verify): cv::AVIReadContainer
-pruned (compile-verify): cv::AVIWriteContainer
-pruned (compile-verify): cv::CLOSE_CAMERA
-pruned (compile-verify): cv::COLORSPACE_BGR
-pruned (compile-verify): cv::COLORSPACE_GRAY
-pruned (compile-verify): cv::COLORSPACE_RGBA
-pruned (compile-verify): cv::COLORSPACE_YUV444P
-pruned (compile-verify): cv::Codecs
-pruned (compile-verify): cv::MJPEG
-pruned (compile-verify): cv::OPEN_CAMERA
-pruned (compile-verify): cv::PluginStreamReader
-pruned (compile-verify): cv::SHOW_TRACKBAR
-pruned (compile-verify): cv::StreamType
-pruned (compile-verify): cv::UPDATE_IMAGE_ELEMENT
-pruned (compile-verify): cv::db
-pruned (compile-verify): cv::dc
-pruned (compile-verify): cv::icvExtractPattern
-pruned (compile-verify): cv::pc
-pruned (compile-verify): cv::wb
-pruned (compile-verify): cv::winrt_imshow
-pruned (compile-verify): cv::winrt_onVisibilityChanged
-pruned (compile-verify): cv::winrt_setFrameContainer
+reviewed using exception: cv::AVIReadContainer -- 'AVIReadContainer' has not been declared in 'cv'
+reviewed using exception: cv::AVIWriteContainer -- 'AVIWriteContainer' has not been declared in 'cv'
+reviewed using exception: cv::CLOSE_CAMERA -- 'CLOSE_CAMERA' has not been declared in 'cv'
+reviewed using exception: cv::COLORSPACE_BGR -- 'COLORSPACE_BGR' has not been declared in 'cv'
+reviewed using exception: cv::COLORSPACE_GRAY -- 'COLORSPACE_GRAY' has not been declared in 'cv'
+reviewed using exception: cv::COLORSPACE_RGBA -- 'COLORSPACE_RGBA' has not been declared in 'cv'
+reviewed using exception: cv::COLORSPACE_YUV444P -- 'COLORSPACE_YUV444P' has not been declared in 'cv'
+reviewed using exception: cv::Codecs -- 'Codecs' has not been declared in 'cv'
+reviewed using exception: cv::MJPEG -- 'MJPEG' has not been declared in 'cv'
+reviewed using exception: cv::OPEN_CAMERA -- 'OPEN_CAMERA' has not been declared in 'cv'
+reviewed using exception: cv::PluginStreamReader -- 'PluginStreamReader' has not been declared in 'cv'
+reviewed using exception: cv::SHOW_TRACKBAR -- 'SHOW_TRACKBAR' has not been declared in 'cv'
+reviewed using exception: cv::StreamType -- 'StreamType' has not been declared in 'cv'
+reviewed using exception: cv::UPDATE_IMAGE_ELEMENT -- 'UPDATE_IMAGE_ELEMENT' has not been declared in 'cv'
+reviewed using exception: cv::db -- 'db' has not been declared in 'cv'
+reviewed using exception: cv::dc -- 'dc' has not been declared in 'cv'
+reviewed using exception: cv::icvExtractPattern -- 'icvExtractPattern' has not been declared in 'cv'
+reviewed using exception: cv::pc -- 'pc' has not been declared in 'cv'
+reviewed using exception: cv::wb -- 'wb' has not been declared in 'cv'
+reviewed using exception: cv::winrt_imshow -- 'winrt_imshow' has not been declared in 'cv'
+reviewed using exception: cv::winrt_onVisibilityChanged -- 'winrt_onVisibilityChanged' has not been declared in 'cv'
+reviewed using exception: cv::winrt_setFrameContainer -- 'winrt_setFrameContainer' has not been declared in 'cv'

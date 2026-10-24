@@ -188,6 +188,13 @@ jobs:
         shell: bash
         run: python3 tools/generate_persistence.py --check
 
+      - name: Generated portable helpers and value operators match the pinned SDK
+        shell: bash
+        run: |
+          python3 tools/generate_inline_helpers.py --check
+          python3 tools/generate_type_ops.py --check
+          python3 tools/test_export_diagnostics.py
+
       - name: Build
         shell: bash
         run: mcpp build
@@ -271,6 +278,10 @@ jobs:
       - name: Native SDK versus module persistence formats
         shell: bash
         run: python3 tools/check_persistence_format.py
+
+      - name: Native SDK versus module portable helper behavior
+        shell: bash
+        run: python3 tools/check_utility_helpers.py
 
       - name: Features without the optional DNN surface
         if: matrix.name == 'linux-llvm-22'
