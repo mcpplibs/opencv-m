@@ -41,6 +41,10 @@ def main():
         recorded.update(names)
         if not set(group.get("features", [])) <= features:
             continue
+        if set(group.get("without-features", [])) & features:
+            continue
+        if group.get("when-header-loaded") and inventory["headers"].get(group["source"]) != "loaded":
+            continue
         for name in names:
             assert name in inventory["entities"], f"Reviewed name absent from active inventory: {name}"
             assert group["source"] in inventory["entities"][name]["headers"], name

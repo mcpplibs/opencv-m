@@ -282,6 +282,7 @@ jobs:
             target/api-audit/inventory.json
             target/api-audit/includes.log
             target/api-audit/export-consumer.log
+            target/api-audit/unlisted-import-probe/
           if-no-files-found: error
 
       - name: Actual default project template

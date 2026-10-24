@@ -831,3 +831,37 @@ independent-home template/API/deployment tests, explicit optional capability
 matrices and exact-head native CI remain required. On 2026-10-25, the latest
 published mcpp is still v2026.10.24.1, matching all project/CI pins. No merge,
 tag or release has been performed; mcpp engine source remains unchanged.
+
+## Native SSE review profile correction
+
+Exact-head c052ccf native CI job 120910535637 fails at the strict declaration
+review gate, after compilation/behavior checks, because the software-profile
+catalog does not include 23 additional native SSE implementation helpers.
+The actual CI artifact (12565369629) has all-modules,simd without simd-emulated:
+3969 entities, 258 outside using lists, 137 visible manual names and 121 rejected
+names. The failure is not counted as success or hidden by relaxing the gate.
+
+Two exact groups now review twenty underscore-prefixed __m128i SSE emulation
+shims in intrin_sse_em.hpp and three palignr/reinterpret helpers in the explicit
+hal_sse_internal namespace in intrin_sse.hpp. Each retains source SHA256 and
+literal evidence. Groups require simd, exclude simd-emulated and apply only when
+the corresponding header is loaded. Unknown names, changed sources and stale
+exclusions still fail; the preserved software report passes and both injected
+unreviewed/stale faults are rejected. Raw probe source/logs are now included
+in the native inventory CI artifact.
+
+The actual local native SDK/module run passes all four programs (648.92s,
+one build job), matching 1311-byte SIMD and 976-byte legacy outputs. A fresh
+native audit resolves 3719 listed names and sixteen direct modules; all 121
+rejections are covered (103 implementation helpers, 18 binding tests). The
+preserved software audit still covers 101 (83 implementation, 18 binding).
+Log: /tmp/mwrap-native-entity-review.log. No library/module implementation,
+upstream source, template or build recipe is changed by this correction.
+The final source/index CI still requires the corrected HEAD.
+
+The preceding c052ccf source archive has now also passed the final actual WebP
+alpha/animation/XMP behavior, release pack, relocated execution and eighteen
+byte-identical selected notices. Log: /tmp/mwrap-c052ccf-webp-deployment.log.
+Normal template/indexed API deployment passed separately with fifteen notices.
+The corrected archive must be re-pinned and its implementation equivalence
+verified rather than silently claiming c052ccf's failing audit scripts pass.
