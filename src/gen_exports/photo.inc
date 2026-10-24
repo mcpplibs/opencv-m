@@ -135,3 +135,6 @@ export namespace cv::cuda {
 export namespace cv::segmentation {
     using cv::segmentation::IntelligentScissorsMB;
 }
+export using ::InpaintingModes;
+export using ::CV_INPAINT_NS;
+export using ::CV_INPAINT_TELEA;

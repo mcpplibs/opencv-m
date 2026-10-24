@@ -896,6 +896,13 @@ export namespace cv::traits {
 }
 export namespace cv::utils {
     using cv::utils::AllocatorStatisticsInterface;
+    using cv::utils::dumpInputArray;
+    using cv::utils::dumpInputArrayOfArrays;
+    using cv::utils::dumpInputOutputArray;
+    using cv::utils::dumpInputOutputArrayOfArrays;
+    using cv::utils::dumpVectorOfDouble;
+    using cv::utils::dumpVectorOfInt;
+    using cv::utils::dumpVectorOfRect;
     using cv::utils::getThreadID;
 }
 export namespace cv::utils::fs {
@@ -903,6 +910,7 @@ export namespace cv::utils::fs {
     using cv::utils::fs::createDirectories;
     using cv::utils::fs::createDirectory;
     using cv::utils::fs::exists;
+    using cv::utils::fs::getCacheDirectoryForDownloads;
     using cv::utils::fs::getParent;
     using cv::utils::fs::getcwd;
     using cv::utils::fs::glob;

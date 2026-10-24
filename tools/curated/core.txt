@@ -609,3 +609,13 @@ hal::sub8u
 hal::xor8u
 
 utils::getThreadID
+
+# Public helpers outside bindings_utils.hpp's ignored binding-test region.
+utils::dumpInputArray
+utils::dumpInputArrayOfArrays
+utils::dumpInputOutputArray
+utils::dumpInputOutputArrayOfArrays
+utils::dumpVectorOfInt
+utils::dumpVectorOfDouble
+utils::dumpVectorOfRect
+utils::fs::getCacheDirectoryForDownloads

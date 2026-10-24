@@ -1,0 +1,4 @@
+# Original global enum spellings retained by the upstream compatibility header.
+InpaintingModes
+CV_INPAINT_NS
+CV_INPAINT_TELEA

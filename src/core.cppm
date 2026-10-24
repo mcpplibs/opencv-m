@@ -7,11 +7,13 @@
 module;
 #include <cstdarg>   // va_list/va_start/va_copy/va_end — cv::format printf reimpl (core_fns.inc)
 #include <cstdio>    // vsnprintf/fputs/FILE/stdout — cv::format / cv::print reimpls (core_fns.inc)
+#include <sstream>
 #include <opencv2/core.hpp>
 #include <opencv2/core/hal/hal.hpp>
 #include <opencv2/core/llapi/llapi.h>
 #include <opencv2/core/affine.hpp>
 #include <opencv2/core/async.hpp>
+#include <opencv2/core/bindings_utils.hpp>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/core/detail/async_promise.hpp>
 #include <opencv2/core/dualquaternion.hpp>
@@ -38,6 +40,7 @@ export module mcpplibs.mwrap.opencv.core;
 #include "portable_helpers.inc"
 #include "fast_math_helpers.inc"
 #include "cuda_helpers.inc"
+#include "utils_helpers.inc"
 #include "persistence_ops.inc"
 #include "instrumentation_ops.inc"
 #include "affine_ops.inc"

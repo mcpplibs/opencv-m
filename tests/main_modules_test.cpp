@@ -31,6 +31,22 @@ import mcpplibs.mwrap.opencv.video;
 import mcpplibs.mwrap.opencv;
 namespace types = mcpplibs::mwrap::opencv::macros;
 
+#if defined(MCPP_FEATURE_PHOTO)
+TEST(MainModules, OriginalGlobalInpaintingEnumRemainsAvailable) {
+    InpaintingModes mode = CV_INPAINT_TELEA;
+    EXPECT_EQ(static_cast<int>(mode), cv::INPAINT_TELEA);
+    EXPECT_EQ(static_cast<int>(CV_INPAINT_NS), cv::INPAINT_NS);
+}
+#endif
+#if defined(MCPP_FEATURE_VIDEO)
+TEST(MainModules, OriginalGlobalOpticalFlowFlagsRemainAvailable) {
+    EXPECT_EQ(CV_LKFLOW_PYR_A_READY, 1);
+    EXPECT_EQ(CV_LKFLOW_PYR_B_READY, 2);
+    EXPECT_EQ(static_cast<int>(CV_LKFLOW_INITIAL_GUESSES), cv::OPTFLOW_USE_INITIAL_FLOW);
+    EXPECT_EQ(static_cast<int>(CV_LKFLOW_GET_MIN_EIGENVALS), cv::OPTFLOW_LK_GET_MIN_EIGENVALS);
+}
+#endif
+
 #if defined(MCPP_FEATURE_PTCLOUD)
 TEST(MainModules, PointCloudCpuRenderingAndInvalidPoints) {
     cv::Mat points(1, 2, types::CV_32FC4, cv::Scalar(0, 0, 1, 0));

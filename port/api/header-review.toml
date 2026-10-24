@@ -194,15 +194,15 @@ headers = [
 ]
 
 [[groups]]
-decision = "public-gap"
-reason = "Public core_utils dump helpers and the download-cache accessor coexist with @cond IGNORED binding tests. Public helpers still need selective exports/adapters; the whole header must not be dismissed as binding-only."
+decision = "implemented"
+reason = "Twelve public dump helpers use exact SDK forwards; eight external array/vector/cache helpers retain original declarations. Independent native/module consumers cover formatting and array diagnostics on all three Linux compilers. The ignored binding-test region is not exported."
 headers = [
   "modules/core/include/opencv2/core/bindings_utils.hpp",
 ]
 
 [[groups]]
-decision = "public-gap"
-reason = "Retained legacy C constants introduce original global enum names. Modern C++ enum equivalents are available, but original global compatibility spellings are not yet exported."
+decision = "implemented"
+reason = "The original global InpaintingModes type and six global legacy constants are exported from photo/video with using declarations. Direct module tests compare their original values and modern C++ equivalents."
 headers = [
   "modules/photo/include/opencv2/photo/legacy/constants_c.h",
   "modules/video/include/opencv2/video/legacy/constants_c.h",

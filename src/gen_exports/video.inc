@@ -51,3 +51,7 @@ export namespace cv::detail::tracking {
     using cv::detail::tracking::TrackerTargetState;
     using cv::detail::tracking::Trajectory;
 }
+export using ::CV_LKFLOW_PYR_A_READY;
+export using ::CV_LKFLOW_PYR_B_READY;
+export using ::CV_LKFLOW_INITIAL_GUESSES;
+export using ::CV_LKFLOW_GET_MIN_EIGENVALS;

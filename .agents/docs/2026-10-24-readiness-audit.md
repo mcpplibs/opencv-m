@@ -378,3 +378,50 @@ bytes and rejects apparent license comments inside ordinary/raw string literals.
 It reproduces the old failure in an isolated copy and passes with the fix.
 The original 791,266-byte notice supplement still passes its drift check.
 The new Windows native CI result remains required.
+
+## Public core diagnostics and original legacy enum checkpoint
+
+Twelve public static-inline dump functions now forward to the original SDK
+implementations through ordinary module-private functions, avoiding transcribed
+formatting logic. Eight external array/vector/cache diagnostic functions retain
+their original declarations. The explicitly ignored binding-test region is not
+exported. Tests compare scalar/string/geometry/criteria/range/vector formatting
+and all four array diagnostic variants between independent native-header and
+module consumers; the cache accessor signature is checked without touching user
+cache directories. The original InpaintingModes type and six photo/video global
+constants are exported unchanged, with tests against upstream C++ equivalents.
+
+All 26 strict programs pass LLVM23 (27.99s), GCC16 (80.25s) and LLVM22 (31.03s);
+each independent SDK/module utility output matches exactly at 1,302 bytes. Log:
+target/utils-legacy-all-compilers.log. Compiler-derived lookup resolves 3,481
+listed root exports and sixteen direct module surfaces. Inventory is 3,699
+entities, 229 not in using lists (including adapters/ignored SDK helpers), 109
+headers not in facades and fourteen implementation headers. Log:
+target/utils-legacy-api-audit.log. Header review now has twenty remaining
+public-gap records, all related to universal/architecture-specific intrinsics.
+An implemented header review also requires the compiler inventory to confirm
+that its facade actually loads that header. No review label hides these gaps.
+
+The Windows job for 11aa896 has passed Embedded upstream notices match retained
+sources and progressed through the WebP stage into image codec feature tests at
+the last authoritative poll. Its whole job and the new implementation head
+still need final native CI. The case-sensitive path ordering fix has therefore
+passed the real Windows notice gate, not just local emulation.
+
+For the next SIMD work, an isolated Clang module experiment disproved namespace
+using-directive-only exports: qualified calls remain invisible after import.
+Explicit using declarations for original v_float32x4/v_load/v_setall_f32/v_add/
+v_store pass the same import-only probe without copied SDK vector types or ISA
+flags. Logs: target/simd-namespace-probe.log (expected failed experiment) and
+target/simd-explicit-using-probe.log (successful explicit-name experiment). This
+is prototype evidence only; it does not certify the unimplemented SIMD family.
+
+The isolated SIMD prototype additionally passed actual managed mcpp strict
+build/run with LLVM23, GCC16 and LLVM22 (not only syntax checks). It uses the
+original SDK vector type/load/setall/add/store through explicit using
+ declarations; no copied vector type or private ISA flags are introduced. The
+first temporary manifest lacked an explicit binary entry and was corrected;
+only target/simd-native-probe-managed-final.log is runtime acceptance evidence.
+Prototype source/manifest path: /tmp/mwrap-simd-native-probe-0pbdluu1. The twenty
+SIMD family records remain public gaps until the full surface and target matrix
+are implemented and tested.

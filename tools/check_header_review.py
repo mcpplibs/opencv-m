@@ -36,6 +36,8 @@ def main():
             counts[decision] += 1
             if decision == "public-gap":
                 gaps.append(header)
+            if decision == "implemented":
+                assert inventory["headers"][header] == "loaded", f"Implemented facade header not loaded: {header}"
             if decision == "forwarder":
                 source = re.sub(r"/\*.*?\*/|//[^\n]*", "", path.read_text(), flags=re.S)
                 assert "#include" in source and all(

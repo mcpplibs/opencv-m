@@ -199,6 +199,36 @@ inline void emit(const char* consumer) {
     flags ^= Event::DISABLE_TIMING;
     require(flags == 4, "event flag compound operators preserve enum type");
     result << "cuda CPU helpers: " << contiguous.rows << ',' << contiguous.cols << ',' << static_cast<int>(flags) << '\n';
+    const std::vector<cv::String> descriptions{
+        cv::utils::dumpBool(true), cv::utils::dumpBool(false), cv::utils::dumpInt(-17),
+        cv::utils::dumpInt64(4294967297LL), cv::utils::dumpSizeT(4096),
+        cv::utils::dumpFloat(2.375f), cv::utils::dumpDouble(-2.375),
+        cv::utils::dumpCString("SDK"), cv::utils::dumpString("module"),
+        cv::utils::dumpRect(cv::Rect(1, -2, 3, 4)),
+        cv::utils::dumpTermCriteria(cv::TermCriteria(3, 10, 0.125)),
+        cv::utils::dumpRotatedRect(cv::RotatedRect(cv::Point2f(1, 2), cv::Size2f(3, 4), 15)),
+        cv::utils::dumpRange(cv::Range(2, 7)), cv::utils::dumpRange(cv::Range::all()),
+        cv::utils::dumpVectorOfInt({-1, 2, 3}),
+        cv::utils::dumpVectorOfDouble({0.125, -2.375}),
+        cv::utils::dumpVectorOfRect({cv::Rect(1, 2, 3, 4)})};
+    require(descriptions[0] == "Bool: True" && descriptions[1] == "Bool: False" &&
+            descriptions[2] == "Int: -17" && descriptions[3] == "Int64: 4294967297" &&
+            descriptions[4] == "size_t: 4096" && descriptions[12] == "range: (s=2, e=7)" &&
+            descriptions[13] == "range: all", "public utility formatting contracts");
+    for (const auto& text : descriptions) result << text << '\n';
+    cv::Mat diagnostic(2, 3, cv::traits::Type<float>::value, cv::Scalar(7));
+    std::vector<cv::Mat> diagnostic_arrays{diagnostic, diagnostic};
+    const std::vector<cv::String> arrays{
+        cv::utils::dumpInputArray(diagnostic), cv::utils::dumpInputArrayOfArrays(diagnostic_arrays),
+        cv::utils::dumpInputOutputArray(diagnostic),
+        cv::utils::dumpInputOutputArrayOfArrays(diagnostic_arrays)};
+    for (const auto& text : arrays) {
+        require(text.find("empty()=false") != cv::String::npos && text.find("ERROR") == cv::String::npos,
+                "public array diagnostic helper");
+        result << text << '\n';
+    }
+    auto cache_accessor = &cv::utils::fs::getCacheDirectoryForDownloads;
+    require(cache_accessor != nullptr, "download cache accessor signature without filesystem side effects");
     if (const char* directory = std::getenv("OPENCV_M_UTILITY_OUTPUT")) {
         std::ofstream file(std::filesystem::path(directory) / (std::string(consumer) + ".txt"), std::ios::binary);
         file << result.str();
