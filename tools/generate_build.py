@@ -219,7 +219,7 @@ def generate():
     # build.mcpp emits the selected interface with concrete imports after
     # feature resolution, before mcpp scans the generated module.
     build["sources"] = ["src/opencv.cppm", "src/core.cppm", "src/macros.cppm"]
-    notices = [ROOT / "LICENSE", *sorted(
+    notices = [ROOT / "LICENSE", ROOT / "port/licenses/UPSTREAM_SOURCE_NOTICES.txt", *sorted(
         path for path in (ROOT / "upstream/opencv").rglob("*")
         if path.is_file() and any(word in path.name for word in
                                  ("LICENSE", "COPYING", "COPYRIGHT", "NOTICE")))]

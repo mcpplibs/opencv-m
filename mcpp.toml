@@ -415,6 +415,10 @@ from = "LICENSE"
 to = "licenses/opencv"
 
 [[runtime.deploy]]
+from = "port/licenses/UPSTREAM_SOURCE_NOTICES.txt"
+to = "licenses/opencv/port/licenses"
+
+[[runtime.deploy]]
 from = "upstream/opencv/3rdparty/dlpack/LICENSE"
 to = "licenses/opencv/upstream/opencv/3rdparty/dlpack"
 

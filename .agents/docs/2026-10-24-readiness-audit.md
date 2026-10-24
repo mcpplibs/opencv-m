@@ -240,3 +240,21 @@ its own test process group when those thresholds are reached during a run. The
 16-core quota and 32 GiB memory limit additionally cap this task's aggregate
 usage. Host sampling is reactive and cannot guarantee that unrelated processes
 never cause a brief whole-machine spike; unrelated processes are never stopped.
+
+## Embedded source notice deployment checkpoint
+
+Source CI at 16baa03 completed all five native jobs successfully, including the
+Linux LLVM22 ORT path. Later helper/operator changes still need their own CI.
+The distribution audit found that named license files alone omit complete older
+BSD preambles embedded in SDK headers. tools/generate_source_notices.py now
+preserves 542 distinct copyright/license comment blocks at 2,077 retained source
+locations in a deterministic 791,266-byte supplement. It skips quoted strings,
+retains original comment bytes and records source locations. Named notice files
+remain separate. All 15 OpenCV notice artifacts are declared by runtime.deploy;
+WebP consumers additionally receive the provider's three notices.
+
+The generator's drift check runs in every native CI leg. Local checks confirm
+complete base/types/matx/mat.inl BSD preambles, all 15 deployment inputs, and all
+2,305 retained SDK files matching the pinned upstream archive. Index relocation
+acceptance now explicitly requires the supplement byte for byte. Actual archive
+installation/relocation and native CI for this checkpoint remain pending.
