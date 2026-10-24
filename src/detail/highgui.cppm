@@ -1,0 +1,8 @@
+// opencv.highgui — C++23 module over OpenCV 5 highgui (API unchanged;
+// headless backend in this build profile).
+module;
+#include <opencv2/highgui.hpp>
+
+export module mcpplibs.mwrap.opencv.detail.highgui;
+
+#include "../gen_exports/highgui.inc"

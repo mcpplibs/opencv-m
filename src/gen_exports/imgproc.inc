@@ -563,3 +563,39 @@ export namespace cv::fisheye {
     using cv::fisheye::initUndistortRectifyMap;
     using cv::fisheye::undistortImage;
 }
+export namespace cv::hal {
+    using cv::hal::cvtBGR5x5toBGR;
+    using cv::hal::cvtBGR5x5toGray;
+    using cv::hal::cvtBGRtoBGR;
+    using cv::hal::cvtBGRtoBGR5x5;
+    using cv::hal::cvtBGRtoGray;
+    using cv::hal::cvtBGRtoHSV;
+    using cv::hal::cvtBGRtoLab;
+    using cv::hal::cvtBGRtoThreePlaneYUV;
+    using cv::hal::cvtBGRtoTwoPlaneYUV;
+    using cv::hal::cvtBGRtoXYZ;
+    using cv::hal::cvtBGRtoYUV;
+    using cv::hal::cvtGraytoBGR;
+    using cv::hal::cvtGraytoBGR5x5;
+    using cv::hal::cvtHSVtoBGR;
+    using cv::hal::cvtLabtoBGR;
+    using cv::hal::cvtMultipliedRGBAtoRGBA;
+    using cv::hal::cvtOnePlaneBGRtoYUV;
+    using cv::hal::cvtOnePlaneYUVtoBGR;
+    using cv::hal::cvtRGBAtoMultipliedRGBA;
+    using cv::hal::cvtThreePlaneYUVtoBGR;
+    using cv::hal::cvtTwoPlaneYUVtoBGR;
+    using cv::hal::cvtXYZtoBGR;
+    using cv::hal::cvtYUVtoBGR;
+    using cv::hal::filter2D;
+    using cv::hal::integral;
+    using cv::hal::morph;
+    using cv::hal::resize;
+    using cv::hal::sepFilter2D;
+    using cv::hal::warpAffine;
+    using cv::hal::warpAffineBlockline;
+    using cv::hal::warpAffineBlocklineNN;
+    using cv::hal::warpPerspective;
+    using cv::hal::warpPerspectiveBlockline;
+    using cv::hal::warpPerspectiveBlocklineNN;
+}

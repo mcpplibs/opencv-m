@@ -1,0 +1,1445 @@
+{
+  "build": {
+    "jobs": 6,
+    "sources": [
+      "src/opencv.cppm",
+      "src/macros.cppm",
+      "src/cv.cppm",
+      "src/core.cppm",
+      "src/imgproc.cppm",
+      "src/imgcodecs.cppm",
+      "src/videoio.cppm",
+      "src/highgui.cppm",
+      "src/flann.cppm",
+      "src/geometry.cppm"
+    ],
+    "include_dirs": [
+      "port/include",
+      "generated/common",
+      "upstream/opencv",
+      "upstream/opencv/3rdparty/dlpack/include",
+      "upstream/opencv/3rdparty/libjpeg-turbo/src",
+      "upstream/opencv/3rdparty/libjpeg-turbo/simd/nasm",
+      "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64",
+      "upstream/opencv/3rdparty/zlib",
+      "upstream/opencv/modules/core/include",
+      "upstream/opencv/modules/flann/include",
+      "upstream/opencv/modules/geometry/include",
+      "upstream/opencv/modules/imgproc/include",
+      "upstream/opencv/3rdparty/mlas/inc",
+      "upstream/opencv/3rdparty/mlas/lib",
+      "upstream/opencv/modules/dnn/include",
+      "upstream/opencv/modules/dnn/misc/caffe",
+      "upstream/opencv/modules/dnn/misc/tensorflow",
+      "upstream/opencv/modules/dnn/misc/onnx",
+      "upstream/opencv/modules/dnn/misc/tflite",
+      "upstream/opencv/3rdparty/flatbuffers/include",
+      "upstream/opencv/3rdparty/protobuf/src",
+      "upstream/opencv/3rdparty/libpng",
+      "upstream/opencv/modules/imgcodecs/include",
+      "upstream/opencv/modules/videoio/include",
+      "upstream/opencv/modules/highgui/include"
+    ]
+  },
+  "target": {
+    "cfg(unix)": {
+      "build": {
+        "flags": [
+          {
+            "glob": "**/modules/core/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "HAVE_UNISTD_H=1",
+              "NDEBUG",
+              "_USE_MATH_DEFINES",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "**/modules/flann/**",
+            "defines": [
+              "NDEBUG",
+              "_USE_MATH_DEFINES",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "**/modules/geometry/**",
+            "defines": [
+              "NDEBUG",
+              "_USE_MATH_DEFINES",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "**/modules/highgui/**",
+            "defines": [
+              "ENABLE_PLUGINS",
+              "NDEBUG",
+              "_USE_MATH_DEFINES",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "**/modules/imgcodecs/**",
+            "defines": [
+              "HAVE_IMGCODEC_HDR",
+              "HAVE_IMGCODEC_PFM",
+              "HAVE_IMGCODEC_PXM",
+              "HAVE_IMGCODEC_SUNRASTER",
+              "HAVE_STDARG_H=1",
+              "HAVE_UNISTD_H=1",
+              "NDEBUG",
+              "_USE_MATH_DEFINES",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "**/modules/imgproc/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "HAVE_UNISTD_H=1",
+              "NDEBUG",
+              "_USE_MATH_DEFINES",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "**/3rdparty/libjpeg-turbo/**",
+            "defines": [
+              "NDEBUG",
+              "NO_GETENV",
+              "NO_PUTENV"
+            ]
+          },
+          {
+            "glob": "**/tu/jpeg12/**",
+            "defines": [
+              "BITS_IN_JSAMPLE=12",
+              "NDEBUG",
+              "NO_GETENV",
+              "NO_PUTENV"
+            ]
+          },
+          {
+            "glob": "**/tu/jpeg16/**",
+            "defines": [
+              "BITS_IN_JSAMPLE=16",
+              "NDEBUG",
+              "NO_GETENV",
+              "NO_PUTENV"
+            ]
+          },
+          {
+            "glob": "**/3rdparty/libpng/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "HAVE_UNISTD_H=1",
+              "NDEBUG"
+            ]
+          },
+          {
+            "glob": "**/modules/videoio/**",
+            "defines": [
+              "ENABLE_PLUGINS",
+              "HAVE_FFMPEG",
+              "HAVE_FFMPEG_LIBAVDEVICE",
+              "NDEBUG",
+              "_USE_MATH_DEFINES",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "**/3rdparty/zlib/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "HAVE_UNISTD_H=1",
+              "NDEBUG"
+            ]
+          },
+          {
+            "glob": "upstream/opencv/modules/core/src/alloc.cpp",
+            "defines": [
+              "HAVE_POSIX_MEMALIGN=1"
+            ]
+          },
+          {
+            "glob": "upstream/opencv/modules/core/src/parallel/parallel.cpp",
+            "defines": [
+              "PARALLEL_ENABLE_PLUGINS=1"
+            ]
+          },
+          {
+            "glob": "upstream/opencv/modules/core/src/system.cpp",
+            "defines": [
+              "HAVE_GETAUXVAL=1"
+            ]
+          }
+        ]
+      }
+    },
+    "cfg(linux)": {
+      "build": {
+        "cflags": [
+          "-w",
+          "-DOPENCV_ALLOCATOR_STATS_COUNTER_TYPE=long long",
+          "-DPNG_INTEL_SSE_OPT=1",
+          "-DHAVE_CAMV4L2",
+          "-DHAVE_MALLOC_H=1",
+          "-DHAVE_MEMALIGN=1",
+          "-DHAVE_FLATBUFFERS=1"
+        ],
+        "cxxflags": [
+          "-w",
+          "-DOPENCV_ALLOCATOR_STATS_COUNTER_TYPE=long long",
+          "-DPNG_INTEL_SSE_OPT=1",
+          "-DHAVE_CAMV4L2",
+          "-DHAVE_MALLOC_H=1",
+          "-DHAVE_MEMALIGN=1",
+          "-DHAVE_FLATBUFFERS=1"
+        ],
+        "ldflags": [
+          "-lpthread",
+          "-ldl"
+        ],
+        "sources": [
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jsimd.c",
+          "upstream/opencv/3rdparty/libjpeg-turbo/src/{jaricom,jcapimin,jcapistd,jcarith,jccoefct,jccolor,jcdctmgr,jcdiffct,jchuff,jcicc,jcinit,jclhuff,jclossls,jcmainct,jcmarker,jcmaster,jcomapi,jcparam,jcphuff,jcprepct,jcsample,jctrans,jdapimin,jdapistd,jdarith,jdatadst,jdatasrc,jdcoefct,jdcolor,jddctmgr,jddiffct,jdhuff,jdicc,jdinput,jdlhuff,jdlossls,jdmainct,jdmarker,jdmaster,jdmerge,jdphuff,jdpostct,jdsample,jdtrans,jerror,jfdctflt,jfdctfst,jfdctint,jidctflt,jidctfst,jidctint,jidctred,jmemmgr,jmemnobs,jpeg_nbits,jquant1,jquant2,jutils}.c",
+          "upstream/opencv/3rdparty/libpng/*.c",
+          "upstream/opencv/3rdparty/libpng/intel/*.c",
+          "upstream/opencv/3rdparty/zlib/*.c",
+          "upstream/opencv/modules/core/src/*.cpp",
+          "upstream/opencv/modules/core/src/opencl/runtime/*.cpp",
+          "upstream/opencv/modules/core/src/parallel/*.cpp",
+          "upstream/opencv/modules/core/src/utils/*.cpp",
+          "upstream/opencv/modules/flann/src/*.cpp",
+          "upstream/opencv/modules/geometry/src/*.cpp",
+          "upstream/opencv/modules/geometry/src/ptcloud/*.cpp",
+          "upstream/opencv/modules/geometry/src/usac/*.cpp",
+          "upstream/opencv/modules/highgui/src/{backend,roiSelector,window}.cpp",
+          "upstream/opencv/modules/imgcodecs/src/*.cpp",
+          "upstream/opencv/modules/imgproc/src/{accum,accum.dispatch,bilateral_filter.dispatch,blend,box_filter.dispatch,canny,clahe,color,color_hsv.dispatch,color_lab,color_rgb.dispatch,color_yuv.dispatch,colormap,connectedcomponents,contours_approx,contours_common,contours_link,contours_new,contours_truco,corner,corner.avx,cornersubpix,demosaicing,deriv,distransform,drawing,drawing_text,emd_new,filter.dispatch,fisheye,floodfill,gabor,generalized_hough,grabcut,histogram,hough,imgwarp,imgwarp.avx2,imgwarp.sse4_1,lsd,main,median_blur.dispatch,morph.dispatch,phasecorr,phasecorr_iterative,pyramids,resize,resize.avx2,resize.sse4_1,samplers,segmentation,smooth.dispatch,spatialgradient,stackblur,stb_truetype,sumpixels.dispatch,tables,templmatch,thresh,undistort.dispatch,utils}.cpp",
+          "upstream/opencv/modules/videoio/src/{backend_plugin,backend_static,cap,cap_ffmpeg,cap_images,cap_mjpeg_decoder,cap_mjpeg_encoder,cap_v4l,container_avi,videoio_registry}.cpp",
+          "generated/common/modules/core/{arithm.avx2,arithm.sse4_1,convert.avx2,convert_scale.avx2,count_non_zero.avx2,has_non_zero.avx2,mathfuncs_core.avx,mathfuncs_core.avx2,matmul.avx2,matmul.avx512_skx,matmul.sse4_1,mean.avx2,merge.avx2,minmax.avx2,minmax.sse4_1,nan_mask.avx2,norm.avx,norm.avx2,norm.sse4_1,reduce.avx2,split.avx2,stat.avx2,stat.sse4_2,sum.avx2,transpose.avx,transpose.avx2}.cpp",
+          "generated/common/modules/imgproc/{accum.avx,accum.avx2,accum.sse4_1,bilateral_filter.avx2,bilateral_filter.avx512_skx,box_filter.avx2,box_filter.avx512_skx,box_filter.sse4_1,color_hsv.avx2,color_hsv.sse4_1,color_rgb.avx2,color_rgb.sse4_1,color_yuv.avx2,color_yuv.sse4_1,filter.avx2,filter.sse4_1,median_blur.avx2,median_blur.avx512_skx,median_blur.sse4_1,morph.avx2,morph.sse4_1,smooth.avx2,smooth.sse4_1,sumpixels.avx2,sumpixels.avx512_skx,undistort.avx2,warp_kernels.avx2,warp_kernels.sse4_1}.cpp",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jsimdcpu.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jfdctflt-sse.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jccolor-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jcgray-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jchuff-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jcphuff-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jcsample-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jdcolor-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jdmerge-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jdsample-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jfdctfst-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jfdctint-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jidctflt-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jidctfst-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jidctint-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jidctred-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jquantf-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jquanti-sse2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jccolor-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jcgray-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jcsample-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jdcolor-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jdmerge-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jdsample-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jfdctint-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jidctint-avx2.asm",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/x86_64/jquanti-avx2.asm",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcapistd.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jccolor.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcdiffct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jclossls.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcmainct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcprepct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcsample.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdapistd.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdcolor.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jddiffct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdlossls.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdmainct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdpostct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdsample.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jutils.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jccoefct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcdctmgr.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdcoefct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jddctmgr.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdmerge.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jfdctfst.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jfdctint.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctflt.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctfst.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctint.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctred.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jquant1.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jquant2.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcapistd.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jccolor.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcdiffct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jclossls.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcmainct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcprepct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcsample.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdapistd.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdcolor.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jddiffct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdlossls.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdmainct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdpostct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdsample.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jutils.c"
+        ],
+        "flags": [
+          {
+            "glob": "upstream/opencv/**/*.asm",
+            "defines": [
+              "ELF",
+              "NO_GETENV",
+              "NO_PUTENV",
+              "PIC",
+              "__CET__",
+              "__x86_64__"
+            ]
+          },
+          {
+            "glob": "**/modules/core/**/*.avx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX"
+            ]
+          },
+          {
+            "glob": "**/modules/core/**/*.avx2.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX2"
+            ]
+          },
+          {
+            "glob": "**/modules/core/**/*.avx512_skx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma",
+              "-mavx512f",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512vl",
+              "-mavx512bw",
+              "-mavx512dq"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX512_COMMON=1",
+              "CV_CPU_COMPILE_AVX512_SKX=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_AVX_512F=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX512_SKX"
+            ]
+          },
+          {
+            "glob": "**/modules/core/**/*.sse4_1.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=SSE4_1"
+            ]
+          },
+          {
+            "glob": "**/modules/core/**/*.sse4_2.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=SSE4_2"
+            ]
+          },
+          {
+            "glob": "**/modules/imgproc/**/*.avx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX"
+            ]
+          },
+          {
+            "glob": "**/modules/imgproc/**/*.avx2.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX2"
+            ]
+          },
+          {
+            "glob": "**/modules/imgproc/**/*.avx512_skx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma",
+              "-mavx512f",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512vl",
+              "-mavx512bw",
+              "-mavx512dq"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX512_COMMON=1",
+              "CV_CPU_COMPILE_AVX512_SKX=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_AVX_512F=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX512_SKX"
+            ]
+          },
+          {
+            "glob": "**/modules/imgproc/**/*.sse4_1.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=SSE4_1"
+            ]
+          },
+          {
+            "glob": "upstream/opencv/**",
+            "cflags": [
+              "-msse3"
+            ],
+            "cxxflags": [
+              "-msse3"
+            ]
+          },
+          {
+            "glob": "generated/**",
+            "cflags": [
+              "-msse3"
+            ],
+            "cxxflags": [
+              "-msse3"
+            ]
+          }
+        ]
+      }
+    },
+    "cfg(macos)": {
+      "build": {
+        "cflags": [
+          "-w",
+          "-DOPENCV_ALLOCATOR_STATS_COUNTER_TYPE=int",
+          "-DHAVE_STDARG_H=1",
+          "-DHAVE_UNISTD_H=1",
+          "-DNEON_INTRINSICS",
+          "-DPNG_ARM_NEON_OPT=2"
+        ],
+        "cxxflags": [
+          "-w",
+          "-DOPENCV_ALLOCATOR_STATS_COUNTER_TYPE=int",
+          "-DHAVE_STDARG_H=1",
+          "-DHAVE_UNISTD_H=1",
+          "-DNEON_INTRINSICS",
+          "-DPNG_ARM_NEON_OPT=2"
+        ],
+        "ldflags": [
+          "-lpthread",
+          "-ldl"
+        ],
+        "sources": [
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/arm/{jccolor-neon,jcgray-neon,jcphuff-neon,jcsample-neon,jdcolor-neon,jdmerge-neon,jdsample-neon,jfdctfst-neon,jfdctint-neon,jidctfst-neon,jidctint-neon,jidctred-neon,jquanti-neon}.c",
+          "upstream/opencv/3rdparty/libjpeg-turbo/simd/arm/aarch64/{jchuff-neon,jsimd}.c",
+          "upstream/opencv/3rdparty/libjpeg-turbo/src/{jaricom,jcapimin,jcapistd,jcarith,jccoefct,jccolor,jcdctmgr,jcdiffct,jchuff,jcicc,jcinit,jclhuff,jclossls,jcmainct,jcmarker,jcmaster,jcomapi,jcparam,jcphuff,jcprepct,jcsample,jctrans,jdapimin,jdapistd,jdarith,jdatadst,jdatasrc,jdcoefct,jdcolor,jddctmgr,jddiffct,jdhuff,jdicc,jdinput,jdlhuff,jdlossls,jdmainct,jdmarker,jdmaster,jdmerge,jdphuff,jdpostct,jdsample,jdtrans,jerror,jfdctflt,jfdctfst,jfdctint,jidctflt,jidctfst,jidctint,jidctred,jmemmgr,jmemnobs,jpeg_nbits,jquant1,jquant2,jutils}.c",
+          "upstream/opencv/3rdparty/libpng/*.c",
+          "upstream/opencv/3rdparty/libpng/arm/filter_neon.S",
+          "upstream/opencv/3rdparty/libpng/arm/*.c",
+          "upstream/opencv/3rdparty/zlib/*.c",
+          "upstream/opencv/modules/core/src/*.cpp",
+          "upstream/opencv/modules/core/src/opencl/runtime/*.cpp",
+          "upstream/opencv/modules/core/src/parallel/*.cpp",
+          "upstream/opencv/modules/core/src/utils/*.cpp",
+          "upstream/opencv/modules/flann/src/*.cpp",
+          "upstream/opencv/modules/geometry/src/*.cpp",
+          "upstream/opencv/modules/geometry/src/ptcloud/*.cpp",
+          "upstream/opencv/modules/geometry/src/usac/*.cpp",
+          "upstream/opencv/modules/highgui/src/{backend,roiSelector,window}.cpp",
+          "upstream/opencv/modules/imgcodecs/src/*.cpp",
+          "upstream/opencv/modules/imgproc/src/{accum,accum.dispatch,bilateral_filter.dispatch,blend,box_filter.dispatch,canny,clahe,color,color_hsv.dispatch,color_lab,color_rgb.dispatch,color_yuv.dispatch,colormap,connectedcomponents,contours_approx,contours_common,contours_link,contours_new,contours_truco,corner,cornersubpix,demosaicing,deriv,distransform,drawing,drawing_text,emd_new,filter.dispatch,fisheye,floodfill,gabor,generalized_hough,grabcut,histogram,hough,imgwarp,lsd,main,median_blur.dispatch,morph.dispatch,phasecorr,phasecorr_iterative,pyramids,resize,samplers,segmentation,smooth.dispatch,spatialgradient,stackblur,stb_truetype,sumpixels.dispatch,tables,templmatch,thresh,undistort.dispatch,utils}.cpp",
+          "upstream/opencv/modules/videoio/src/{backend_plugin,backend_static,cap,cap_ffmpeg,cap_images,cap_mjpeg_decoder,cap_mjpeg_encoder,container_avi,videoio_registry}.cpp",
+          "generated/common/modules/core/transpose.neon.cpp",
+          "generated/common/modules/imgproc/warp_kernels.neon.cpp",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcapistd.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jccolor.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcdiffct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jclossls.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcmainct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcprepct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcsample.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdapistd.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdcolor.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jddiffct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdlossls.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdmainct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdpostct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdsample.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jutils.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jccoefct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jcdctmgr.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdcoefct.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jddctmgr.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jdmerge.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jfdctfst.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jfdctint.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctflt.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctfst.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctint.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jidctred.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jquant1.c",
+          "generated/common/tu/jpeg12/jpeg12_3rdparty_libjpeg-turbo_src_jquant2.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcapistd.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jccolor.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcdiffct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jclossls.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcmainct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcprepct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jcsample.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdapistd.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdcolor.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jddiffct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdlossls.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdmainct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdpostct.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jdsample.c",
+          "generated/common/tu/jpeg16/jpeg16_3rdparty_libjpeg-turbo_src_jutils.c"
+        ],
+        "flags": [
+          {
+            "glob": "generated/common/modules/core/transpose.neon.cpp",
+            "defines": [
+              "CV_CPU_DISPATCH_MODE=NEON"
+            ]
+          },
+          {
+            "glob": "generated/common/modules/imgproc/warp_kernels.neon.cpp",
+            "defines": [
+              "CV_CPU_DISPATCH_MODE=NEON"
+            ]
+          }
+        ]
+      }
+    },
+    "cfg(windows)": {
+      "build": {
+        "cflags": [
+          "-w"
+        ],
+        "cxxflags": [
+          "-w"
+        ],
+        "ldflags": [
+          "-lole32"
+        ],
+        "sources": [
+          "generated/windows/tu/w/**/*.{c,cc,cpp,asm}"
+        ],
+        "flags": [
+          {
+            "glob": "generated/windows/tu/w/core/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "NDEBUG",
+              "OPENCV_ALLOCATOR_STATS_COUNTER_TYPE=long long",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_USE_MATH_DEFINES",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/flann/**",
+            "defines": [
+              "NDEBUG",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_USE_MATH_DEFINES",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/geometry/**",
+            "defines": [
+              "NDEBUG",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_USE_MATH_DEFINES",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/highgui/**",
+            "defines": [
+              "ENABLE_PLUGINS",
+              "NDEBUG",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_USE_MATH_DEFINES",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/imgcodecs/**",
+            "defines": [
+              "HAVE_IMGCODEC_HDR",
+              "HAVE_IMGCODEC_PFM",
+              "HAVE_IMGCODEC_PXM",
+              "HAVE_IMGCODEC_SUNRASTER",
+              "HAVE_STDARG_H=1",
+              "NDEBUG",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_USE_MATH_DEFINES",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/imgproc/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "NDEBUG",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_USE_MATH_DEFINES",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/libjpeg-turbo/**",
+            "defines": [
+              "NDEBUG",
+              "NO_GETENV",
+              "NO_PUTENV",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/jpeg12/**",
+            "defines": [
+              "BITS_IN_JSAMPLE=12",
+              "NDEBUG",
+              "NO_GETENV",
+              "NO_PUTENV",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/jpeg16/**",
+            "defines": [
+              "BITS_IN_JSAMPLE=16",
+              "NDEBUG",
+              "NO_GETENV",
+              "NO_PUTENV",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/libpng/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "NDEBUG",
+              "PNG_INTEL_SSE_OPT=1",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/videoio/**",
+            "defines": [
+              "ENABLE_PLUGINS",
+              "HAVE_FFMPEG",
+              "NDEBUG",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_USE_MATH_DEFINES",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS",
+              "__OPENCV_BUILD=1",
+              "__STDC_CONSTANT_MACROS",
+              "__STDC_FORMAT_MACROS",
+              "__STDC_LIMIT_MACROS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/zlib/**",
+            "defines": [
+              "HAVE_STDARG_H=1",
+              "NDEBUG",
+              "NO_FSEEKO",
+              "WIN32",
+              "_CRT_NONSTDC_NO_DEPRECATE",
+              "_CRT_SECURE_NO_DEPRECATE",
+              "_SCL_SECURE_NO_WARNINGS",
+              "_VARIADIC_MAX=10",
+              "_WIN32_WINNT=0x0601",
+              "_WINDOWS"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/core/**/*.avx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/core/**/*.avx2.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX2"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/core/**/*.avx512_skx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma",
+              "-mavx512f",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512vl",
+              "-mavx512bw",
+              "-mavx512dq"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX512_COMMON=1",
+              "CV_CPU_COMPILE_AVX512_SKX=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_AVX_512F=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX512_SKX"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/core/**/*.sse4_1.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=SSE4_1"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/core/**/*.sse4_2.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=SSE4_2"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/imgproc/**/*.avx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/imgproc/**/*.avx2.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX2"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/imgproc/**/*.avx512_skx.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1",
+              "-mpopcnt",
+              "-msse4.2",
+              "-mavx",
+              "-mf16c",
+              "-mavx2",
+              "-mfma",
+              "-mavx512f",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512f",
+              "-mavx512cd",
+              "-mavx512vl",
+              "-mavx512bw",
+              "-mavx512dq"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_AVX2=1",
+              "CV_CPU_COMPILE_AVX512_COMMON=1",
+              "CV_CPU_COMPILE_AVX512_SKX=1",
+              "CV_CPU_COMPILE_AVX=1",
+              "CV_CPU_COMPILE_AVX_512F=1",
+              "CV_CPU_COMPILE_FMA3=1",
+              "CV_CPU_COMPILE_FP16=1",
+              "CV_CPU_COMPILE_POPCNT=1",
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSE4_2=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=AVX512_SKX"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/imgproc/**/*.sse4_1.cpp",
+            "cxxflags": [
+              "-mssse3",
+              "-msse4.1"
+            ],
+            "defines": [
+              "CV_CPU_COMPILE_SSE4_1=1",
+              "CV_CPU_COMPILE_SSSE3=1",
+              "CV_CPU_DISPATCH_MODE=SSE4_1"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/core/third_party_opencv-5.0.0_modules_core_src_alloc.cpp",
+            "defines": [
+              "HAVE_MALLOC_H=1",
+              "HAVE_WIN32_ALIGNED_MALLOC=1"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/core/third_party_opencv-5.0.0_modules_core_src_parallel_parallel.cpp",
+            "defines": [
+              "DEBUG_POSTFIX=d",
+              "PARALLEL_ENABLE_PLUGINS=1"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/w/videoio/third_party_opencv-5.0.0_modules_videoio_src_backend_plugin.cpp",
+            "defines": [
+              "DEBUG_POSTFIX=d"
+            ]
+          },
+          {
+            "glob": "generated/windows/tu/**",
+            "cflags": [
+              "-msse3"
+            ],
+            "cxxflags": [
+              "-msse3"
+            ]
+          }
+        ]
+      }
+    },
+    "x86_64-linux-musl": {
+      "linkage": "static"
+    }
+  },
+  "dnn": {
+    "defines": [
+      "HAVE_OPENCV_DNN"
+    ],
+    "sources": [
+      "src/dnn.cppm"
+    ],
+    "flags": [
+      {
+        "glob": "**/modules/dnn/**",
+        "defines": [
+          "ENABLE_PLUGINS",
+          "HAVE_MLAS=1",
+          "HAVE_PROTOBUF=1",
+          "NDEBUG",
+          "_USE_MATH_DEFINES",
+          "__OPENCV_BUILD=1",
+          "__STDC_CONSTANT_MACROS",
+          "__STDC_FORMAT_MACROS",
+          "__STDC_LIMIT_MACROS"
+        ]
+      },
+      {
+        "glob": "**/3rdparty/mlas/**",
+        "defines": [
+          "BUILD_MLAS_NO_ONNXRUNTIME=1",
+          "MLAS_GEMM_ONLY=1",
+          "MLAS_OPENCV_THREADING=1",
+          "NDEBUG",
+          "_GNU_SOURCE=1",
+          "_USE_MATH_DEFINES",
+          "__STDC_CONSTANT_MACROS",
+          "__STDC_FORMAT_MACROS",
+          "__STDC_LIMIT_MACROS"
+        ]
+      },
+      {
+        "glob": "**/tu/mlasgemm/**",
+        "defines": [
+          "BUILD_MLAS_NO_ONNXRUNTIME=1",
+          "MLAS_GEMM_ONLY=1",
+          "MLAS_OPENCV_THREADING=1",
+          "NDEBUG",
+          "_USE_MATH_DEFINES",
+          "__STDC_CONSTANT_MACROS",
+          "__STDC_FORMAT_MACROS",
+          "__STDC_LIMIT_MACROS"
+        ]
+      },
+      {
+        "glob": "**/3rdparty/protobuf/**",
+        "defines": [
+          "HAVE_PTHREAD=1",
+          "NDEBUG"
+        ]
+      },
+      {
+        "glob": "**/modules/dnn/**/*.avx.cpp",
+        "cxxflags": [
+          "-mssse3",
+          "-msse4.1",
+          "-mpopcnt",
+          "-msse4.2",
+          "-mavx"
+        ],
+        "defines": [
+          "CV_CPU_COMPILE_AVX=1",
+          "CV_CPU_COMPILE_POPCNT=1",
+          "CV_CPU_COMPILE_SSE4_1=1",
+          "CV_CPU_COMPILE_SSE4_2=1",
+          "CV_CPU_COMPILE_SSSE3=1",
+          "CV_CPU_DISPATCH_MODE=AVX"
+        ]
+      },
+      {
+        "glob": "**/modules/dnn/**/*.avx2.cpp",
+        "cxxflags": [
+          "-mssse3",
+          "-msse4.1",
+          "-mpopcnt",
+          "-msse4.2",
+          "-mavx",
+          "-mf16c",
+          "-mavx2",
+          "-mfma"
+        ],
+        "defines": [
+          "CV_CPU_COMPILE_AVX2=1",
+          "CV_CPU_COMPILE_AVX=1",
+          "CV_CPU_COMPILE_FMA3=1",
+          "CV_CPU_COMPILE_FP16=1",
+          "CV_CPU_COMPILE_POPCNT=1",
+          "CV_CPU_COMPILE_SSE4_1=1",
+          "CV_CPU_COMPILE_SSE4_2=1",
+          "CV_CPU_COMPILE_SSSE3=1",
+          "CV_CPU_DISPATCH_MODE=AVX2"
+        ]
+      },
+      {
+        "glob": "**/modules/dnn/**/*.avx512_skx.cpp",
+        "cxxflags": [
+          "-mssse3",
+          "-msse4.1",
+          "-mpopcnt",
+          "-msse4.2",
+          "-mavx",
+          "-mf16c",
+          "-mavx2",
+          "-mfma",
+          "-mavx512f",
+          "-mavx512f",
+          "-mavx512cd",
+          "-mavx512f",
+          "-mavx512cd",
+          "-mavx512vl",
+          "-mavx512bw",
+          "-mavx512dq"
+        ],
+        "defines": [
+          "CV_CPU_COMPILE_AVX2=1",
+          "CV_CPU_COMPILE_AVX512_COMMON=1",
+          "CV_CPU_COMPILE_AVX512_SKX=1",
+          "CV_CPU_COMPILE_AVX=1",
+          "CV_CPU_COMPILE_AVX_512F=1",
+          "CV_CPU_COMPILE_FMA3=1",
+          "CV_CPU_COMPILE_FP16=1",
+          "CV_CPU_COMPILE_POPCNT=1",
+          "CV_CPU_COMPILE_SSE4_1=1",
+          "CV_CPU_COMPILE_SSE4_2=1",
+          "CV_CPU_COMPILE_SSSE3=1",
+          "CV_CPU_DISPATCH_MODE=AVX512_SKX"
+        ]
+      },
+      {
+        "glob": "upstream/opencv/3rdparty/mlas/lib/platform.cpp",
+        "cxxflags": [
+          "-include",
+          "unistd.h"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/int8layers/layers_common.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/activation_kernels.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/conv2_depthwise.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/conv2_kernels.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/conv_block.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/conv_block.neon_fp16.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON_FP16"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/conv_winograd_f63.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/fast_gemm_kernels.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/gridsample_kernels.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/nary_eltwise_kernels.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/reduce2_kernels.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/cpu_kernels/transpose_kernels.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/common/modules/dnn/layers/layers_common.neon.cpp",
+        "defines": [
+          "CV_CPU_DISPATCH_MODE=NEON"
+        ]
+      },
+      {
+        "glob": "generated/windows/tu/wdnn/dnn/**",
+        "defines": [
+          "ENABLE_PLUGINS",
+          "HAVE_PROTOBUF=1",
+          "NDEBUG",
+          "WIN32",
+          "_CRT_NONSTDC_NO_DEPRECATE",
+          "_CRT_SECURE_NO_DEPRECATE",
+          "_CRT_SECURE_NO_WARNINGS=1",
+          "_SCL_SECURE_NO_WARNINGS",
+          "_USE_MATH_DEFINES",
+          "_VARIADIC_MAX=10",
+          "_WIN32_WINNT=0x0601",
+          "_WINDOWS",
+          "__OPENCV_BUILD=1",
+          "__STDC_CONSTANT_MACROS",
+          "__STDC_FORMAT_MACROS",
+          "__STDC_LIMIT_MACROS"
+        ]
+      },
+      {
+        "glob": "generated/windows/tu/wdnn/protobuf/**",
+        "defines": [
+          "NDEBUG",
+          "WIN32",
+          "_CRT_NONSTDC_NO_DEPRECATE",
+          "_CRT_SECURE_NO_DEPRECATE",
+          "_CRT_SECURE_NO_WARNINGS=1",
+          "_SCL_SECURE_NO_WARNINGS",
+          "_VARIADIC_MAX=10",
+          "_WIN32_WINNT=0x0601",
+          "_WINDOWS"
+        ]
+      },
+      {
+        "glob": "generated/windows/tu/wdnn/dnn/**/*.avx.cpp",
+        "cxxflags": [
+          "-mssse3",
+          "-msse4.1",
+          "-mpopcnt",
+          "-msse4.2",
+          "-mavx"
+        ],
+        "defines": [
+          "CV_CPU_COMPILE_AVX=1",
+          "CV_CPU_COMPILE_POPCNT=1",
+          "CV_CPU_COMPILE_SSE4_1=1",
+          "CV_CPU_COMPILE_SSE4_2=1",
+          "CV_CPU_COMPILE_SSSE3=1",
+          "CV_CPU_DISPATCH_MODE=AVX"
+        ]
+      },
+      {
+        "glob": "generated/windows/tu/wdnn/dnn/**/*.avx2.cpp",
+        "cxxflags": [
+          "-mssse3",
+          "-msse4.1",
+          "-mpopcnt",
+          "-msse4.2",
+          "-mavx",
+          "-mf16c",
+          "-mavx2",
+          "-mfma"
+        ],
+        "defines": [
+          "CV_CPU_COMPILE_AVX2=1",
+          "CV_CPU_COMPILE_AVX=1",
+          "CV_CPU_COMPILE_FMA3=1",
+          "CV_CPU_COMPILE_FP16=1",
+          "CV_CPU_COMPILE_POPCNT=1",
+          "CV_CPU_COMPILE_SSE4_1=1",
+          "CV_CPU_COMPILE_SSE4_2=1",
+          "CV_CPU_COMPILE_SSSE3=1",
+          "CV_CPU_DISPATCH_MODE=AVX2"
+        ]
+      },
+      {
+        "glob": "generated/windows/tu/wdnn/dnn/**/*.avx512_skx.cpp",
+        "cxxflags": [
+          "-mssse3",
+          "-msse4.1",
+          "-mpopcnt",
+          "-msse4.2",
+          "-mavx",
+          "-mf16c",
+          "-mavx2",
+          "-mfma",
+          "-mavx512f",
+          "-mavx512f",
+          "-mavx512cd",
+          "-mavx512f",
+          "-mavx512cd",
+          "-mavx512vl",
+          "-mavx512bw",
+          "-mavx512dq"
+        ],
+        "defines": [
+          "CV_CPU_COMPILE_AVX2=1",
+          "CV_CPU_COMPILE_AVX512_COMMON=1",
+          "CV_CPU_COMPILE_AVX512_SKX=1",
+          "CV_CPU_COMPILE_AVX=1",
+          "CV_CPU_COMPILE_AVX_512F=1",
+          "CV_CPU_COMPILE_FMA3=1",
+          "CV_CPU_COMPILE_FP16=1",
+          "CV_CPU_COMPILE_POPCNT=1",
+          "CV_CPU_COMPILE_SSE4_1=1",
+          "CV_CPU_COMPILE_SSE4_2=1",
+          "CV_CPU_COMPILE_SSSE3=1",
+          "CV_CPU_DISPATCH_MODE=AVX512_SKX"
+        ]
+      },
+      {
+        "glob": "generated/windows/tu/wdnn/dnn/third_party_opencv-5.0.0_modules_dnn_src_backend.cpp",
+        "defines": [
+          "DEBUG_POSTFIX=d"
+        ]
+      }
+    ]
+  }
+}

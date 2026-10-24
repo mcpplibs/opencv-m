@@ -4,4 +4,4 @@ odd-name: cv.ImageCollection.iterator.operator *
 odd-name: cv.ImageCollection.iterator.operator++
 odd-name: cv.ImageCollection.iterator.operator- >
 odd-name: cv.ImageCollection.operator[]
-pruned (compile-verify): cv::imwritemulti
+reviewed using exception: cv::imwritemulti -- SDK body adapted in generated imgcodecs_helpers.inc

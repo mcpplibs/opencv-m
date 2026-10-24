@@ -1,16 +1,14 @@
-# names failing compile-verification for opencv.dnn — internal shape_utils.hpp
-# / layer-factory helpers that hdr_parser collected but that are not part of
-# the public surface reachable through <opencv2/dnn.hpp> + all_layers.hpp.
-dnn::concat
-dnn::getActivationFunc
-dnn::getLayerFactoryImpl
-dnn::getLayerFactoryMutex
-dnn::getPlane
-dnn::isAllOnes
-dnn::normalize_axis
-dnn::normalize_axis_range
-dnn::shape
-dnn::slice
-dnn::toString
-dnn::total
-dnn::_Range
+# Static-inline public shape helpers are adapted in src/dnn_shapes.inc rather
+# than exported with using declarations. Private layer-factory helpers remain
+# unavailable; their names are not part of the public contract.
+dnn::concat   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::getLayerFactoryImpl   # private layer_reg.private.hpp implementation helper
+dnn::getLayerFactoryMutex   # private layer_reg.private.hpp implementation helper
+dnn::getPlane   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::isAllOnes   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::normalize_axis   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::normalize_axis_range   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::shape   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::slice   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::toString   # SDK shape body adapted in generated src/dnn_shapes.inc
+dnn::total   # SDK shape body adapted in generated src/dnn_shapes.inc

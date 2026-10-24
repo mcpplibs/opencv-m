@@ -1,236 +1,167 @@
-# opencv-m Architecture
+# opencv-m architecture
 
-[中文](architecture.md) · **English**
+[中文](architecture.md)
 
-This document describes the structure of opencv-m, the responsibility of each layer, and the
-reasoning behind the principal design decisions. It is addressed to developers who intend to
-modify this repository, or who need to understand the general problem of wrapping a large
-header-based C++ library in C++23 modules.
+The package `mcpplibs.mwrap.opencv` wraps OpenCV 5.0.0 for C++23 modules.
+The wrapper revision is 5.0.0.1. Upstream `cv::` names and type identities remain
+unchanged; package/module identity identifies the adaptation layer. This
+checkpoint does not claim complete public API or hardware coverage.
 
----
+## Source ownership
 
-## 1. Objectives and constraints
+- `upstream/opencv`: retained official source and headers, byte-identical to the
+  SHA256-pinned archive in `upstream/sources.lock.toml`. All sixteen main C++
+  modules are imported. Bindings, test frameworks and contrib are separate scope.
+- `port`: configuration inputs, source catalogs and compatibility headers.
+- `generated`: stable configuration/dispatch/resources committed for reproducible
+  builds. Feature-specific files belong to the build output directory.
+- `src`: public interfaces and explicit adapters for internal-linkage entities.
+- `templates`, `tests`, `tools`: executable consumers, behavior checks, import,
+  generation and coverage audits.
 
-opencv-m must satisfy three requirements simultaneously; in existing approaches these conflict:
+OpenCV implementation objects have one owner. FFmpeg and ORT come from declared
+providers; an additional compat.opencv implementation must not be linked beside
+the vendored implementation. Wrapper/SDK layers do not fetch dependencies while
+compiling module interfaces.
 
-1. **Module-based consumption**: `import opencv.cv;` replaces `#include <opencv2/opencv.hpp>`
-   while the API spelling remains unchanged (`cv::Mat`, `cv::cvtColor`).
-2. **No OpenCV installation and no CMake on the consumer side**: once the dependency is
-   declared, mcpp performs the entire build.
-3. **No reduction in functionality**: imgcodecs (PNG/JPEG), videoio (FFmpeg backend) and dnn
-   are available on Linux, macOS and Windows alike, with runtime SIMD dispatch preserved.
+## Public interfaces and internal adapter units
 
-Two constraints govern the design. First, OpenCV's build configuration is produced by CMake:
-`cvconfig.h`, `cv_cpu_config.h` and the per-module SIMD dispatch translation units are all
-configure-time artefacts, which a consumer cannot obtain without running CMake. Second, the
-export semantics of C++ modules are stricter than those of headers: macros do not cross a module
-boundary, and entities with internal linkage (`static inline`) cannot be re-exported through
-`export using` — clang rejects this outright, gcc merely tolerates it.
+`src/core.cppm` aggregates `detail.core` and `detail.matx`. The first owns the
+SDK header facade and general internal-linkage helpers. The second imports
+those original class declarations before defining Matx/Vec adapters with the
+SDK's exact template parameters. Defining these patterns beside the textual
+class declarations crashed Clang22 importers; changing them to whole-operand
+templates lost explicit template arguments and derived-to-base deduction.
+The separate producer preserves the original argument forms and avoids that
+serialization failure. Values and pure
+macro calculations live in `mcpplibs.mwrap.opencv.macros`; raw preprocessing
+macros remain available through `<mwrap/opencv/macros.hpp>` before imports.
 
-The architecture of this repository is a systematic response to those two constraints.
+Each other public module is a generated aggregation unit. For example,
+`mcpplibs.mwrap.opencv.stitching` re-exports core, its required module dependencies
+and the independent `mcpplibs.mwrap.opencv.detail.stitching` adapter. The internal
+unit's GMF includes upstream headers and its export-using list. The `detail`
+module family is an implementation detail; upstream `cv::detail` stitching APIs
+remain public C++ APIs and retain that namespace.
 
-## 2. Layering
+Keeping textual GMFs and dependency imports in separate units avoids GCC 16's
+SVD default-argument conflict when core.hpp and import core meet in one unit.
+Interface partitions also triggered a GCC 16 merge ICE in this graph; independent
+named adapter units passed the direct-import behavior tests. No compiler/engine
+source patch or upstream-header modification is required for this layout.
 
-```
-consumer project
-  └─ import opencv.cv;                     ← module interface layer
-        └─ src/*.cppm  +  src/*.inc        ← export surface (generated + hand-written replacements)
-              └─ third_party/opencv-5.0.0  ← vendored upstream source (patch-free)
-                   +  gen/                 ← frozen configuration snapshots (CMake substitute)
-                   +  mcpp.toml / build.mcpp ← build description (CMakeLists substitute)
-                   +  compat.ffmpeg        ← the single external dependency (videoio backend)
-```
+The root interface exports core/macros and a configuration-specific selection
+module. That selection has direct imports, including ORT when requested, so
+module scanning and GCC BMI mapper paths see the complete dependency graph.
+A module's source existing on disk does not activate its feature.
 
-### 2.1 Vendored upstream source — `third_party/opencv-5.0.0/`
+## Build generation and feature graph
 
-A pruned import of the official OpenCV 5.0.0 tag tarball, pinned by sha256 and carrying **no
-patches**. Eight modules are retained (core, imgproc, imgcodecs, highgui, videoio, dnn, flann,
-geometry) together with seven third-party components (libjpeg-turbo, libpng, zlib, protobuf,
-mlas, flatbuffers, dlpack). The test and perf trees and the language-binding directories are
-removed, with the exception of `modules/python/src2`, whose `hdr_parser.py` is an input to the
-export-surface generator. The result is 1969 files, 48 MB.
+`tools/generate_build.py` derives required module relationships from the pinned
+CMake module definitions, generates public aggregation interfaces, the manifest
+and per-platform implementation catalogs. Adapter units are maintained separately
+and the generator preserves their content. `build.mcpp` selects catalogs and
+writes private configuration into its output directory; consumers run no CMake.
 
-The patch-free property is a deliberate constraint: on an upstream version bump,
-`tools/vendor/import_opencv.sh` re-imports the tree and no patch set has to be replayed. All
-platform differences are pushed outward into `gen/` and `mcpp.toml`.
+Defaults are empty; core is mandatory. `all-modules` selects the sixteen main
+module implementations, while codecs, native windows/video and external DNN
+SDKs stay explicit. `highgui-native` selects GTK3/Win32/Cocoa; `videoio-native`
+selects V4L2/MSMF/AVFoundation. Explicit backend names reject mismatched targets.
+`dnn-onnxruntime` implies dnn and the standalone ORT wrapper/official CPU SDK.
 
-### 2.2 Frozen configuration snapshots — `gen/`
+The generated manifest declares runtime deployment of fourteen named retained
+wrapper/upstream notices plus the embedded-source notice supplement, preserving their source paths.
+Static implementation objects cannot rely on a shared-library notice scan.
 
-The headers and derived translation units that CMake emits at configure time are committed here
-as **real, already-generated files**:
+Private ISA and pthread flags belong only to implementation TUs. Public and
+internal wrapper BMIs must remain consumable by baseline consumers. The CI guard
+reads resolved compile commands for every interface, including internal units.
+Bundled zlib uses its upstream prefix; private codec symbols use hidden Unix
+visibility to avoid interposition with the GTK SDK's codecs.
 
-| Directory | Contents | Size |
-|---|---|---|
-| `gen/common/` | artefacts byte-identical across all three platforms (SIMD dispatch wrapper TUs, `opencv_modules.hpp`, …) plus `gen/common/synth/` (fonts, OpenCL kernels) | 257 files |
-| `gen/linux/`, `gen/macosx/`, `gen/windows/` | platform-dependent `cvconfig.h`, `cv_cpu_config.h`, …, each with `INCLUDE_DIRS.txt` and `DNN_SOURCES.txt` | 43–45 files each |
+The opt-in `simd` utility exposes native 128-bit intrinsics through
+`mcpplibs.mwrap.opencv.core.simd`; [its contract](simd.md) separates the compiled
+library baseline from per-TU ISA selection. Vector types remain original SDK
+entities. GCC memory-entry forwards preserve unaligned semantics that its
+imported inline intrinsic body miscompiled. Native/platform acceptance and the
+software-mode and other ISA acceptance stay explicit in the coverage review.
 
-The snapshots were ported once from the retired `compat.opencv` descriptor by
-`tools/vendor/port_descriptor.py`, a process that included cross-platform de-duplication,
-conflict detection and byte-level verification. Committing generated artefacts rather than
-running CMake at build time is what makes "no CMake on the consumer side" attainable; the cost
-is that an upstream bump requires the port to be re-run.
+## API verification and known boundaries
 
-### 2.3 Build description — `mcpp.toml` and `build.mcpp`
+The Python binding parser plus curated export lists are generation inputs, not
+an API completeness proof. `tools/audit_api.py --verify-exports` inventories
+facade-visible namespace/global declarations, overload signatures (including
+function templates), internal linkage and retained-header coverage using the
+resolved all-modules Clang configuration. It compiles a root-import consumer and
+one consumer for each public module. CI uploads the report and consumer log.
 
-`mcpp.toml` (about 1500 lines) carries everything that can be declared: source globs, public
-include directories, 51 per-glob compile-option groups assigned to their OS under
-`[target.'cfg(...)'.build.flags]`, platform-conditional source sets under
-`[target.'cfg(os)'.build]`, the `[features]` definitions, and the single external dependency
-`compat.ffmpeg`.
+Unloaded headers, unlisted entities, static-inline adaptations, SDK-dependent
+surfaces and template/overload behavior remain separately reviewed.
+The scalar conversion adapter is generated from the pinned saturate.hpp, keeping
+all thirteen input overloads and their upstream specializations; a private
+ordinary module function bridges TU-local cvRound. Independent SDK function
+pointers captured before imports check all 169 source/destination type pairs.
+The makePtr custom-deleter rejection is checked with both successful and rejected
+consumer compilations. Generic cv::min/max use the original std entities, with
+explicit image overloads to preserve overload selection. Exporting a
+class makes its definition reachable but does not prove every method works in
+every backend configuration. Module-only use and textual-header mixing have
+separate tests; full core.hpp mixing on GCC still has its upstream-declaration
+merge limitation. No full-support release can be inferred from source counts.
 
-`build.mcpp` covers only the three things the manifest grammar **cannot** express, and nothing
-further:
+Runtime tests use generated images/models/videos. ORT checks its actual CPU
+session profile to exclude native fallback. GUI tests create/display/destroy a
+real window; Linux camera checks do not claim physical device capture. Release
+acceptance also requires immutable archive consumers, SDK notices and relocated
+application runtime checks, independent of package-internal tests.
 
-1. reading `gen/<os>/INCLUDE_DIRS.txt` for the target platform and emitting private include
-   directories (the manifest has no platform-conditional `include_dirs` key);
-2. injecting the platform-dependent sources listed in `gen/<os>/DNN_SOURCES.txt` when the `dnn`
-   feature is active (the manifest has no platform × feature cross dimension);
-3. embedding `assets/WenQuanYiMicroHei.ttf.gz` as a hex header when the `unifont` feature is
-   active (equivalent to CMake's `ocv_blob2hdr`).
+## Upgrades
 
-The file is written modules-first and uses the typed API via `import mcpp;`. Note that
-`import std;` is not available in the build.mcpp compilation context — only the bundled `mcpp`
-module is wired up there — so textual std includes remain, and must precede the import.
+1. Import a pinned official archive with `tools/vendor/import_opencv.sh`.
+2. Verify retained bytes with `tools/check_upstream.py`.
+3. Regenerate build metadata, exports and macro mappings; review every diff.
+4. Re-run AST/direct-import, behavior, backend, archive and native CI gates.
+5. Use the upstream version, optionally followed by one numeric wrapper revision.
 
-### 2.4 Module interface layer — `src/`
+Persistence adapters preserve all 65 pinned SDK inline bodies, with qualified
+internal calls and module-private vector proxies. Existing primitive functions
+remain original SDK calls; custom serializers retain ADL. The enum adapter keeps
+the SDK's optional void-pointer template argument without exporting a dependent
+enable_if type that crashes Clang. Separate textual-header and module consumers
+verify identical XML/YAML/JSON and Base64 output on every native CI platform.
 
-Each `opencv.<mod>` is self-contained: the corresponding upstream headers are included in the
-global module fragment, and names are exported individually in the purview via
-`export using cv::name;`. The modules do not import one another; `opencv.cv` is the sole
-aggregate entry point and `export import`s the submodules.
+Linux glibc project targets explicitly use the toolchain-coupled C++ runtime,
+matching the ORT template. The actual SDK process must preserve typed OpenCV
+exception catches as well as successful inference. The template tests both.
 
-The export surface is composed of two parts:
+The readiness ledger under `.agents/docs` records checkpoint evidence and open
+gates. mcpp engine source stays read-only; its documentation PR is independent.
 
-- **Generated** — `src/gen_exports/*.inc` (2267 lines). `tools/gen_exports.py` invokes upstream
-  `hdr_parser.py` to enumerate the `CV_EXPORTS_W` surface, then overlays the manually curated
-  names in `tools/curated/<mod>.txt` — entities the wrapper generator cannot see, such as the
-  template typedef families (`Point2i`, `Vec3b`, `Matx33f`), the `InputArray` family and the
-  traits. Names are de-duplicated across modules, so each entity has exactly one home module.
-- **Hand-written replacements** — `src/*_ops.inc` and `src/core_fns.inc`; see §3.1.
+[Coverage matrices / 覆盖矩阵](coverage.md)
 
-`tools/prune_loop.py` closes the loop around the generator: on a failed build it parses the
-errors that point into `gen_exports/*.inc`, appends the offending names together with their
-reason to `tools/curated/<mod>.prune.txt`, regenerates and retries until the build is green.
-431 lines have been pruned to date.
+The core/imgproc HAL exports their public function/class declarations, preserving
+upstream `cv::hal` names and runtime dispatch. SDK `@cond IGNORED` compatibility
+aliases and private filter implementations are excluded. Instrumentation exports
+the external interface and original node types; collection remains disabled as
+in the selected SDK configuration. Its integer setFlags overload forwards to the
+original enum function. The video adapter additionally includes the documented
+tracking extension interfaces, tested with a user-derived feature and original
+SDK feature-set dispatch.
 
-## 3. Principal design decisions
+All 122 free value operators from the pinned types.hpp now use generated SDK
+bodies, replacing the old partial handwritten implementations. This preserves
+overload coverage and the SDK's overflow-safe rectangle intersection, including
+Jaccard distances near INT_MAX. Fifteen core helpers and image conveniences
+retain their upstream bodies with module-safe lookup. rawInOut calls the SDK
+member through an instance: OpenCV 5 omitted static on its std::array overload,
+making the original free wrapper uncompilable for that argument. Vector behavior
+is unchanged. Independent header/member and module consumers compare results.
 
-### 3.1 Replacement layer for internally-linked entities
+The ArUco default threshold is captured by value because its SDK declaration has
+internal linkage. Module-only access retains its qualified name/value and address
+use; naming that value after including the original ArUco header and importing
+the module is ambiguous. This limitation is verified separately from API behavior.
 
-OpenCV defines its operators and a number of named free functions as `static inline` in headers.
-Such entities have internal linkage and cannot be re-exported through `export using`. This
-repository replaces that surface with equivalent `inline` (external linkage) definitions, in
-three files:
-
-| File | Coverage |
-|---|---|
-| `src/core_ops.inc` | `saturate_cast`, Point/Size/Rect/Range/Scalar, Mat/MatExpr operators |
-| `src/matx_ops.inc` | Matx/Vec algebra |
-| `src/core_fns.inc` | named free functions (`cv::format`, `cv::print`, … re-implemented to upstream semantics) |
-
-This layer is the direct reason `import opencv.cv;` compiles under clang (macOS/Windows) and gcc
-alike. In mixed translation units — those that both include headers and import modules — the
-upstream exact-match `static inline` overloads remain more specialised, so semantics are
-unchanged.
-
-### 3.2 Deduction form of template parameters (a clang BMI constraint)
-
-An empirically established constraint applies on clang 20 and 22: a function or operator template
-whose parameters are not fully bound by its **first argument**, once serialised into a module BMI,
-crashes the frontend of any importer that uses that name. clang 18 is unaffected, making this an
-18→20 regression. The affected shapes include the four-`int` `Matx × Matx` multiplication,
-`determinant` over `Matx<_Tp,m,m>`, the two-typename `+=`/`-=`, and the comma-initialiser `<<`.
-
-`src/matx_ops.inc` therefore uses **whole-type deduction**: the templates are declared as
-`template<typename _MA, typename _MB>` and re-bound by self-checking constraints such as
-`__is_same(_MA, typename _MA::mat_type)`, so that every template parameter is determined by the
-argument types themselves. The form is semantically equivalent under gcc and has been
-regression-verified. A minimal reproducer and the analysis are recorded in mcpp#256.
-
-### 3.3 Treatment of macros
-
-A module cannot export a macro. Object-like constant macros (`CV_8U`, `CV_PI`, `CV_MAKETYPE`, …)
-are exported as `cv::` constexpr values or functions retaining the original spelling.
-Function-like macros (`CV_Assert`, `CV_Error`, the version macros) cannot be handled this way;
-a translation unit that needs the original spelling should `#include <opencv-m/macros.hpp>`
-before the import.
-
-### 3.4 Platform-conditional compilation and the Windows stub layer
-
-Since mcpp 0.0.102 the per-glob flag tables can be made platform-conditional
-(`[target.'cfg(...)'.build.flags]`, mcpp#258), and the descriptor is partitioned accordingly:
-the entries byte-identical between the Linux and macOS snapshots live in `cfg(unix)`, the
-x86_64 dispatch TUs and nasm `.asm` in `cfg(linux)`, the neon TUs in `cfg(macos)`, and the
-Windows tables in `cfg(windows)`. An entry whose predicate does not match the resolved target
-never enters the glob table, so no platform's build sees another platform's globs — and the
-structural dead-glob warnings (about 26 per build before the migration) are gone on every
-platform.
-
-The Windows/unix difference comprises both **additions and removals** — the zlib group, for
-instance, defines `HAVE_UNISTD_H=1` on unix and must leave it undefined on Windows. Conditional
-entries are appended after the base and take effect under GNU last-wins, so removals are now
-expressible; the Windows TUs are still carried by the **stub-namespace** arrangement — every
-Windows translation unit is a one-line `#include` stub under `gen/windows/tu/w*/` (703 stubs in
-total), giving each TU a stable path identity of its own. Removing the stub layer altogether
-(compiling `third_party/**` directly on Windows and undoing the unix defines per cfg) is no
-longer blocked by the manifest grammar and remains a separate, later clean-up.
-
-### 3.5 Feature partitioning
-
-| Feature | Contents | Rationale |
-|---|---|---|
-| `dnn` | adds the `import opencv.dnn;` interface and the underlying dnn sources (including vendored protobuf) | over 300 additional translation units, built only for consumers that opt in; the `opencv.cv` umbrella does not include dnn by default |
-| `unifont` | embeds the WenQuanYi Micro Hei font, enabling Unicode/CJK `putText` through `FontFace("uni")` | the font payload and the rendering path are only meaningful to consumers that need them |
-
-The gemm backend of `dnn` is selected per platform: Linux and macOS use mlas (x86 AVX/AVX2/AVX512,
-arm NEON), while Windows uses OpenCV's built-in `fast_gemm`. Upstream mlas x86 assembly is written
-in GAS/ELF syntax and clang-cl cannot emit COFF from it, so the upstream path of "fall back to
-fast_gemm when no assembly is available" is followed. This platform distinction relies on the
-per-OS feature semantics introduced by mcpp#253, hence the requirement of mcpp ≥ 0.0.101.
-
-### 3.6 Dependency boundary
-
-There is exactly one external dependency: `compat.ffmpeg`, which provides the implementation
-behind the videoio FFmpeg backend (`cap_ffmpeg`). Everything else is contained in this
-repository. On the package-index side only a thin `opencv.lua` pointing at this repository's
-releases remains; upstream opencv.org distributions are no longer referenced directly.
-
-## 4. Verification strategy
-
-CI is a platform × toolchain matrix; all five legs are required:
-
-| Leg | Platform and toolchain |
-|---|---|
-| linux-gcc | Ubuntu / gcc 16.1.0 (additionally builds the `dnn,unifont` features and lints template placeholders) |
-| linux-llvm-22 | Ubuntu / llvm 22.1.8 |
-| linux-musl-static | Ubuntu / gcc 16.1.0 `--target x86_64-linux-musl`, statically linked |
-| macos-llvm | macOS 15 / llvm (arm64) |
-| windows-llvm | Windows / llvm |
-
-Each leg cold-builds roughly 2700 object files; the `~/.mcpp/registry` cache carries toolchains
-and the built `compat.ffmpeg` across runs. The test suite comprises six executables covering
-export-surface completeness (`api_surface_test`), read/write round-trips including FFmpeg mp4
-(`roundtrip_test`), mixed module/header translation units (`full_mix_test`, `macros_mix_test`),
-and the two feature interfaces (`dnn_module_test`, `unifont_module_test`).
-
-The example projects are not executed in CI: each is a path-dependency consumer that cold-builds
-the entire library in its own `target/` (about 40 minutes on a four-core runner), and its
-coverage is already contained in `mcpp test`.
-
-## 5. Upstream upgrade procedure
-
-1. Import the new tarball with `tools/vendor/import_opencv.sh` (the script downloads and verifies
-   it itself and does not depend on the host environment).
-2. Regenerate the `gen/` snapshots and re-check the cross-platform differences and conflicts.
-3. Regenerate the export surface with `python3 tools/gen_exports.py`, then converge to a green
-   build with `python3 tools/prune_loop.py`.
-4. Publish a release once all five CI legs are green, and update the version pointer in the thin
-   `opencv.lua` on the index side.
-
-## 6. Known temporary structures
-
-| Item | Removal condition |
-|---|---|
-| the 703 stubs under `gen/windows/tu/w*/` and the corresponding `cfg(windows)` glob entries | no longer grammar-blocked since mcpp#258; removing the stub layer (compiling `third_party/**` directly on Windows, undoing the unix defines per cfg) is a separate, later clean-up — see [#17](https://github.com/Sunrisepeak/opencv-m/issues/17) |
-| the llvm CI leg installing gcc first | mcpp#259 (`toolchain install llvm` does not pull its glibc runtime) is fixed |
-| the whole-type deduction form in `src/matx_ops.inc` | may be reconsidered once the clang BMI regression is fixed, though the present form is harmless in itself |
+Every using-declaration exception requires an explicit reason. The historical
+tools/prune_loop.py now builds once and emits a JSON/log report without changing
+curated lists or exports; it cannot shrink the API until compilation turns green.

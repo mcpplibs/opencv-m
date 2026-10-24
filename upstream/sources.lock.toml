@@ -1,0 +1,8 @@
+[opencv]
+version = "5.0.0"
+tag = "5.0.0"
+repo = "https://github.com/opencv/opencv"
+url = "https://github.com/opencv/opencv/archive/refs/tags/5.0.0.tar.gz"
+sha256 = "b0528f5a1d379d59d4701cb28c36e22214cc51cf64594e5b56f2d3e6c0233095"
+path = "upstream/opencv"
+patches = []

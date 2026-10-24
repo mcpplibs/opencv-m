@@ -12,19 +12,22 @@ Two inputs merge into src/gen_exports/<module>.inc:
 
 Names are deduped across modules (first module wins, module order below), so
 each entity is exported by exactly one home module. Sub-namespace names
-(cv.ocl.X, cv.utils.X, …) group into nested namespace blocks; cv.detail and
-private surfaces are dropped.
+(cv.ocl.X, cv.utils.X, …) group into nested namespace blocks. The binding
+parser skips detail/private namespaces; curated lists explicitly restore public
+C++ surfaces such as stitching/detail, with Clang/consumer audits tracking gaps.
 
 Usage: gen_exports.py [opencv-root]      (default: the vendored
-                                          third_party/opencv-5.0.0 tree)
+                                          upstream/opencv tree)
 """
 import re
 import sys
 from collections import defaultdict
 from pathlib import Path
+from _files import write_if_changed
 
 REPO = Path(__file__).resolve().parent.parent
-MODULE_ORDER = ["core", "imgproc", "imgcodecs", "videoio", "highgui", "flann", "geometry", "dnn"]
+MODULE_ORDER = ["core", "imgproc", "imgcodecs", "videoio", "highgui", "flann", "geometry", "dnn",
+                "features", "objdetect", "stereo", "calib", "photo", "ptcloud", "stitching", "video"]
 SKIP_HEADER_PARTS = ("detail", "legacy", "private", "cuda", "opencl", "hal",
                      "utils", "llapi", "parallel", "detection_based_tracker")
 SKIP_NS = ("detail", "internal", "traits", "hal", "instr", "utils", "samples",
@@ -34,7 +37,7 @@ SKIP_NS = ("detail", "internal", "traits", "hal", "instr", "utils", "samples",
 def opencv_root() -> Path:
     if len(sys.argv) > 1:
         return Path(sys.argv[1]).resolve()
-    return REPO / "third_party" / "opencv-5.0.0"  # vendored source
+    return REPO / "upstream" / "opencv"
 
 
 def module_headers(root: Path, mod: str):
@@ -61,6 +64,7 @@ def main() -> None:
 
     for mod in MODULE_ORDER:
         names = defaultdict(set)          # sub-namespace ("", "ocl", …) -> names
+        qualified_names = defaultdict(set) # upstream namespaces outside cv
         skipped: list[str] = []
 
         def claim(fq: str, ns: str, name: str):
@@ -150,25 +154,43 @@ def main() -> None:
                 line = line.split("#", 1)[0].strip()
                 if not line:
                     continue
+                if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*", line):
+                    raise ValueError(f"Invalid C++ export name in {curated}: {line}")
                 fq = "cv::" + line
                 parts = line.split("::")
                 claim(fq, "::".join(parts[:-1]), parts[-1])
 
-        # prune list: names that fail compile-verification (internal linkage,
-        # header not in the module's GMF, …) — maintained by tools/prune_loop.py
+        qualified_file = REPO / "tools" / "curated" / f"{mod}.qualified.txt"
+        if qualified_file.exists():
+            for raw in qualified_file.read_text().splitlines():
+                name = raw.split("#", 1)[0].strip()
+                if not name:
+                    continue
+                if not re.fullmatch(r"(?:[A-Za-z_][A-Za-z0-9_]*::)+[A-Za-z_][A-Za-z0-9_]*", name):
+                    raise ValueError(f"Invalid qualified export in {qualified_file}: {name}")
+                if name not in claimed:
+                    claimed[name] = mod
+                    namespace, leaf = name.rsplit("::", 1)
+                    qualified_names[namespace].add(leaf)
+
+        # Reviewed exceptions to using-declarations: explicit adapters or an
+        # excluded/private surface. Compile failures never edit these lists.
         prune = REPO / "tools" / "curated" / f"{mod}.prune.txt"
         if prune.exists():
-            for line in prune.read_text().splitlines():
-                line = line.split("#", 1)[0].strip()
+            for raw in prune.read_text().splitlines():
+                line, _, reason = raw.partition("#")
+                line, reason = line.strip(), reason.strip()
                 if not line:
                     continue
+                if not reason:
+                    raise ValueError(f"Export exception needs a reason: {prune}: {line}")
                 parts = line.split("::")
                 ns, leaf = "::".join(parts[:-1]), parts[-1]
                 if leaf in names[ns]:
                     names[ns].discard(leaf)
-                    skipped.append(f"pruned (compile-verify): cv::{line}")
+                    skipped.append(f"reviewed using exception: cv::{line} -- {reason}")
 
-        per_mod[mod] = {"names": names, "skipped": skipped}
+        per_mod[mod] = {"names": names, "qualified": qualified_names, "skipped": skipped}
 
     for mod in MODULE_ORDER:
         names, skipped = per_mod[mod]["names"], per_mod[mod]["skipped"]
@@ -182,8 +204,42 @@ def main() -> None:
                 lines.append(f"    using {fqns}::{n};")
                 total += 1
             lines.append("}")
-        (out_dir / f"{mod}.inc").write_text("\n".join(lines) + "\n")
-        (out_dir / f"{mod}.skipped.txt").write_text("\n".join(sorted(set(skipped))) + "\n")
+        for namespace, entries in sorted(per_mod[mod]["qualified"].items()):
+            lines.append(f"export namespace {namespace} {{")
+            for name in sorted(entries):
+                lines.append(f"    using {namespace}::{name};")
+                total += 1
+            lines.append("}")
+        conditional_file = REPO / "tools" / "curated" / f"{mod}.conditional.txt"
+        if conditional_file.exists():
+            for raw in conditional_file.read_text().splitlines():
+                entry = raw.split("#", 1)[0].strip()
+                if not entry:
+                    continue
+                guard, name = entry.split()
+                if not re.fullmatch(r"[A-Z_][A-Z0-9_]*", guard) or not re.fullmatch(r"[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*", name):
+                    raise ValueError(f"Invalid conditional export in {conditional_file}: {entry}")
+                fq = "cv::" + name
+                if fq in claimed:
+                    raise ValueError(f"Conditional export also generated unconditionally: {fq}")
+                claimed[fq] = mod
+                namespace, leaf = fq.rsplit("::", 1)
+                lines += [f"#if defined({guard})", f"export namespace {namespace} {{",
+                          f"    using {fq};", "}", "#endif"]
+                total += 1
+        # OpenCV also owns public global aliases, CPU enums and helper types.
+        # Their original namespace must survive the module facade unchanged.
+        globals_file = REPO / "tools" / "curated" / f"{mod}.globals.txt"
+        if globals_file.exists():
+            for raw in globals_file.read_text().splitlines():
+                name = raw.split("#", 1)[0].strip()
+                if name:
+                    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                        raise ValueError(f"Invalid global export in {globals_file}: {name}")
+                    lines.append(f"export using ::{name};")
+                    total += 1
+        write_if_changed(out_dir / f"{mod}.inc", "\n".join(lines) + "\n")
+        write_if_changed(out_dir / f"{mod}.skipped.txt", "\n".join(sorted(set(skipped))) + "\n")
         print(f"{mod:10} {total:4} names   ({len(skipped)} skipped notes)")
 
 

@@ -1,6 +1,6 @@
 // Show what the source-built OpenCV exposes — version, build info, backends.
 import std;
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
 int main() {
     std::println("OpenCV {}", cv::getVersionString());

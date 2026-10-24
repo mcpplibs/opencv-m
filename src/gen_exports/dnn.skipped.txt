@@ -9,16 +9,14 @@ odd-name: cv.dnn.Layer.void forward
 odd-name: cv.dnn.Model.operator Net&
 odd-name: cv.dnn.Model.operator=
 odd-name: cv.dnn.std.ostream operator <<
-pruned (compile-verify): cv::dnn::_Range
-pruned (compile-verify): cv::dnn::concat
-pruned (compile-verify): cv::dnn::getActivationFunc
-pruned (compile-verify): cv::dnn::getLayerFactoryImpl
-pruned (compile-verify): cv::dnn::getLayerFactoryMutex
-pruned (compile-verify): cv::dnn::getPlane
-pruned (compile-verify): cv::dnn::isAllOnes
-pruned (compile-verify): cv::dnn::normalize_axis
-pruned (compile-verify): cv::dnn::normalize_axis_range
-pruned (compile-verify): cv::dnn::shape
-pruned (compile-verify): cv::dnn::slice
-pruned (compile-verify): cv::dnn::toString
-pruned (compile-verify): cv::dnn::total
+reviewed using exception: cv::dnn::concat -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::getLayerFactoryImpl -- private layer_reg.private.hpp implementation helper
+reviewed using exception: cv::dnn::getLayerFactoryMutex -- private layer_reg.private.hpp implementation helper
+reviewed using exception: cv::dnn::getPlane -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::isAllOnes -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::normalize_axis -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::normalize_axis_range -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::shape -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::slice -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::toString -- SDK shape body adapted in generated src/dnn_shapes.inc
+reviewed using exception: cv::dnn::total -- SDK shape body adapted in generated src/dnn_shapes.inc

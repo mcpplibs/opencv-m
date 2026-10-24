@@ -1,0 +1,12 @@
+upstream/opencv/modules/stitching/src/autocalib.cpp
+upstream/opencv/modules/stitching/src/blenders.cpp
+upstream/opencv/modules/stitching/src/camera.cpp
+upstream/opencv/modules/stitching/src/exposure_compensate.cpp
+upstream/opencv/modules/stitching/src/matchers.cpp
+upstream/opencv/modules/stitching/src/motion_estimators.cpp
+upstream/opencv/modules/stitching/src/seam_finders.cpp
+upstream/opencv/modules/stitching/src/stitcher.cpp
+upstream/opencv/modules/stitching/src/timelapsers.cpp
+upstream/opencv/modules/stitching/src/util.cpp
+upstream/opencv/modules/stitching/src/warpers.cpp
+upstream/opencv/modules/stitching/src/warpers_cuda.cpp

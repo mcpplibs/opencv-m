@@ -29,6 +29,11 @@ export namespace cv {
     using cv::LevMarq;
     using cv::LocalOptimMethod;
     using cv::MAGSAC;
+    using cv::MSTAlgorithm;
+    using cv::MSTEdge;
+    using cv::MST_KRUSKAL;
+    using cv::MST_PRIM;
+    using cv::MatrixType;
     using cv::NEIGH_FLANN_KNN;
     using cv::NEIGH_FLANN_RADIUS;
     using cv::NEIGH_GRID;
@@ -75,11 +80,13 @@ export namespace cv {
     using cv::USAC_PARALLEL;
     using cv::USAC_PROSAC;
     using cv::UsacParams;
+    using cv::VariableType;
     using cv::approxPolyDP;
     using cv::approxPolyN;
     using cv::arcLength;
     using cv::boundingRect;
     using cv::boxPoints;
+    using cv::buildMST;
     using cv::calibrationMatrixValues;
     using cv::composeRT;
     using cv::computeCorrespondEpilines;
@@ -142,6 +149,10 @@ export namespace cv {
     using cv::undistortImagePoints;
     using cv::undistortPoints;
     using cv::voxelGridSampling;
+}
+export namespace cv::detail {
+    using cv::detail::LevMarqBackend;
+    using cv::detail::LevMarqBase;
 }
 export namespace cv::fisheye {
     using cv::fisheye::distortPoints;

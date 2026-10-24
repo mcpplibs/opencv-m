@@ -5,12 +5,13 @@
 
 #include <vector>
 
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
+#if defined(MCPP_FEATURE_IMGPROC) && defined(MCPP_FEATURE_IMGCODECS)
 namespace {
 
 cv::Mat make_test_image() {
-    cv::Mat img(64, 64, cv::CV_8UC3, cv::Scalar(30, 60, 90));
+    cv::Mat img(64, 64, mcpplibs::mwrap::opencv::macros::CV_8UC3, cv::Scalar(30, 60, 90));
     cv::circle(img, {32, 32}, 20, {255, 255, 255}, -1);
     cv::rectangle(img, {4, 4}, {60, 60}, {0, 128, 255}, 2);
     return img;
@@ -18,6 +19,32 @@ cv::Mat make_test_image() {
 
 } // namespace
 
+TEST(Roundtrip, BuiltInBitmapAndPortablePixmapArePixelExact) {
+    const auto image = make_test_image();
+    for (const char* extension : {".bmp", ".ppm"}) {
+        SCOPED_TRACE(extension);
+        std::vector<unsigned char> encoded;
+        ASSERT_TRUE(cv::imencode(extension, image, encoded));
+        const auto decoded = cv::imdecode(encoded, cv::IMREAD_UNCHANGED);
+        ASSERT_FALSE(decoded.empty());
+        ASSERT_EQ(decoded.type(), image.type());
+        ASSERT_TRUE(decoded.size() == image.size());
+        EXPECT_DOUBLE_EQ(cv::norm(decoded, image, cv::NORM_INF), 0);
+    }
+}
+
+TEST(Roundtrip, PortableFloatMapPreservesFloatPixels) {
+    cv::Mat image(8, 12, mcpplibs::mwrap::opencv::macros::CV_32FC3, cv::Scalar(0.125, 0.5, 2.0));
+    std::vector<unsigned char> encoded;
+    ASSERT_TRUE(cv::imencode(".pfm", image, encoded));
+    const auto decoded = cv::imdecode(encoded, cv::IMREAD_UNCHANGED);
+    ASSERT_FALSE(decoded.empty());
+    ASSERT_EQ(decoded.type(), image.type());
+    ASSERT_TRUE(decoded.size() == image.size());
+    EXPECT_DOUBLE_EQ(cv::norm(decoded, image, cv::NORM_INF), 0);
+}
+
+#if defined(MCPP_FEATURE_IMGCODECS_PNG)
 TEST(Roundtrip, PngIsPixelExact) {
     cv::Mat img = make_test_image();
     std::vector<unsigned char> buf;
@@ -29,7 +56,9 @@ TEST(Roundtrip, PngIsPixelExact) {
     cv::absdiff(img, back, diff);
     EXPECT_EQ(cv::countNonZero(diff.reshape(1)), 0);
 }
+#endif
 
+#if defined(MCPP_FEATURE_IMGCODECS_JPEG)
 TEST(Roundtrip, JpegIsClose) {
     cv::Mat img = make_test_image();
     std::vector<unsigned char> buf;
@@ -39,3 +68,6 @@ TEST(Roundtrip, JpegIsClose) {
     ASSERT_TRUE(back.size() == img.size());
     EXPECT_LT(cv::norm(img, back, cv::NORM_L1) / (64.0 * 64 * 3), 12.0);  // q95 ringing on sharp synthetic edges ≈ 7
 }
+#endif
+
+#endif

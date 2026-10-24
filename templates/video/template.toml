@@ -1,0 +1,3 @@
+[template]
+description = "Encode and decode generated frames with FFmpeg and inspect the native camera backend"
+post_message = "Run `mcpp run` to encode/decode a generated video without a camera."

@@ -1,0 +1,11 @@
+# Documented public extension interfaces in tracking.detail.hpp.
+detail::tracking::TrackerFeature
+detail::tracking::TrackerFeatureSet
+detail::tracking::TrackerSamplerAlgorithm
+detail::tracking::TrackerSampler
+detail::tracking::TrackerTargetState
+detail::tracking::ConfidenceMap
+detail::tracking::Trajectory
+detail::tracking::TrackerStateEstimator
+detail::tracking::TrackerModel
+detail::tracking::TrackerSamplerCSC

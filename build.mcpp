@@ -1,39 +1,15 @@
-// build.mcpp — opencv-m single-repo build glue. Covers exactly what the
-// mcpp.toml manifest grammar cannot express (v0.0.101), nothing more:
-//
-//   1. per-OS generated-config include dirs: the frozen config snapshots live
-//      in gen/<os>/ (cvconfig.h, cv_cpu_config.h, per-ISA dispatch TU headers)
-//      + gen/common/ overlaps; the manifest has no [target.'cfg(os)']
-//      include_dirs key, so the per-OS -I list is read from
-//      gen/<os>/INCLUDE_DIRS.txt (written by tools/vendor/port_descriptor.py)
-//      and emitted as PRIVATE include dirs — consumers only ever need
-//      gen/common (opencv2/opencv_modules.hpp), which is declarative in
-//      [build].include_dirs.
-//   2. per-OS dnn sources (feature-gated): [features.dnn] carries only the
-//      OS-neutral subset (no per-OS features in the manifest grammar); the
-//      per-OS remainder — ISA dispatch TUs, mlas, feature stubs — is listed
-//      in gen/<os>/DNN_SOURCES.txt and injected here.
-//   3. unifont: when the `unifont` feature is on, hex-embed the vendored
-//      assets/WenQuanYiMicroHei.ttf.gz into $MCPP_OUT_DIR/builtin_font_uni.h
-//      (symbol OcvBuiltinFontUni; byte-faithful port of cmake ocv_blob2hdr —
-//      the COMPRESSED bytes are embedded, OpenCV inflates at runtime).
-//
-// Style: modules-first per docs/07 — directives and the env contract go
-// through `import mcpp;` (the module is bundled in the mcpp binary, so it
-// always matches the protocol). `import std;` is NOT available in the
-// build.mcpp compile context — empirically verified 2026-07-21: only the
-// bundled `mcpp` module is wired up there (regular project TUs can import
-// std, this special TU cannot). Textual std includes remain for the file
-// I/O this program does itself, and MUST precede the import. Diagnostics go to stdout as
-// non-directive lines (never stderr: it can interleave into the buffered
-// directive stream).
+// OpenCV target configuration and selected source catalogs. The upstream
+// implementation stays unchanged; outputs are private to this build instance.
 #include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 import mcpp;
@@ -121,16 +97,278 @@ static std::vector<std::string> expand_glob_line(const fs::path& man, const std:
     return files;
 }
 
-int main() {
+static std::string c_string(const std::string& value) {
+    std::string result = "\"";
+    for (char c : value) {
+        if (c == '\\' || c == '\"') result += '\\';
+        if (c == '\n') result += "\\n";
+        else if (c == '\r') result += "\\r";
+        else result += c;
+    }
+    return result + "\"";
+}
+
+static void inject_catalog(const fs::path& man, const std::string& os,
+                           const std::string& feature) {
+    std::string relative = "port/config/sources/" + os + "/" + feature + ".txt";
+    std::ifstream input(man / relative);
+    if (!input) return;
+    std::string line;
+    while (std::getline(input, line)) {
+        while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) line.pop_back();
+        if (line.empty() || line[0] == '#') continue;
+        for (const auto& source : expand_glob_line(man, line)) mcpp::source(source.c_str());
+    }
+    mcpp::rerun_if_changed(relative.c_str());
+}
+
+static std::string shell_quote(const std::string& value) {
+    std::string result = "'";
+    for (char c : value) result += c == '\'' ? "'\\''" : std::string(1, c);
+    return result + "'";
+}
+
+static std::vector<std::string> flag_words(const std::string& value) {
+    std::vector<std::string> words;
+    std::string word;
+    char quote = 0;
+    bool escape = false;
+    for (char c : value) {
+        if (escape) { word += c; escape = false; }
+        else if (c == '\\' && quote != '\'') escape = true;
+        else if (quote) { if (c == quote) quote = 0; else word += c; }
+        else if (c == '\'' || c == '"') quote = c;
+        else if (std::isspace(static_cast<unsigned char>(c))) {
+            if (!word.empty()) { words.push_back(word); word.clear(); }
+        } else word += c;
+    }
+    if (quote || escape) throw std::runtime_error("malformed GTK pkg-config flags");
+    if (!word.empty()) words.push_back(word);
+    return words;
+}
+
+static std::string configure_highgui(const fs::path& out, const std::string& os) {
+    const bool native = mcpp::has_feature("highgui-native");
+    const bool gtk = mcpp::has_feature("highgui-gtk3") || (native && os == "linux");
+    const bool win32 = mcpp::has_feature("highgui-win32") || (native && os == "windows");
+    const bool cocoa = mcpp::has_feature("highgui-cocoa") || (native && os == "macosx");
+    if (native && os != "linux" && os != "windows" && os != "macosx")
+        throw std::runtime_error("highgui-native supports Linux, Windows and macOS desktop targets");
+    if ((gtk && os != "linux") || (win32 && os != "windows") || (cocoa && os != "macosx"))
+        throw std::runtime_error("selected highgui backend does not support this target OS");
+    std::string backend = "NONE";
+    if (gtk) {
+        if (std::string(mcpp::target_arch()) != "x86_64")
+            throw std::runtime_error("the current GTK3 SDK closure is supported on Linux x86_64 only");
+        if (std::string(mcpp::target_libc()) == "musl")
+            throw std::runtime_error("highgui-gtk3 requires the glibc GTK SDK; musl is not supported");
+        const std::string sdk = mcpp::xpkg_dir("xim", "gtk3");
+        const std::string pc = mcpp::pkg_config_libdir();
+        if (sdk.empty() || pc.empty())
+            throw std::runtime_error("highgui-gtk3 requires the declared xim:gtk3@3.24.43 SDK");
+        const fs::path xtst = mcpp::xpkg_dir("xim", "libXtst");
+        if (xtst.empty() || !fs::exists(xtst / "lib/libXtst.so"))
+            throw std::runtime_error("highgui-gtk3 requires the declared xim:libXtst@1.2.5 SDK");
+        // The Xtst payload exports its libraries/headers but not an xtst.pc
+        // asset. Supply that metadata from its exact declared payload, never
+        // from the host pkg-config database.
+        const auto pc_extra = out / "gtk-pkgconfig";
+        spew(pc_extra / "xtst.pc", "prefix=" + xtst.string() +
+             "\nlibdir=${prefix}/lib\nincludedir=${prefix}/include\n"
+             "Name: Xtst\nDescription: Declared XTest SDK\nVersion: 1.2.5\n"
+             "Requires: x11 xext xi\nLibs: -L${libdir} -lXtst\nCflags: -I${includedir}\n");
+        const auto flags = out / "gtk3-flags.txt";
+        const std::string command = "PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR=" + shell_quote(pc_extra.string() + ":" + pc)
+            + " pkg-config --cflags --libs gtk+-3.0 > " + shell_quote(flags.string());
+        if (std::system(command.c_str()))
+            throw std::runtime_error("pkg-config could not resolve the declared GTK3 SDK");
+        for (const auto& flag : flag_words(slurp(flags))) {
+            if (flag.starts_with("-I")) mcpp::include_dir(flag.substr(2).c_str());
+            else if (flag.starts_with("-L")) {
+                mcpp::link_search(flag.substr(2).c_str());
+                mcpp::runtime_search_dir(flag.substr(2).c_str());
+            } else if (flag.starts_with("-l")) mcpp::link_lib(flag.substr(2).c_str());
+            else if (flag == "-pthread") mcpp::link_flag(flag.c_str());
+            else { mcpp::cxxflag(flag.c_str()); mcpp::link_flag(flag.c_str()); }
+        }
+        mcpp::runtime_search_dir((fs::path(sdk) / "lib").string().c_str());
+        mcpp::define("HAVE_GTK");
+        mcpp::define("HAVE_GTK3");
+        mcpp::source("upstream/opencv/modules/highgui/src/window_gtk.cpp");
+        backend = "GTK3";
+    } else if (win32) {
+        mcpp::define("HAVE_WIN32UI");
+        mcpp::source("upstream/opencv/modules/highgui/src/window_w32.cpp");
+        for (const char* lib : {"user32", "gdi32", "comdlg32", "advapi32"}) mcpp::link_lib(lib);
+        backend = "WIN32UI";
+    } else if (cocoa) {
+        mcpp::define("HAVE_COCOA");
+        mcpp::source("upstream/opencv/modules/highgui/src/window_cocoa.mm");
+        mcpp::link_flag("-framework");
+        mcpp::link_flag("Cocoa");
+        backend = "COCOA";
+    }
+    spew(out / "opencv_highgui_config.hpp",
+         "#pragma once\n#define OPENCV_HIGHGUI_BUILTIN_BACKEND_STR \"" + backend + "\"\n"
+         + (backend == "NONE" ? "#define OPENCV_HIGHGUI_WITHOUT_BUILTIN_BACKEND 1\n" : ""));
+    return backend;
+}
+
+static std::string configure_videoio(const fs::path& man, const std::string& os) {
+    const bool native = mcpp::has_feature("videoio-native");
+    const bool v4l = mcpp::has_feature("videoio-v4l2") || (native && os == "linux");
+    const bool msmf = mcpp::has_feature("videoio-msmf") || (native && os == "windows");
+    const bool avf = mcpp::has_feature("videoio-avfoundation") || (native && os == "macosx");
+    if ((native && os != "linux" && os != "windows" && os != "macosx") ||
+        (v4l && os != "linux") || (msmf && os != "windows") || (avf && os != "macosx"))
+        throw std::runtime_error("selected native videoio backend does not support this target OS");
+    if (v4l) {
+        mcpp::define("HAVE_CAMV4L2");
+        if (!mcpp::has_feature("videoio-v4l2")) inject_catalog(man, os, "videoio-v4l2");
+        return "V4L2";
+    }
+    if (msmf) {
+        if (std::string(mcpp::target_env()) != "msvc")
+            throw std::runtime_error("videoio-msmf is supported with the Windows MSVC ABI SDK only");
+        mcpp::define("HAVE_MSMF");
+        mcpp::source("upstream/opencv/modules/videoio/src/cap_msmf.cpp");
+        for (const char* lib : {"mfplat", "mf", "mfuuid", "mfreadwrite", "strmiids", "dxgi",
+                                "shlwapi", "ole32", "oleaut32", "uuid", "comsuppw"})
+            mcpp::link_lib(lib);
+        return "MSMF";
+    }
+    if (avf) {
+        mcpp::define("HAVE_AVFOUNDATION");
+        mcpp::source("upstream/opencv/modules/videoio/src/cap_avfoundation_mac.mm");
+        for (const char* framework : {"Cocoa", "Accelerate", "AVFoundation", "CoreGraphics",
+                                     "CoreMedia", "CoreVideo", "QuartzCore"}) {
+            mcpp::link_flag("-framework");
+            mcpp::link_flag(framework);
+        }
+        return "AVFOUNDATION";
+    }
+    return "NONE";
+}
+
+int main() try {
     fs::path man = mcpp::manifest_dir()[0] ? mcpp::manifest_dir() : ".";
 
     // 1. per-OS include dirs
     std::string os = mcpp::target_os()[0] ? mcpp::target_os() : "linux";
-    if (os == "macos") os = "macosx";  // gen/ keeps the descriptor-era dir name
-    // windows compiles through the gen/windows/tu/w*/ stub namespace (see
+    if (mcpp::has_feature("simd") && !mcpp::has_feature("simd-emulated")) {
+        const std::string arch = mcpp::target_arch();
+        if (arch != "x86_64" && arch != "aarch64") {
+            std::printf("opencv-m: simd currently supports x86_64 SSE2 and aarch64 NEON baselines\n");
+            return 1;
+        }
+    }
+    if (os == "macos") os = "macosx";  // generated/ keeps the descriptor-era dir name
+    if (!mcpp::out_dir()[0]) {
+        std::printf("opencv-m: MCPP_OUT_DIR is required\n");
+        return 1;
+    }
+    if (mcpp::has_feature("videoio-v4l2") && os != "linux") {
+        std::printf("opencv-m: videoio-v4l2 requires a Linux target\n");
+        return 1;
+    }
+    fs::path out = mcpp::out_dir();
+    mcpp::include_dir(out.string().c_str());
+    const std::string gui = configure_highgui(out, os);
+    const std::string native_video = configure_videoio(man, os);
+    if (mcpp::has_feature("dnn-onnxruntime")) {
+        const std::string arch = mcpp::target_arch();
+        const std::string env = mcpp::target_env();
+        if (!((os == "linux" && arch == "x86_64" && env == "gnu") ||
+              (os == "windows" && arch == "x86_64" && env == "msvc") ||
+              (os == "macosx" && arch == "aarch64")))
+            throw std::runtime_error("dnn-onnxruntime supplies CPU SDKs for Linux x86_64 glibc, Windows x86_64 MSVC ABI and macOS arm64 only");
+    }
+    // Newly integrated modules use the upstream baseline dispatch path.
+    // Their optional OpenCL backends remain unavailable until actual kernel
+    // embeddings and runtime validation are provided; never fake that flag.
+    for (const char* name : {"features", "objdetect", "photo", "ptcloud", "stereo", "stitching", "video"}) {
+        spew(out / (std::string("opencl_kernels_") + name + ".hpp"),
+             "#pragma once\n#include <opencv2/core/ocl.hpp>\n"
+             "#include <opencv2/core/ocl_genbase.hpp>\n#include <opencv2/core/opencl/ocl_defs.hpp>\n"
+             "#ifdef HAVE_OPENCL\n#error OpenCL kernels for this module are not integrated\n#endif\n");
+    }
+    for (const char* name : {"sift", "lkpyramid"})
+        spew(out / (std::string(name) + ".simd_declarations.hpp"),
+             "#define CV_CPU_DISPATCH_MODES_ALL BASELINE\n");
+    inject_catalog(man, os, "core");
+    std::vector<std::string> modules;
+    std::istringstream module_list(slurp(man / "port/config/modules.txt"));
+    std::string module;
+    while (std::getline(module_list, module)) {
+        while (!module.empty() && (module.back() == '\r' || module.back() == ' ')) module.pop_back();
+        if (module.empty() || (module != "core" && !mcpp::has_feature(module.c_str()))) continue;
+        modules.push_back(module);
+        if (module != "core" && module != "dnn") inject_catalog(man, os, module);
+    }
+    mcpp::rerun_if_changed("port/config/modules.txt");
+    for (const char* feature : {"imgcodecs-jpeg", "imgcodecs-png", "videoio-ffmpeg", "videoio-v4l2"})
+        if (mcpp::has_feature(feature)) inject_catalog(man, os, feature);
+    // Imports must be direct module declarations (GCC rejects them inside
+    // included headers). Generate the complete selected interface before
+    // mcpp scans it; there are no conditional imports for its scanner to guess.
+    std::ostringstream imports;
+    if (mcpp::has_feature("dnn-onnxruntime"))
+        imports << "export import mcpplibs.mwrap.onnxruntime;\n";
+    // Keep every adapter in the aggregate's direct dependency graph too.
+    // GCC's mapper for cross-package self-tests otherwise mixes default and
+    // explicit BMI paths for indirect internal imports (notably with ORT).
+    imports << "export import mcpplibs.mwrap.opencv.detail.core;\n"
+               "export import mcpplibs.mwrap.opencv.detail.matx;\n"
+               "export import mcpplibs.mwrap.opencv.core;\n";
+    if (mcpp::has_feature("simd"))
+        imports << "export import mcpplibs.mwrap.opencv.detail.simd;\n"
+                   "export import mcpplibs.mwrap.opencv.core.simd;\n";
+    for (const auto& name : modules)
+        if (name != "core") imports << "export import mcpplibs.mwrap.opencv.detail." << name << ";\n";
+    for (const auto& name : modules)
+        if (name != "core") imports << "export import mcpplibs.mwrap.opencv." << name << ";\n";
+    std::string aggregate = slurp(man / "src/selected.cppm.in");
+    const std::string marker = "@MCPP_OPENCV_IMPORTS@";
+    auto marker_at = aggregate.find(marker);
+    if (marker_at == std::string::npos) {
+        std::printf("opencv-m: src/selected.cppm.in has no import marker\n");
+        return 1;
+    }
+    aggregate.replace(marker_at, marker.size(), imports.str());
+    const auto aggregate_path = out / "selected.cppm";
+    spew(aggregate_path, aggregate);
+    mcpp::generated(aggregate_path.string().c_str());
+    mcpp::rerun_if_changed("src/selected.cppm.in");
+
+    std::string config = slurp(man / ("generated/" + os + "/cvconfig.h"));
+    config.erase(std::remove(config.begin(), config.end(), '\r'), config.end());
+    for (const auto& entry : {std::pair{"HAVE_JPEG", "imgcodecs-jpeg"},
+                              std::pair{"HAVE_PNG", "imgcodecs-png"}}) {
+        if (!mcpp::has_feature(entry.second)) {
+            const std::string definition = std::string("#define ") + entry.first;
+            auto at = config.find(definition + "\n");
+            if (at != std::string::npos) config.replace(at, definition.size(), std::string("/* #undef ") + entry.first + " */");
+        }
+    }
+    if (mcpp::has_feature("imgcodecs-webp")) config += "\n#define HAVE_WEBP 1\n";
+    spew(out / "cvconfig.h", config);
+    spew(out / "opencv2/cvconfig.h", config);
+    std::ostringstream report;
+    report << "OpenCV 5.0.0 (mcpplibs.mwrap.opencv 5.0.0.1)\nTarget: " << os << "\nModules:";
+    for (const auto& name : modules) report << ' ' << name;
+    report << "\nJPEG: " << (mcpp::has_feature("imgcodecs-jpeg") ? "YES" : "NO")
+           << "\nPNG: " << (mcpp::has_feature("imgcodecs-png") ? "YES" : "NO")
+           << "\nWEBP: " << (mcpp::has_feature("imgcodecs-webp") ? "YES" : "NO")
+           << "\nFFmpeg: " << (mcpp::has_feature("videoio-ffmpeg") ? "YES" : "NO") << "\n";
+    report << "Window backend: " << gui << "\n";
+    report << "Native video backend: " << native_video << "\n";
+    report << "DNN ONNX Runtime: " << (mcpp::has_feature("dnn-onnxruntime") ? "CPU (1.25.1)" : "NO") << "\n";
+    spew(out / "version_string.inc", c_string(report.str()) + "\n");
+
+    // windows compiles through the generated/windows/tu/w*/ stub namespace (see
     // mcpp.toml header comment; workaround for mcpp-community/mcpp#258) —
     // same INCLUDE_DIRS/DNN_SOURCES machinery as the other OSes from here on.
-    std::string listrel = "gen/" + os + "/INCLUDE_DIRS.txt";
+    std::string listrel = "generated/" + os + "/INCLUDE_DIRS.txt";
     std::ifstream list(man / listrel);
     if (!list) {
         std::printf("opencv-m build.mcpp: %s missing — no frozen snapshot for target OS '%s'\n",
@@ -148,7 +386,24 @@ int main() {
 
     // 2. per-OS dnn sources (feature-gated)
     if (mcpp::has_feature("dnn")) {
-        std::string dnnrel = "gen/" + os + "/DNN_SOURCES.txt";
+        fs::path ort_backend;
+        if (os == "windows" && mcpp::has_feature("dnn-onnxruntime")) {
+            // Keep the vendor byte-faithful. ORT expects a native wide path
+            // on Windows; upstream's model path handles this but its profile
+            // call currently passes char*. Generate a private adapted TU.
+            const auto original = "upstream/opencv/modules/dnn/src/net_impl_backend.cpp";
+            std::string text = slurp(man / original);
+            const std::string call = "opts.EnableProfiling(ort_profile_path_prefix.c_str());";
+            const auto at = text.find(call);
+            if (at == std::string::npos || text.find(call, at + 1) != std::string::npos)
+                throw std::runtime_error("upstream ORT profiling call changed; review the Windows path adapter");
+            text.replace(at, call.size(), "opts.EnableProfiling(mwrap_opencv_port::ort_profile_path(ort_profile_path_prefix).c_str());");
+            ort_backend = out / "port/modules/dnn/src/net_impl_backend.cpp";
+            spew(ort_backend, "#include <mwrap/opencv/ort_profile_path.hpp>\n" + text);
+            mcpp::include_dir("upstream/opencv/modules/dnn/src");
+            mcpp::rerun_if_changed(original);
+        }
+        std::string dnnrel = "generated/" + os + "/DNN_SOURCES.txt";
         std::ifstream dl(man / dnnrel);
         if (dl) {
             int injected = 0;
@@ -157,7 +412,9 @@ int main() {
                 while (!dline.empty() && (dline.back() == '\r' || dline.back() == ' ')) dline.pop_back();
                 if (dline.empty() || dline[0] == '#') continue;
                 for (const std::string& one : expand_glob_line(man, dline)) {
-                    mcpp::source(one.c_str());
+                    if (!ort_backend.empty() && one.ends_with("net_impl_backend.cpp"))
+                        mcpp::source(ort_backend.string().c_str());
+                    else mcpp::source(one.c_str());
                     injected++;
                 }
             }
@@ -179,4 +436,7 @@ int main() {
     std::printf("opencv-m build.mcpp: include dirs for '%s' emitted\n", os.c_str());
     std::fflush(stdout);
     return 0;
+} catch (const std::exception& error) {
+    std::fprintf(stderr, "opencv-m: %s\n", error.what());
+    return 1;
 }

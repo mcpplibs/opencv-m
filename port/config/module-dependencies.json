@@ -1,0 +1,62 @@
+{
+  "calib": [
+    "flann",
+    "geometry",
+    "imgproc",
+    "objdetect",
+    "stereo"
+  ],
+  "core": [],
+  "dnn": [
+    "geometry",
+    "imgproc"
+  ],
+  "features": [
+    "geometry",
+    "imgproc"
+  ],
+  "flann": [],
+  "geometry": [
+    "flann"
+  ],
+  "highgui": [
+    "imgproc"
+  ],
+  "imgcodecs": [
+    "imgproc"
+  ],
+  "imgproc": [
+    "geometry"
+  ],
+  "objdetect": [
+    "features",
+    "geometry",
+    "imgproc"
+  ],
+  "photo": [
+    "geometry",
+    "imgproc"
+  ],
+  "ptcloud": [
+    "flann",
+    "geometry",
+    "imgproc"
+  ],
+  "stereo": [
+    "geometry",
+    "imgproc"
+  ],
+  "stitching": [
+    "features",
+    "flann",
+    "geometry",
+    "imgproc"
+  ],
+  "video": [
+    "imgproc"
+  ],
+  "videoio": [
+    "imgcodecs",
+    "imgproc"
+  ]
+}

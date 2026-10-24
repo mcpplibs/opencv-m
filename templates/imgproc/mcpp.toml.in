@@ -3,11 +3,8 @@ name        = "{{project.name}}"
 version     = "0.1.0"
 description = "OpenCV image pipeline ({{project.name}})"
 
-# `opencv` is spelled out: templates substitute only project.name,
-# self.name and self.version — there is no namespace placeholder yet.
-# See mcpp-index#163.
-[dependencies.opencv]
-{{self.name}} = "{{self.version}}"
+[dependencies]
+"{{self.name}}" = { version = "{{self.version}}", features = ["imgproc", "imgcodecs-png", "imgcodecs-jpeg"] }
 
 [targets.{{project.name}}]
 kind = "bin"

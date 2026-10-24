@@ -15,14 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # 0.0.102 (mcpp#258): OS-conditional [target.'cfg(os)'.build].flags, which
-  # this manifest uses to keep -msse3 on the library TUs but off the module
-  # interfaces. 0.0.101 rejects `flags` under a cfg section. (0.0.102 also
-  # carries #261 — the windows scan-deps command-line fix.) The pin tracks
-  # the latest release; 0.0.103 adds the mcpplibs index org migration +
-  # per-repo artifact adoption (mcpp#267/#269) — no manifest-grammar change,
-  # the package floor stays 0.0.102.
-  MCPP_VERSION: "2026.8.5.4"
+  # Latest stable release verified on 2026-10-24; keep this pin and
+  # .xlings.json/release.yml aligned. Engine sources stay unchanged.
+  MCPP_VERSION: "2026.10.24.1"
 
 jobs:
   # ── Platform × toolchain matrix ─────────────────────────────────────────
@@ -36,7 +31,7 @@ jobs:
   #                 signature); merged as e83ed49, green since.
   #   windows     — per-glob flags live in [target.'cfg(windows)'.build.flags]
   #                 (mcpp#258, landed in 0.0.102), still keyed on the
-  #                 gen/windows/tu/w*/ stub paths; removing the stub layer
+  #                 generated/windows/tu/w*/ stub paths; removing the stub layer
   #                 itself is tracked in #17.
   test:
     name: ${{ matrix.name }}
@@ -48,6 +43,7 @@ jobs:
       matrix:
         include:
           - name: linux-gcc
+            ort_toolchain: gcc@16.1.0
             os: ubuntu-latest
             suffix: linux-x86_64
             ext: tar.gz
@@ -59,6 +55,7 @@ jobs:
             features: true
             examples: true
           - name: linux-llvm-22
+            ort_toolchain: llvm@22.1.8
             os: ubuntu-latest
             suffix: linux-x86_64
             ext: tar.gz
@@ -87,6 +84,7 @@ jobs:
             features: false
             examples: false
           - name: macos-llvm
+            ort_toolchain: llvm@23.1.3
             os: macos-15
             suffix: macosx-arm64
             ext: tar.gz
@@ -96,6 +94,7 @@ jobs:
             features: false
             examples: false
           - name: windows-llvm
+            ort_toolchain: llvm@23.1.3
             os: windows-latest
             suffix: windows-x86_64
             ext: zip
@@ -173,9 +172,48 @@ jobs:
           done < <(find templates -name '*.cpp.in' -o -name '*.cc.in' -o -name '*.cpp' -o -name '*.cc')
           exit $fail
 
+      - name: Generated macro mappings match pinned headers
+        shell: bash
+        run: python3 tools/generate_macros.py --check
+
+      - name: Embedded upstream notices match retained sources
+        shell: bash
+        run: |
+          python3 tools/test_source_notices.py
+          python3 tools/generate_source_notices.py --check
+
+      - name: Generated scalar conversions match the pinned SDK
+        shell: bash
+        run: python3 tools/generate_saturate.py --check
+
+      - name: Generated DNN shape helpers match the pinned SDK
+        shell: bash
+        run: python3 tools/generate_dnn_shapes.py --check
+
+      - name: Generated persistence helpers match the pinned SDK
+        shell: bash
+        run: python3 tools/generate_persistence.py --check
+
+      - name: Generated portable helpers and value operators match the pinned SDK
+        shell: bash
+        run: |
+          python3 tools/generate_inline_helpers.py --check
+          python3 tools/generate_cuda_helpers.py --check
+          python3 tools/generate_simd.py --check
+          python3 tools/generate_simd_legacy.py --check
+          python3 tools/generate_objdetect_constants.py --check
+          python3 tools/generate_type_ops.py --check
+          python3 tools/generate_mat_aug_ops.py --check
+          python3 tools/test_export_diagnostics.py
+
       - name: Build
         shell: bash
         run: mcpp build
+
+      - name: Build configuration newline regression
+        if: matrix.name == 'linux-gcc'
+        shell: bash
+        run: python3 tools/test_build_config.py target/.build-mcpp/build.mcpp.bin
 
       # Guard the module-interface BMIs against non-baseline target features.
       # A src/*.cppm compiled with -msse3/-mavx/-march=… bakes that feature
@@ -185,30 +223,154 @@ jobs:
       # (OpenCV's x86_64 baseline), so it is applied per-glob to the library
       # TUs only — this asserts it never leaked back onto an interface unit.
       - name: Module-interface baseline guard
-        if: matrix.features
         shell: bash
-        run: |
-          ninja=$(find target -name build.ninja | head -1)
-          [ -n "$ninja" ] || { echo "no build.ninja found"; exit 1; }
-          bad=0
-          for m in opencv cv core imgproc imgcodecs videoio highgui flann geometry; do
-            hits=$(grep -E "[ =/]src/${m}\.cppm" "$ninja" | grep -oE '\-m(sse[0-9._]*|avx[0-9_]*|arch=[^ ]+)' | sort -u || true)
-            if [ -n "$hits" ]; then
-              echo "::error::src/${m}.cppm carries non-baseline target feature(s): $hits — its BMI will be unloadable by baseline consumers"
-              bad=1
-            fi
-          done
-          [ $bad -eq 0 ] && echo "module interfaces are baseline (no target-feature flags)."
-          exit $bad
+        run: python3 tools/check_interface_flags.py
 
       - name: Test
         shell: bash
         run: mcpp test
 
+      - name: Candidate codec and ORT index
+        uses: actions/checkout@v4
+        with:
+          repository: mcpplibs/mcpp-index
+          ref: 7e5a54ccee615e2f8b1a32b34dd9cd7d5c2c55cb
+          path: .candidate-index
+
+      - name: WebP lossless alpha, animation and metadata
+        shell: bash
+        run: |
+          if [[ "${{ matrix.name }}" == "linux-musl-static" ]]; then
+            python3 tools/test_candidate.py --index .candidate-index --toolchain gcc@16.1.0 --target x86_64-linux-musl --features imgcodecs-webp --filter webp_codec
+          else
+            python3 tools/test_candidate.py --index .candidate-index --toolchain "${{ matrix.ort_toolchain }}" --features imgcodecs-webp --filter webp_codec
+          fi
+
+      - name: WebP disabled dependency boundary
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: python3 tools/test_candidate.py --index .candidate-index --toolchain llvm@22.1.8 --features imgcodecs --filter webp_codec --absent-dependency compat.libwebp
+
+      - name: Image codec feature tests
+        shell: bash
+        run: mcpp test --features imgcodecs-png,imgcodecs-jpeg
+
+      - name: All main modules and generated-input algorithm behavior
+        shell: bash
+        run: |
+          mcpp test --features all-modules,simd --strict --timeout 120
+          python3 tools/check_interface_flags.py
+          python3 tools/check_cpp_contracts.py
+
+      - name: C++ declaration and header coverage inventory
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: |
+          python3 tools/test_audit_api.py
+          python3 tools/check_interface_flags.py
+          python3 tools/audit_api.py --verify-exports
+          python3 tools/probe_unlisted_api.py
+          python3 tools/check_entity_review.py --require-complete
+          python3 tools/check_header_review.py
+
+      - name: Preserve C++ inventory for review
+        if: matrix.name == 'linux-llvm-22' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencv-cpp-inventory
+          path: |
+            target/api-audit/inventory.json
+            target/api-audit/includes.log
+            target/api-audit/export-consumer.log
+            target/api-audit/unlisted-import-probe/
+          if-no-files-found: error
+
+      - name: Actual default project template
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: python3 tools/test_template.py --toolchain llvm@22.1.8
+
+      - name: Native SDK versus module persistence formats
+        shell: bash
+        run: python3 tools/check_persistence_format.py
+
+      - name: Native SDK versus module portable helper behavior
+        shell: bash
+        run: python3 tools/check_utility_helpers.py
+
+      - name: Original SDK versus module Matx and Vec template contracts
+        shell: bash
+        run: python3 tools/check_matx_templates.py
+
+      - name: Original SDK versus qualified FP state and opaque videoio APIs
+        shell: bash
+        run: python3 tools/check_fp_state.py
+
+      - name: Original SDK versus Mat augmented assignment signatures and behavior
+        shell: bash
+        run: python3 tools/check_mat_aug.py
+
+      - name: Original SDK versus DNN equality and unavailable backend contracts
+        shell: bash
+        run: python3 tools/check_dnn_compat.py
+
+      - name: Native SDK versus module baseline SIMD behavior
+        shell: bash
+        run: |
+          python3 tools/check_simd.py
+          python3 tools/check_interface_flags.py
+
+      - name: Original SDK versus module software SIMD behavior
+        shell: bash
+        run: |
+          python3 tools/check_simd.py --emulated
+          python3 tools/check_interface_flags.py
+
+      - name: Optimized software SIMD behavior
+        if: matrix.name == 'linux-gcc'
+        shell: bash
+        run: python3 tools/check_simd.py --emulated --profile release
+
+      - name: Features without the optional DNN surface
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: mcpp test --features features --strict --timeout 120
+
       - name: Feature tests (dnn + unifont module interfaces)
         if: matrix.features
         shell: bash
         run: mcpp test --features dnn,unifont
+
+      - name: Linux native GTK3 window and actual window template
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb pkg-config
+          xvfb-run -a mcpp test --features highgui-native --timeout 60
+          xvfb-run -a python3 tools/test_template.py --toolchain llvm@22.1.8 --template window --run-arg=--smoke-test
+
+      - name: Native Win32 or Cocoa window
+        if: runner.os == 'Windows' || runner.os == 'macOS'
+        shell: bash
+        run: mcpp test --features highgui-native --timeout 60
+
+      - name: Native video backend and FFmpeg file roundtrips
+        shell: bash
+        run: mcpp test --features videoio-native,videoio-ffmpeg --strict --timeout 120
+
+      - name: Actual video project template
+        if: matrix.ort_toolchain
+        shell: bash
+        run: python3 tools/test_template.py --toolchain "${{ matrix.ort_toolchain }}" --template video
+
+      - name: OpenCV ONNX Runtime CPU execution proof and actual project template
+        if: matrix.ort_toolchain
+        shell: bash
+        run: |
+          python3 tools/generate_ort_model.py --check
+          python3 tools/test_candidate.py --index .candidate-index --toolchain "${{ matrix.ort_toolchain }}"
+          python3 tools/test_template.py --index .candidate-index --template onnxruntime --toolchain "${{ matrix.ort_toolchain }}"
 
       # NOTE examples are exercised locally, not here: each one is a path-dep
       # consumer that cold-rebuilds the whole vendored OpenCV (+ffmpeg) in its

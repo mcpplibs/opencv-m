@@ -1,0 +1,13 @@
+
+# Public C++ entities restored from the Clang facade inventory.
+MatrixType
+VariableType
+
+# Portable standalone public headers, loaded explicitly by the facade.
+MSTAlgorithm
+MSTEdge
+MST_KRUSKAL
+MST_PRIM
+buildMST
+detail::LevMarqBackend
+detail::LevMarqBase

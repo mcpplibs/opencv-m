@@ -1,21 +1,12 @@
-// {{project.name}} — OpenCV 5 via C++23 modules: same API, no OpenCV headers.
-#include <cstdio>   // stderr: a C macro, so not exported by `import std;`
 import std;
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
-int main(int argc, char** argv) {
-    if (argc < 2) {
-        std::println(stderr, "usage: {{project.name}} <image-file>");
-        return 1;
-    }
-    cv::Mat img = cv::imread(argv[1], cv::IMREAD_COLOR);
-    if (img.empty()) {
-        std::println(stderr, "cannot read {}", argv[1]);
-        return 1;
-    }
-    std::println("{}: {}x{}, {} channels", argv[1], img.cols, img.rows, img.channels());
+int main() {
+    namespace macros = mcpplibs::mwrap::opencv::macros;
+    cv::Mat image(64, 64, macros::CV_8UC3, cv::Scalar(20, 80, 160));
     cv::Mat gray;
-    cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
-    cv::imwrite("out.png", gray);
-    std::println("out.png written");
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+    if (gray.rows != 64 || gray.cols != 64 || gray.channels() != 1) return 1;
+    if (!cv::imwrite("out.png", gray)) return 2;
+    std::println("OpenCV {}: wrote {}x{} out.png", cv::getVersionString(), gray.cols, gray.rows);
 }

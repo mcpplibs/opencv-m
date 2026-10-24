@@ -1,0 +1,13 @@
+generated/linux
+generated/common
+generated/linux/3rdparty/libjpeg-turbo
+generated/common/3rdparty/libjpeg-turbo
+generated/common/3rdparty/zlib
+generated/linux/modules/core
+generated/common/modules/core
+generated/linux/modules/imgproc
+generated/common/modules/imgproc
+generated/linux/modules/dnn
+generated/common/modules/dnn
+generated/common/modules/highgui
+generated/common/synth

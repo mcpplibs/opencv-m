@@ -1,0 +1,14 @@
+
+# Public C++ entities restored from the Clang facade inventory.
+dnn::ActivationFunc
+dnn::MatType
+dnn::SoftNMSMethod
+dnn::getActivationFunc
+dnn::_Range
+# Public legacy backend utilities retain the SDK's unavailable-backend behavior.
+dnn::getInferenceEngineBackendType
+dnn::setInferenceEngineBackendType
+dnn::getInferenceEngineVPUType
+dnn::getInferenceEngineCPUType
+dnn::resetMyriadDevice
+dnn::releaseHDDLPlugin

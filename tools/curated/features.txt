@@ -1,0 +1,14 @@
+
+# Public C++ entities restored from the Clang facade inventory.
+Accumulator
+AffineDescriptorExtractor
+AffineFeatureDetector
+DescriptorExtractor
+DrawMatchesFlags
+FeatureDetector
+FlannBasedMatcher
+L1
+L2
+SL2
+SiftDescriptorExtractor
+SiftFeatureDetector

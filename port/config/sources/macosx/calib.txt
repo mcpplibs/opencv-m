@@ -1,0 +1,5 @@
+upstream/opencv/modules/calib/src/calibration.cpp
+upstream/opencv/modules/calib/src/calibration_handeye.cpp
+upstream/opencv/modules/calib/src/fisheye.cpp
+upstream/opencv/modules/calib/src/main.cpp
+upstream/opencv/modules/calib/src/multiview_calibration.cpp
