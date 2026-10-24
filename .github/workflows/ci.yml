@@ -212,6 +212,27 @@ jobs:
         shell: bash
         run: mcpp test
 
+      - name: Candidate codec and ORT index
+        uses: actions/checkout@v4
+        with:
+          repository: mcpplibs/mcpp-index
+          ref: 7e5a54ccee615e2f8b1a32b34dd9cd7d5c2c55cb
+          path: .candidate-index
+
+      - name: WebP lossless alpha, animation and metadata
+        shell: bash
+        run: |
+          if [[ "${{ matrix.name }}" == "linux-musl-static" ]]; then
+            python3 tools/test_candidate.py --index .candidate-index --toolchain gcc@16.1.0 --target x86_64-linux-musl --features imgcodecs-webp --filter webp_codec
+          else
+            python3 tools/test_candidate.py --index .candidate-index --toolchain "${{ matrix.ort_toolchain }}" --features imgcodecs-webp --filter webp_codec
+          fi
+
+      - name: WebP disabled dependency boundary
+        if: matrix.name == 'linux-llvm-22'
+        shell: bash
+        run: python3 tools/test_candidate.py --index .candidate-index --toolchain llvm@22.1.8 --features imgcodecs --filter webp_codec --absent-dependency compat.libwebp
+
       - name: Image codec feature tests
         shell: bash
         run: mcpp test --features imgcodecs-png,imgcodecs-jpeg
@@ -283,14 +304,6 @@ jobs:
         if: matrix.ort_toolchain
         shell: bash
         run: python3 tools/test_template.py --toolchain "${{ matrix.ort_toolchain }}" --template video
-
-      - name: Candidate ORT SDK and wrapper index
-        if: matrix.ort_toolchain
-        uses: actions/checkout@v4
-        with:
-          repository: mcpplibs/mcpp-index
-          ref: 9f41559c77dc0fa4051980eecc7c5b1f6f4f3dd2
-          path: .candidate-index
 
       - name: OpenCV ONNX Runtime CPU execution proof and actual project template
         if: matrix.ort_toolchain

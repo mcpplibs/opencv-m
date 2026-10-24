@@ -338,6 +338,7 @@ int main() try {
             if (at != std::string::npos) config.replace(at, definition.size(), std::string("/* #undef ") + entry.first + " */");
         }
     }
+    if (mcpp::has_feature("imgcodecs-webp")) config += "\n#define HAVE_WEBP 1\n";
     spew(out / "cvconfig.h", config);
     spew(out / "opencv2/cvconfig.h", config);
     std::ostringstream report;
@@ -345,6 +346,7 @@ int main() try {
     for (const auto& name : modules) report << ' ' << name;
     report << "\nJPEG: " << (mcpp::has_feature("imgcodecs-jpeg") ? "YES" : "NO")
            << "\nPNG: " << (mcpp::has_feature("imgcodecs-png") ? "YES" : "NO")
+           << "\nWEBP: " << (mcpp::has_feature("imgcodecs-webp") ? "YES" : "NO")
            << "\nFFmpeg: " << (mcpp::has_feature("videoio-ffmpeg") ? "YES" : "NO") << "\n";
     report << "Window backend: " << gui << "\n";
     report << "Native video backend: " << native_video << "\n";

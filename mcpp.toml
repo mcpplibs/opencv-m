@@ -676,6 +676,13 @@ implies = ["imgcodecs"]
 [features.imgcodecs-png]
 implies = ["imgcodecs"]
 
+[features.imgcodecs-webp]
+implies = ["imgcodecs"]
+
+[[features.imgcodecs-webp.flags]]
+glob = "**/imgcodecs/**"
+defines = ["HAVE_WEBP=1"]
+
 [features.videoio-ffmpeg]
 implies = ["videoio"]
 defines = ["HAVE_FFMPEG", "HAVE_FFMPEG_LIBAVDEVICE"]
@@ -727,6 +734,14 @@ defines = ["HAVE_ONNXRUNTIME=1"]
 
 [feature-deps.videoio-ffmpeg.compat]
 ffmpeg = "8.1.2"
+
+[feature-deps.imgcodecs-webp]
+
+[feature-deps.imgcodecs-webp.compat]
+
+[feature-deps.imgcodecs-webp.compat.libwebp]
+version = "1.5.0"
+features = ["demux", "mux"]
 
 [feature-deps.dnn-onnxruntime]
 

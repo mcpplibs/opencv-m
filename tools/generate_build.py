@@ -173,6 +173,8 @@ def generate():
     features.update({
         "imgcodecs-jpeg": {"implies": ["imgcodecs"]},
         "imgcodecs-png": {"implies": ["imgcodecs"]},
+        "imgcodecs-webp": {"implies": ["imgcodecs"], "flags": [
+            {"glob": "**/imgcodecs/**", "defines": ["HAVE_WEBP=1"]}]},
         "videoio-ffmpeg": {"implies": ["videoio"], "defines": ["HAVE_FFMPEG", "HAVE_FFMPEG_LIBAVDEVICE"]},
         "videoio-v4l2": {"implies": ["videoio"], "defines": ["HAVE_CAMV4L2"]},
         "videoio-native": {"implies": ["videoio"]},
@@ -245,6 +247,8 @@ def generate():
         "dev-dependencies": {"compat": {"gtest": "1.15.2"}},
         "features": features,
         "feature-deps": {"videoio-ffmpeg": {"compat": {"ffmpeg": "8.1.2"}},
+                         "imgcodecs-webp": {"compat": {"libwebp": {
+                             "version": "1.5.0", "features": ["demux", "mux"]}}},
                          "dnn-onnxruntime": {"mcpplibs.mwrap": {"onnxruntime": "1.25.1"}}},
         "targets": {"opencv": {"kind": "lib"}},
     }

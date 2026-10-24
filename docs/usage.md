@@ -90,6 +90,7 @@ closure. Consumers can disable a dependency's defaults with `default-features = 
 | all-modules | All sixteen main modules; external codecs, GUI backends and SDKs stay explicit |
 | imgcodecs | Image codec API and common source set |
 | imgcodecs-png, imgcodecs-jpeg | Enable the corresponding codec and imply imgcodecs |
+| imgcodecs-webp | Adds libwebp encode/decode, mux and demux for lossless/alpha images, animation and metadata |
 | videoio | Video I/O API |
 | videoio-ffmpeg | Adds the FFmpeg implementation and compat.ffmpeg dependency |
 | videoio-v4l2 | Adds V4L2 on Linux; other targets are refused |

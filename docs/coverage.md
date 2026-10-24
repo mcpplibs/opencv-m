@@ -60,6 +60,7 @@ features and their required dependency closure. Every module also depends on cor
 | `videoio-ffmpeg` | Generated file encode/decode and actual video template | Declared FFmpeg SDK; managed NASM on x86_64 Linux/Windows |
 | Base image codecs | BMP/PPM exact roundtrips; PFM float roundtrip | Other compiled base formats are not individually certified |
 | `imgcodecs-png`, `imgcodecs-jpeg` | Generated image roundtrips | Separate explicit features |
+| `imgcodecs-webp` | Lossless transparent RGB/alpha, animation frames/timing/loop count and exact XMP bytes | libwebp 1.5.0 with mux/demux; Linux GCC16, LLVM22/23 local checks pass; native/archive gates pending |
 | `dnn` | Generated ONNX Add through native classic/new engines | No external accelerator implied |
 | `dnn-onnxruntime` | Generated ONNX Add; actual CPUExecutionProvider session profile and template | Official ORT 1.25.1 CPU SDK, supported targets only |
 | CUDA, OpenCL, OpenVINO, other SDK backends | Planned/unavailable | Declaration exports do not enable a device implementation |

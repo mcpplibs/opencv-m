@@ -84,6 +84,7 @@ opencv = { version = "5.0.0.1", features = ["imgcodecs-png", "imgcodecs-jpeg"] }
 | all-modules | 全部十六个主模块；外部 codec、窗口后端和 SDK 仍显式选择 |
 | imgcodecs | 图像 codec API 与通用源码 |
 | imgcodecs-png、imgcodecs-jpeg | 启用对应格式，并包含 imgcodecs |
+| imgcodecs-webp | 增加 libwebp 编解码、mux/demux，支持无损/透明图、动画与元数据 |
 | videoio | 视频 I/O API |
 | videoio-ffmpeg | 增加 FFmpeg 实现和 compat.ffmpeg 依赖 |
 | videoio-v4l2 | Linux V4L2，其他目标明确拒绝 |

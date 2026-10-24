@@ -25,6 +25,11 @@ TEST(ApiSurface, BuildInformationMatchesSelectedCodecs) {
 #else
     EXPECT_NE(info.find("JPEG: NO"), std::string::npos);
 #endif
+#if defined(MCPP_FEATURE_IMGCODECS_WEBP)
+    EXPECT_NE(info.find("WEBP: YES"), std::string::npos);
+#else
+    EXPECT_NE(info.find("WEBP: NO"), std::string::npos);
+#endif
 }
 
 TEST(ApiSurface, CoreTypesAndConstants) {
