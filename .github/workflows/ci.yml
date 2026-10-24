@@ -178,7 +178,9 @@ jobs:
 
       - name: Embedded upstream notices match retained sources
         shell: bash
-        run: python3 tools/generate_source_notices.py --check
+        run: |
+          python3 tools/test_source_notices.py
+          python3 tools/generate_source_notices.py --check
 
       - name: Generated scalar conversions match the pinned SDK
         shell: bash

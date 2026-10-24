@@ -24,7 +24,11 @@ TERMS = re.compile(rb"copyright|licen[cs]e|redistribution|SPDX-|public domain|pa
 
 def render():
     blocks = defaultdict(list)
-    for path in sorted((ROOT / "upstream/opencv").rglob("*")):
+    sdk = ROOT / "upstream/opencv"
+    # WindowsPath comparisons case-fold names; PosixPath comparisons do not.
+    # Explicit string components retain one order on every host and preserve
+    # the original Linux artifact bytes, including directory-before-file order.
+    for path in sorted(sdk.rglob("*"), key=lambda path: path.relative_to(sdk).parts):
         if not path.is_file() or "__pycache__" in path.parts:
             continue
         source = path.read_bytes()
