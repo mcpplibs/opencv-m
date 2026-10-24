@@ -865,3 +865,36 @@ byte-identical selected notices. Log: /tmp/mwrap-c052ccf-webp-deployment.log.
 Normal template/indexed API deployment passed separately with fifteen notices.
 The corrected archive must be re-pinned and its implementation equivalence
 verified rather than silently claiming c052ccf's failing audit scripts pass.
+
+
+## Root aggregate imports in the GCC ORT configuration (2026-10-25)
+
+Source 71d0967 CI job 120923103789 passed the native all-module and SDK
+contracts, then failed the staged dnn-onnxruntime configuration: reading core
+from the root fell back to bare detail.core/detail.matx BMI filenames. The
+selected aggregate already imported these producers, but root's earlier core
+import still reached the broken indirect mapping. A fresh temporary copy with
+one actual ORT test reproduces the same two diagnostics.
+
+The root now directly imports both internal producers before public core.
+Their existing public re-exports and SDK entities are unchanged. The retained
+project passed actual CPUExecutionProvider/profile inference (131.98s).
+A second A/B replay restores the original root against the SAME warmed graph:
+it fails with both missing-BMI diagnostics again. Restoring exact formal root
+bytes passes actual CPU/profile inference (6.41s), excluding cache warmth as
+the explanation. Logs: /tmp/mwrap-gcc-ort-root-repro.log,
+/tmp/mwrap-gcc-ort-root-import-negative.log, /tmp/mwrap-gcc-root-import-ab.log.
+
+All 38 programs pass on LLVM23 (128.68s), GCC16 (238.24s) and LLVM22 (790.55s,
+including its cold configuration rebuild). Seven SDK/module outputs remain
+1460/1302/342/21/1574/92/976 bytes. The interface, makePtr positive/negative,
+230 SIMD name and preserved SDK-negative guards pass; the fresh software
+inventory and all 101 exact rejection decisions pass. Results and log:
+/tmp/mwrap-root-import-bounded-results.json and
+/tmp/mwrap-root-import-bounded-all.log. New CDB snapshots use the
+root-import-bounded prefix; prior checkpoint evidence is retained separately.
+
+Only the root import graph changes; retained SDK bytes, implementation bodies,
+provider recipes and notices are unchanged. This source still requires a new
+immutable archive/index pin and all final native/source/index CI. The preceding
+71d0967 archive's successful deployments cannot substitute for that gate.
