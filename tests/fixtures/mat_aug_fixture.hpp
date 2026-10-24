@@ -32,6 +32,23 @@ void family(std::ostringstream& out, Operation operation) {
     record<T>(out,left,fixed,operation);
 }
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+inline cv::Mat_<float> comma_matrix() {
+    // Exercise the original deprecated API without making warning policy the oracle.
+    return (cv::Mat_<float>(2,2)<<1.f,2.f,3.f,4.f);
+}
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
 inline void emit(const char* consumer) {
     std::ostringstream out;
 #define MWRAP_AUG(OP, TYPE, RIGHT) \
@@ -51,6 +68,25 @@ inline void emit(const char* consumer) {
     MWRAP_AUG(|=, uchar, cv::Scalar(3))
     MWRAP_AUG(^=, uchar, cv::Scalar(3))
 #undef MWRAP_AUG
+    // Original expression assignment overloads use MatOp's augmented path.
+#define MWRAP_EXPR_AUG(OP) \
+    { \
+        const auto operation=[](auto& a,const auto& b)->decltype(auto) { return cv::operator OP(a,b); }; \
+        cv::Mat_<float> typed(2,2,float(8)); \
+        const cv::Mat plain=typed; \
+        const cv::MatExpr expression=plain+cv::Scalar(1); \
+        record<float>(out,plain,expression,operation); \
+        record<float>(out,typed,expression,operation); \
+    }
+    MWRAP_EXPR_AUG(+=)
+    MWRAP_EXPR_AUG(-=)
+    MWRAP_EXPR_AUG(*=)
+    MWRAP_EXPR_AUG(/=)
+#undef MWRAP_EXPR_AUG
+    cv::Mat_<float>& (*expression_assignment)(cv::Mat_<float>&,const cv::MatExpr&)=&cv::operator+=<float>;
+    const cv::Mat& (*constant_expression_assignment)(const cv::Mat&,const cv::MatExpr&)=&cv::operator/=;
+    (void)expression_assignment;
+    (void)constant_expression_assignment;
     using Typed=cv::Mat_<uchar>;
     using Fixed=cv::Matx<uchar,2,2>;
     Typed& (*typed)(Typed&,const Typed&)=&cv::operator^=<uchar>;
@@ -64,6 +100,26 @@ inline void emit(const char* consumer) {
     cv::Mat plain_a=a;
     if (&plain(plain_a,cv::Scalar(2))!=&plain_a || a(0,0)!=8) throw std::runtime_error("plain assignment pointer");
     out << "explicit-signatures-and-identity\n";
+    // Derived Mat operands and user conversions must follow the SDK overloads.
+    cv::Mat_<float> left(2,2,float(8)), right(2,2,float(2));
+    const auto values=[&](const cv::Mat& value) {
+        cv::Mat converted;
+        value.convertTo(converted,cv::traits::Type<float>::value);
+        for (int row=0;row<2;++row)
+            for (int col=0;col<2;++col) out << converted.at<float>(row,col) << ',';
+        out << '\n';
+    };
+    values(left+right); values(left-right); values(left*right); values(left/right);
+    values(left+2); values(2+left); values(left*2); values(2*left);
+    values(left>2); values(left==8);
+    struct Number { operator double() const { return 2; } };
+    values(left*Number{});
+    struct Matrix { const cv::Mat& value; operator cv::Mat() const { return value; } };
+    values(Matrix{left}+right);
+    cv::MatExpr (*add)(const cv::Mat&,const cv::Mat&)=&cv::operator+;
+    values(add(left,right));
+    values(comma_matrix());
+    out << "typed-and-user-conversions\n";
     if (const char* directory=std::getenv("OPENCV_M_MAT_AUG_OUTPUT")) {
         std::ofstream file(std::filesystem::path(directory)/(std::string(consumer)+".txt"),std::ios::binary);
         file << out.str();

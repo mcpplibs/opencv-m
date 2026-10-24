@@ -787,3 +787,47 @@ observational probe reports sdk exit 0 and module exit 1. This is not counted as
 a passing acceptance test. Original parameter shapes/conversions and MatExpr
 assignment families require repair before full-support/merge/release readiness.
 Other-ISA header acceptance and exact final archive/index alignment remain open.
+
+## Mat expression parameter and conversion restoration
+
+The SDK/module ordinary-consumer probe above is now positive on both sides.
+All 64 Mat/MatExpr/MatShape forwards retain their original SDK parameter types,
+with the existing constrained dummy-template adaptation for non-template SDK
+functions. This restores ordinary overload ranking, derived Mat_ operands and
+implicit numeric/user conversions; exact-base-type constraints no longer reject
+valid SDK expressions. Each forward still invokes the captured exact original
+SDK function. Sixteen original MatExpr augmented-assignment bodies and the
+original deprecated Mat_ comma initializer are generated from mat.inl.hpp in
+the imported-type producer. No SDK class/body or retained source file is changed.
+
+The expanded independent oracle covers 114 assignment cases, exact signatures
+and returned references, thirteen ordinary conversion cases and comma
+initialization. SDK/module output matches 1574 bytes; the typed-Mat probe changes
+from SDK 0/module 1 to SDK 0/module 0. The initial Clang22 focused test passes
+without the earlier exact-Matx serialization crash.
+
+The first full composition attempt is not accepted: the resource guard stopped
+it when free disk reached 5.47 GiB (host CPU 7.54%, available memory 81.31%).
+No external processes were stopped. Only task-owned untracked executable bins
+were removed, after checking no live references; objects, BMIs, sources and logs
+were retained. Disk free recovered from 5.3 GiB to 16.93 GiB. Every compiler now
+uses one binary at a time, removing it only after its successful run.
+
+The complete unchanged all-modules,simd-emulated test set passes all 38 unique
+programs on LLVM23 (120.87s), GCC16 (270.10s) and LLVM22 (146.14s). Every compiler
+matches all seven SDK pairs: 1460/1302/342/21/1574/92/976 bytes. All retain
+39 interface guards, makePtr contracts, 230 enabled SIMD name spellings and
+negative SDK/trait checks. Fresh Clang audit/probes still resolve 3726 listed
+names, sixteen direct modules, 137 manual names and 101 exact source-reviewed
+rejections; seven audit regression tests pass. Logs and per-program results:
+/tmp/mwrap-mat-conversion-bounded-all.log and
+/tmp/mwrap-mat-conversion-bounded-results.json. The stopped run is retained at
+/tmp/mwrap-mat-conversion-composition.log with resource metrics beside it.
+
+Index consumption is being extended with typed-Mat addition, exact MatExpr
+assignment pointers and affine-expression values, so an older cached candidate
+cannot stand in for this restoration. Final immutable archive alignment,
+independent-home template/API/deployment tests, explicit optional capability
+matrices and exact-head native CI remain required. On 2026-10-25, the latest
+published mcpp is still v2026.10.24.1, matching all project/CI pins. No merge,
+tag or release has been performed; mcpp engine source remains unchanged.

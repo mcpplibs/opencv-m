@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare 49 mutable/const SDK Mat assignment families with module imports."""
+"""Compare SDK/import Mat assignments, expressions and operand conversions."""
 import argparse
 import os
 from pathlib import Path
@@ -20,5 +20,5 @@ with tempfile.TemporaryDirectory(prefix="opencv-mat-aug-oracle-") as directory:
     sdk = (Path(directory) / "sdk.txt").read_bytes()
     module = (Path(directory) / "module.txt").read_bytes()
     assert sdk and sdk == module, "Mat assignment behavior differs from original SDK"
-    assert len(sdk.splitlines()) == 99, "49 mutable/const cases and signature checks required"
-    print(f"SDK and module Mat assignments match ({len(sdk)} bytes; 98 operand/const cases)")
+    assert len(sdk.splitlines()) == 130, "114 assignments, signature marker and 14 conversion/initializer cases/marker required"
+    print(f"SDK and module Mat assignments/conversions match ({len(sdk)} bytes; 114 assignment cases)")

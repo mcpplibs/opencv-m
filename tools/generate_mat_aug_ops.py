@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Expand the pinned SDK's 49 Mat augmented-assignment macros for modules."""
+"""Generate pinned SDK Mat assignment, expression and initializer adapters."""
 import argparse
 from pathlib import Path
 import re
 
 from _files import write_if_changed
+from generate_persistence import braced_end
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,6 +51,29 @@ def main():
             result += (f"template<{template}> requires {constraint}\n"
                        f"inline {const}{left}& operator {op} ({const}{left}& a, const {right}& b)\n"
                        f"{{ {body}; return a; }}\n\n")
+    expression_source = (ROOT / "upstream/opencv/modules/core/include/opencv2/core/mat.inl.hpp").read_text()
+    pattern = re.compile(r"(?m)^(?:template<([^\n>]+)>\s*)?static inline\s+([^{};]+?)\s*\{")
+    expressions = []
+    for match in pattern.finditer(expression_source):
+        head = " ".join(match[2].split())
+        if "const MatExpr& b" not in head or not re.search(r"operator\s*(?:\+=|-=|\*=|/=)\s*\(", head):
+            continue
+        template = match[1] or "class _D = void"
+        assert template in {"typename _Tp", "class _D = void"}, template
+        constraint = "opencv_m_pick<_Tp>" if match[1] else "opencv_m_pick<_D>"
+        opening = match.end() - 1
+        body = expression_source[opening:braced_end(expression_source, opening)]
+        expressions.append(f"template<{template}> requires {constraint}\ninline {head}\n{body}\n")
+    assert len(expressions) == 16, len(expressions)
+    comma_pattern = re.compile(r"template<([^\n>]+)>\s+CV_DEPRECATED_EXTERNAL static inline\s+(MatCommaInitializer_[^{};]+?)\s*\{")
+    comma = list(comma_pattern.finditer(expression_source))
+    assert len(comma) == 1 and comma[0][1] == "typename _Tp, typename T2"
+    match = comma[0]
+    opening = match.end() - 1
+    expressions.append("template<" + match[1] + "> requires opencv_m_pick<_Tp>\n[[deprecated]] inline "
+                       + " ".join(match[2].split()) + "\n" + expression_source[opening:braced_end(expression_source, opening)] + "\n")
+    result += expression_source[:expression_source.index("#ifndef")]
+    result += "\n".join(expressions)
     result += "} } // cv::opencv_m_repl\n"
     path = ROOT / "src/mat_aug_ops.inc"
     if args.check:
