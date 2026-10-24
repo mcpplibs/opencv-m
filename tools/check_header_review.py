@@ -8,7 +8,7 @@ import re
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-DECISIONS = {"cuda-sdk", "public-gap", "partial-native", "runtime-internal", "forwarder", "platform-sdk",
+DECISIONS = {"cuda-sdk", "public-gap", "partial", "partial-native", "runtime-internal", "forwarder", "platform-sdk",
              "parallel-sdk", "upstream-internal", "implementation", "textual-only",
              "binding-only", "implemented", "typed-mapped", "documentation"}
 
@@ -34,7 +34,7 @@ def main():
             assert path.is_file(), header
             records[header] = decision
             counts[decision] += 1
-            if decision in {"public-gap", "partial-native"}:
+            if decision in {"public-gap", "partial", "partial-native"}:
                 gaps.append(header)
             if decision == "implemented":
                 assert inventory["headers"][header] == "loaded", f"Implemented facade header not loaded: {header}"

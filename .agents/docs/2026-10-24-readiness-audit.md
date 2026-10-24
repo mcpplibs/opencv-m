@@ -9,14 +9,17 @@ The six companion source PR heads were rechecked through GitHub: ORT 576c780b
 ImGui ffebf83b (4) and Godot 40f72d55 (3) all have successful checks. Their
 independent draft PRs remain open, with executable templates included.
 
-OpenCV's 16baa03 native matrix passed all five jobs. Newer portable API and
-notice checkpoints require their own native CI; the 3d02868 matrix was still
-queued at the last poll. The current local ABI/rendering additions pass all
-three compilers, as recorded at the end of this ledger. Index 2e54735 publishes
-the independently verified 019eaadb archive; site-check passed, validation and
-updater were queued, and OpenKAL was running. Final source/archive alignment
-and all relevant exact-head checks remain required. API/header and backend
-classification is still unfinished. No merge/release readiness is claimed.
+OpenCV's 16baa03 native matrix passed all five jobs. Native run 40086514828
+on eb1d34b is running; Windows has passed the all-main-module step, including
+the formerly crashing ArUCo constant case. Local software SIMD work described
+below has three-compiler and GCC release parity; its all-main-module combination
+and new exact-head native matrix remain required. Index 6ff350a fixes the
+cross-namespace ambiguity that failed validation on 2e54735; its new site check
+passes, while workspace validation, updater and OpenKAL checks remain pending.
+The index still pins the independently verified 019eaadb OpenCV archive.
+Final source/archive alignment and all relevant exact-head checks remain
+required. API/header and backend classification is unfinished. No merge/release
+readiness is claimed.
 
 Sections below are chronological checkpoint evidence, not current PR status.
 
@@ -475,3 +478,45 @@ helper contracts pass LLVM23/GCC16/LLVM22 after this change (4.71s/8.67s/4.91s).
 Log: target/aruco-explicit-float-three-compilers.log. Actual Windows confirmation
 is still required; no test or export was disabled. Native CI and final source/
 archive/index alignment remain open; no merge/tag/release readiness is claimed.
+
+## Software SIMD implementation checkpoint
+
+`simd-emulated` implies `simd` and selects the original SDK's
+CV_FORCE_SIMD128_CPP implementation in the public SIMD/macros adapters only.
+The package feature union selects one vector implementation; algorithm kernel
+ISA/dispatch settings are unchanged. Original v_reg<T,N> definitions and SDK
+function bodies are retained. After including ordinary core declarations, the
+adapter temporarily maps CV_INLINE to inline for namespace function templates
+and restores the macro. Software GCC memory templates are exported directly,
+without the native memory-call adapters.
+
+Independent original-header and import-only consumers produce identical
+644-byte results on LLVM23, GCC16 and LLVM22. Generic eight-lane arithmetic,
+bitwise operations, double conversion halves, reductions and rounding shifts
+supplement the native fixture. All 223 enabled names resolve through direct and
+aggregate imports. GCC release parity also passes (90.89s); the three debug
+checks took 2.35s after initial compilation, 73.94s and 47.65s. Switching back
+to native mode passes LLVM23 (40.76s) and GCC16 (72.39s), preserving the original
+495-byte output and 220 names. Logs: /tmp/mwrap-simd-emulated-llvm23.log and
+/tmp/mwrap-simd-emulated-matrix.log.
+
+The generic SDK v_reinterpret_as_uint refers to a missing trait member.
+Both independent original-header and import probes fail with reinterpret_uint,
+while its declaration remains exported. This is a recorded upstream behavior,
+not a deleted export or a claimed successful instantiation. Header review keeps
+one software record partial, eight native-family records partial and eleven
+other ISA/legacy headers open; full-support acceptance still rejects twenty
+unfinished records. Three-compiler all-main-module composition is running at
+/tmp/mwrap-simd-emulated-composition.log. LLVM23 has passed all 28 programs
+(314.59s), 644-byte SIMD/1302-byte utility parity, 35 interface argument guards,
+makePtr positive/negative contracts and 223 direct/root SIMD names. GCC16 and
+LLVM22 composition results remain pending. Native CI now includes software SDK
+parity on every leg and optimized software parity on Linux GCC. Those new gates
+require their own actual results before acceptance.
+
+Index checkpoint 6ff350a registers namespace-only view preparation in workspace
+CI, removes stale complete-index categories and adds a repeated rebuild
+regression. A fresh-home immutable ORT consumer passed strict inference/public
+API tests (103.25s). Index publication bytes/layout are unchanged. The index PR
+and source PR descriptions now distinguish current source work from the older
+verified immutable OpenCV archive. mcpp engine sources remain read-only.

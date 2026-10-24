@@ -677,6 +677,9 @@ implies = ["calib", "dnn", "features", "flann", "geometry", "highgui", "imgcodec
 [features.simd]
 sources = ["src/core_simd.cppm", "src/detail/simd.cppm"]
 
+[features.simd-emulated]
+implies = ["simd"]
+
 [features.imgcodecs-jpeg]
 implies = ["imgcodecs"]
 

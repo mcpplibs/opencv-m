@@ -299,6 +299,17 @@ jobs:
           python3 tools/check_simd.py
           python3 tools/check_interface_flags.py
 
+      - name: Original SDK versus module software SIMD behavior
+        shell: bash
+        run: |
+          python3 tools/check_simd.py --emulated
+          python3 tools/check_interface_flags.py
+
+      - name: Optimized software SIMD behavior
+        if: matrix.name == 'linux-gcc'
+        shell: bash
+        run: python3 tools/check_simd.py --emulated --profile release
+
       - name: Features without the optional DNN surface
         if: matrix.name == 'linux-llvm-22'
         shell: bash

@@ -63,25 +63,25 @@ using ::cv::v_interleave_pairs;
 using ::cv::v_interleave_quads;
 using ::cv::v_invsqrt;
 using ::cv::v_le;
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_load;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_load_aligned;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_load_deinterleave;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_load_expand;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_load_expand_q;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_load_halves;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_load_low;
 #endif
 using ::cv::v_log;
@@ -89,16 +89,16 @@ using ::cv::v_log_default_16f;
 using ::cv::v_log_default_32f;
 using ::cv::v_log_default_64f;
 using ::cv::v_lt;
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_lut;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_lut_deinterleave;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_lut_pairs;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_lut_quads;
 #endif
 using ::cv::v_magnitude;
@@ -183,22 +183,22 @@ using ::cv::v_sincos_default_32f;
 using ::cv::v_sincos_default_64f;
 using ::cv::v_sqr_magnitude;
 using ::cv::v_sqrt;
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_store;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_store_aligned;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_store_aligned_nocache;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_store_high;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_store_interleave;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_store_low;
 #endif
 using ::cv::v_sub;
@@ -216,22 +216,22 @@ using ::cv::v_uint8x16;
 using ::cv::v_xor;
 using ::cv::v_zip;
 using ::cv::vx_cleanup;
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::vx_load;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::vx_load_aligned;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::vx_load_expand;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::vx_load_expand_q;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::vx_load_halves;
 #endif
-#if !defined(__GNUC__) || defined(__clang__)
+#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::vx_load_low;
 #endif
 using ::cv::vx_lut;
@@ -257,7 +257,7 @@ using ::cv::vx_setzero_u16;
 using ::cv::vx_setzero_u32;
 using ::cv::vx_setzero_u64;
 using ::cv::vx_setzero_u8;
-#if CV_SSE2
+#if CV_SSE2 && !defined(MCPP_FEATURE_SIMD_EMULATED)
 using ::cv::v_select_si128;
 using ::cv::v_sign_epi64;
 using ::cv::v_srai_epi64;
@@ -272,6 +272,14 @@ using ::cv::vx_setzero_f16;
 using ::cv::vx_setall_f16;
 using ::cv::v_cvt_f16;
 #endif
+#if defined(MCPP_FEATURE_SIMD_EMULATED)
+using ::cv::v_hsum;
+using ::cv::v_minmax;
+using ::cv::v_reg;
+using ::cv::v_reinterpret_as_int;
+using ::cv::v_reinterpret_as_uint;
+using ::cv::v_rshr;
+#endif
 }
 export namespace cv { namespace hal {
 using ::cv::hal::StoreMode;
@@ -279,7 +287,7 @@ using ::cv::hal::STORE_UNALIGNED;
 using ::cv::hal::STORE_ALIGNED;
 using ::cv::hal::STORE_ALIGNED_NOCACHE;
 } }
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(MCPP_FEATURE_SIMD_EMULATED)
 // GCC loses unaligned intrinsic typedef alignment through imported inline bodies.
 // Ordinary producer-compiled forwards preserve original SDK memory operations.
 namespace opencv_m_simd_up { using namespace ::cv;
@@ -1047,7 +1055,7 @@ export namespace cv { inline namespace opencv_m_simd_repl {
 template<class> inline constexpr bool pick = true;
 template<typename _Tp, typename _Tvec> requires pick<_Tp>
 inline void vx_store(_Tp* dst, const _Tvec& value) {
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(MCPP_FEATURE_SIMD_EMULATED)
 ::opencv_m_simd_up::v_store(dst, value);
 #else
 ::cv::v_store(dst, value);
@@ -1055,7 +1063,7 @@ inline void vx_store(_Tp* dst, const _Tvec& value) {
 }
 template<typename _Tp, typename _Tvec> requires pick<_Tp>
 inline void vx_store_aligned(_Tp* dst, const _Tvec& value) {
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(MCPP_FEATURE_SIMD_EMULATED)
 ::opencv_m_simd_up::v_store_aligned(dst, value);
 #else
 ::cv::v_store_aligned(dst, value);

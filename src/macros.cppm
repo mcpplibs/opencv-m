@@ -5,7 +5,7 @@ module;
 #include <opencv2/features/hal/interface.h>
 #include <opencv2/imgproc/hal/interface.h>
 #if defined(MCPP_FEATURE_SIMD)
-#include <opencv2/core/simd_intrinsics.hpp>
+#include <mwrap/opencv/simd.hpp>
 #endif
 
 export module mcpplibs.mwrap.opencv.macros;

@@ -9,10 +9,11 @@ import tempfile
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--mcpp", default="mcpp")
 parser.add_argument("--toolchain")
+parser.add_argument("--emulated", action="store_true", help="select the original SDK software implementation")
 parser.add_argument("--profile", default="dev", choices=("dev", "release", "dist"))
 args = parser.parse_args()
 with tempfile.TemporaryDirectory(prefix="opencv-simd-oracle-") as directory:
-    command = [args.mcpp, "test", "simd", "--features", "simd", "--profile", args.profile,
+    command = [args.mcpp, "test", "simd", "--features", "simd-emulated" if args.emulated else "simd", "--profile", args.profile,
                "--strict", "--timeout", "120"]
     if args.toolchain:
         command += ["--toolchain", args.toolchain]

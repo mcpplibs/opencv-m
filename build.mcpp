@@ -255,7 +255,7 @@ int main() try {
 
     // 1. per-OS include dirs
     std::string os = mcpp::target_os()[0] ? mcpp::target_os() : "linux";
-    if (mcpp::has_feature("simd")) {
+    if (mcpp::has_feature("simd") && !mcpp::has_feature("simd-emulated")) {
         const std::string arch = mcpp::target_arch();
         if (arch != "x86_64" && arch != "aarch64") {
             std::printf("opencv-m: simd currently supports x86_64 SSE2 and aarch64 NEON baselines\n");

@@ -112,7 +112,9 @@ all 28 programs with `all-modules,simd`, 35 baseline interface checks and makePt
 positive/negative contracts. GCC release-mode parity and export visibility pass.
 See [SIMD configuration](simd.md). Native ARM64/Windows CI remains required.
 
-Header review keeps eight native-family records partially accepted and twelve
-other mode/ISA records unimplemented. Full-support acceptance fails for both
-categories until their remaining scope is satisfied. SDK emulation, old vector
-operators and non-baseline ISA families are not certified by the native checks.
+Header review keeps eight native-family records and one software-mode record
+partially accepted, with eleven other mode/ISA records unimplemented.
+Full-support acceptance fails for all unfinished categories. The opt-in
+`simd-emulated` mode preserves generic SDK vector templates and has independent
+software SDK parity/lookup checks. Old vector operators and non-baseline ISA
+families are not certified by these checks.

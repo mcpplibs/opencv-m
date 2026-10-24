@@ -24,3 +24,20 @@ for label, module in (("direct", "mcpplibs.mwrap.opencv.core.simd"), ("aggregate
     if result.returncode:
         raise SystemExit(result.stdout)
 print(f"Resolved {len(names)} SIMD names through direct and aggregate imports")
+if "cv::v_reg" in names:
+    # The pinned SDK itself has no V_TypeTraits<T>::reinterpret_uint. Preserve
+    # that template's visibility, and verify the same instantiation diagnostic
+    # independently on original headers and imports instead of deleting it.
+    for label, preamble in (
+        ("sdk", "#define CV_FORCE_SIMD128_CPP 1\n#include <opencv2/core/simd_intrinsics.hpp>\n"),
+        ("module", "import mcpplibs.mwrap.opencv.core.simd;\n"),
+    ):
+        probe = directory / (label + "-reinterpret-uint.cpp")
+        probe.write_text(preamble + "void probe() { cv::v_reg<float, 8> value; (void)cv::v_reinterpret_as_uint(value); }\n")
+        result = subprocess.run([consumer["arguments"][0], *compiler_flags(consumer, keep_modules=True),
+                                 "-x", "c++", "-fsyntax-only", str(probe)], cwd=consumer["directory"],
+                                capture_output=True, text=True)
+        diagnostics = result.stdout + result.stderr
+        (directory / (label + "-reinterpret-uint.log")).write_text(diagnostics)
+        assert result.returncode and "reinterpret_uint" in diagnostics, diagnostics
+    print("Original SDK and module preserve the pinned reinterpret_uint instantiation failure")

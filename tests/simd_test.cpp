@@ -19,6 +19,11 @@ TEST(Simd, TypedCapabilitiesDescribeTheCompiledLibraryBaseline) {
     static_assert(macros::CV_SIMD_WIDTH == 16);
     static_assert(macros::CV_SIMD128 == 1 && macros::CV_SIMD128_64F == 1);
     static_assert(macros::CV_SIMD256 == 0 && macros::CV_SIMD512 == 0);
+#if defined(MCPP_FEATURE_SIMD_EMULATED)
+    static_assert(macros::CV_SIMD128_CPP == 1);
+#else
+    static_assert(macros::CV_SIMD128_CPP == 0);
+#endif
     EXPECT_EQ(sizeof(cv::v_float32), macros::CV_SIMD_WIDTH);
     EXPECT_EQ(cv::VTraits<cv::v_float32>::vlanes(), 4);
 }

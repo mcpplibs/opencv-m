@@ -21,17 +21,18 @@ def main():
     memory = surface["gcc-memory-bridges"]
     for name in surface["common"]:
         if name in memory:
-            result += "#if !defined(__GNUC__) || defined(__clang__)\n"
+            result += "#if !defined(__GNUC__) || defined(__clang__) || defined(MCPP_FEATURE_SIMD_EMULATED)\n"
         result += f"using ::cv::{name};\n"
         if name in memory:
             result += "#endif\n"
-    for group, condition in (("sse2", "CV_SSE2"), ("fp16", "CV_SIMD128_FP16")):
+    for group, condition in (("sse2", "CV_SSE2 && !defined(MCPP_FEATURE_SIMD_EMULATED)"), ("fp16", "CV_SIMD128_FP16"),
+                             ("emulated", "defined(MCPP_FEATURE_SIMD_EMULATED)")):
         result += "#if " + condition + "\n"
         result += "\n".join(f"using ::cv::{name};" for name in surface[group]) + "\n#endif\n"
     result += "}\nexport namespace cv { namespace hal {\n"
     result += "\n".join(f"using ::cv::hal::{name};" for name in
                         ("StoreMode", "STORE_UNALIGNED", "STORE_ALIGNED", "STORE_ALIGNED_NOCACHE")) + "\n} }\n"
-    result += "#if defined(__GNUC__) && !defined(__clang__)\n"
+    result += "#if defined(__GNUC__) && !defined(__clang__) && !defined(MCPP_FEATURE_SIMD_EMULATED)\n"
     result += "// GCC loses unaligned intrinsic typedef alignment through imported inline bodies.\n"
     result += "// Ordinary producer-compiled forwards preserve original SDK memory operations.\n"
     result += "namespace opencv_m_simd_up { using namespace ::cv;\n"
@@ -68,7 +69,7 @@ def main():
         function = name.replace("vx_", "v_", 1)
         result += "template<typename _Tp, typename _Tvec> requires pick<_Tp>\n"
         result += f"inline void {name}(_Tp* dst, const _Tvec& value) {{\n"
-        result += f"#if defined(__GNUC__) && !defined(__clang__)\n::opencv_m_simd_up::{function}(dst, value);\n"
+        result += f"#if defined(__GNUC__) && !defined(__clang__) && !defined(MCPP_FEATURE_SIMD_EMULATED)\n::opencv_m_simd_up::{function}(dst, value);\n"
         result += f"#else\n::cv::{function}(dst, value);\n#endif\n}}\n"
     result += "} }\n"
     output = ROOT / "src/simd_exports.inc"

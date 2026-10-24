@@ -92,6 +92,37 @@ inline void emit(const char* consumer) {
     cv::vx_store_aligned(aligned.data(), cv::vx_load(input.data() + 1));
     require(aligned[0] == 1.25f && aligned[3] == 9.f, "legacy aligned store forward");
     cv::vx_store(floats.data(), cv::vx_load(input.data() + 1)); values(out, floats);
+#if defined(MCPP_FEATURE_SIMD_EMULATED)
+    // Keep the SDK's generic lane-count templates, beyond the 128-bit aliases.
+    std::array<float, 8> lanes{1, 2, 3, 4, 5, 6, 7, 8};
+    const cv::v_reg<float, 8> generic(lanes.data());
+    auto twice = cv::v_add(generic, generic);
+    require(twice.s[7] == 16, "generic eight-lane arithmetic");
+    auto quotient = cv::v_div(twice, generic);
+    auto difference = cv::v_sub(twice, generic);
+    auto product = cv::v_mul(generic, quotient);
+    auto low_double = cv::v_cvt_f64(twice);
+    auto high_double = cv::v_cvt_f64_high(twice);
+    require(low_double.s[3] == 8 && high_double.s[0] == 10, "generic double conversion halves");
+    require(difference.s[6] == 7 && product.s[5] == 12, "generic arithmetic overloads");
+    std::array<unsigned, 8> bit_lanes{1, 2, 3, 4, 5, 6, 7, 8};
+    const cv::v_reg<unsigned, 8> bits(bit_lanes.data());
+    auto signed_bits = cv::v_reinterpret_as_int(generic);
+    auto mask_bits = cv::v_not(cv::v_xor(bits, bits));
+    auto all_bits = cv::v_or(bits, mask_bits);
+    auto unchanged_bits = cv::v_and(bits, mask_bits);
+    require(mask_bits.s[0] == ~0u && all_bits.s[7] == ~0u && unchanged_bits.s[4] == bits.s[4], "generic bitwise templates");
+    cv::v_reg<float, 8> minima, maxima;
+    cv::v_minmax(generic, twice, minima, maxima);
+    cv::v_reg<double, 4> horizontal;
+    cv::v_hsum(generic, horizontal);
+    std::array<int, 8> rounding{1, 2, 3, 4, 5, 6, 7, 8};
+    auto shifted = cv::v_rshr<1>(cv::v_reg<int, 8>(rounding.data()));
+    require(minima.s[7] == 8 && maxima.s[7] == 16 && horizontal.s[3] == 15 && shifted.s[6] == 4, "generic reductions and rounding shift");
+    for (int i = 0; i < 8; ++i)
+        out << twice.s[i] << ',' << quotient.s[i] << ',' << signed_bits.s[i] << ',' << shifted.s[i] << ';';
+    out << '\n' << low_double.s[3] << ',' << high_double.s[0] << ',' << horizontal.s[3] << '\n';
+#endif
     if (const char* directory = std::getenv("OPENCV_M_SIMD_OUTPUT")) {
         std::ofstream file(std::filesystem::path(directory) / (std::string(consumer) + ".txt"), std::ios::binary);
         file << out.str(); require(bool(file), "SIMD oracle output");
