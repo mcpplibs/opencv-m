@@ -7,7 +7,8 @@
 // saturation points. Calls to the module scalar conversion adapter avoid GCC's
 // ambiguous lookup of TU-local SDK saturate_cast during importer instantiation.
 // Original class members (inv/solve/t/mul/div/ddot/cross/conj) are not replaced.
-// Mat/MatExpr helpers and other operations.hpp adapters live in detail.core.
+// Mat/MatExpr forwards live in detail.core. SDK augmented assignments are
+// generated in mat_aug_ops.inc beside this imported-type producer.
 // Full textual SDK mixing still has the documented compiler-specific limits.
 
 export namespace cv {

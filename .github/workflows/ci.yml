@@ -203,6 +203,7 @@ jobs:
           python3 tools/generate_simd_legacy.py --check
           python3 tools/generate_objdetect_constants.py --check
           python3 tools/generate_type_ops.py --check
+          python3 tools/generate_mat_aug_ops.py --check
           python3 tools/test_export_diagnostics.py
 
       - name: Build
@@ -268,6 +269,7 @@ jobs:
           python3 tools/test_audit_api.py
           python3 tools/check_interface_flags.py
           python3 tools/audit_api.py --verify-exports
+          python3 tools/probe_unlisted_api.py
           python3 tools/check_header_review.py
 
       - name: Preserve C++ inventory for review
@@ -301,6 +303,10 @@ jobs:
       - name: Original SDK versus qualified FP state and opaque videoio APIs
         shell: bash
         run: python3 tools/check_fp_state.py
+
+      - name: Original SDK versus Mat augmented assignment signatures and behavior
+        shell: bash
+        run: python3 tools/check_mat_aug.py
 
       - name: Native SDK versus module baseline SIMD behavior
         shell: bash

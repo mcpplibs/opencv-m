@@ -673,3 +673,69 @@ fourteen private headers. The new qualified/broadcast names are now accounted
 for. Twenty partial/other-ISA header records and remaining entity classification
 stay open; these counts are not a full-support claim. This local checkpoint is
 ready for native CI, including the actual Windows fixture confirmation.
+
+## Indexed becda22 archive and original-name audit
+
+Index checkpoint 0d7f3d1 pins becda22229cb5ed43d7ce098291cf7a4e5f7d15b,
+SHA256 67fdaec136e4acb4b0aa9d6a37c1c7952fa278180d82d6eab77dcac4211404ce,
+on all three descriptor platforms. A fresh home resolves that exact payload,
+renders the unmodified default template and passes strict build/run (4m31s),
+release packing (4m38s), isolated relocated execution, ELF closure and fifteen
+byte-identical wrapper/upstream notices. Log:
+/tmp/mwrap-becda22-template-deployment.log. A second fresh home passes the
+indexed image consumer and restored qualified FP signature/state checks
+(301.68s): /tmp/mwrap-becda22-indexed-cpu.log. These certify that source archive,
+not later uncommitted API changes. No release/tag/merge was performed.
+
+Before the Mat assignment changes below, an import-only Clang22 consumer probes
+all 247 original names absent from the using lists, with only the root module
+and explicit optional legacy SIMD module imported. After mapping diagnostics,
+the 135 successful names are recompiled together without the 112 rejected names.
+Report: target/api-audit/unlisted-import-probe/report.json; raw attempt logs are
+retained there. Name visibility does not certify overloads, signatures or runtime
+behavior. The rejected list includes SDK-ignored compatibility and private/helper
+entities, binding tests, plus real public omissions; it is not an assertion of
+112 missing public APIs. Mat augmented assignments and DNN Arg equality/backend
+utility declarations require follow-up. Other-ISA header review remains open.
+
+## Mat augmented-assignment restoration
+
+The name probe demonstrates that cv::operator^= is unavailable through the
+previous module surface. The SDK operations.hpp defines 49 augmented-assignment
+macro invocations, each with mutable and const left operands. A generator now
+expands those exact bodies/signatures in detail.matx, where original SDK types
+are imported rather than textually redeclared. Scalar/Mat/Mat_/Matx operands,
+original template order and return-reference identity are retained. Non-template
+SDK forms use the existing constrained dummy-template adaptation; class bodies
+and retained upstream files are unchanged. CI checks reproducible generation
+and compares independent SDK/module consumers.
+
+The shared behavioral fixture runs all 49 operand families with both left-operand
+qualifiers, then checks explicit typed/fixed-size signatures and selected function
+pointers. SDK/module output is identical (1049 bytes) on LLVM23 (5.86s), GCC16
+(12.84s) and LLVM22 (6.14s). Logs: /tmp/mwrap-mat-aug-llvm23.log and
+/tmp/mwrap-mat-aug-matrix.log. The complete 36-program all-modules,simd-emulated
+composition and all six SDK oracle pairs are now running under the shared
+four-core/one-build-job resource limits at /tmp/mwrap-mat-aug-composition.log;
+GCC retains bounded executable storage. Current source CI and final archive
+alignment remain required after this restoration.
+
+The complete restoration run now passes all 36 programs on LLVM23 (49.04s),
+LLVM22 (59.80s) and GCC16 (254.96s, executable storage bounded). Each matches all
+six independent SDK pairs: SIMD 1460, utilities 1302, Matx 342, FP state 21,
+Mat assignments 1049 and legacy SIMD 976 bytes. All retain 39 interface guards,
+makePtr positive/negative contracts, 226 software SIMD names and the original
+negative trait/SDK probes. GCC per-program results:
+/tmp/mwrap-mat-aug-batched-results.json. Generator check mode and byte/mtime
+idempotence pass; no retained SDK source is modified.
+
+The reusable tools/probe_unlisted_api.py verifies consumer/inventory feature
+profile equality and uses BMI mappings only from that same profile. It is now
+part of the Clang inventory CI step. Against the unchanged pinned-header
+inventory and the new Clang22 BMIs, the report has 136 visible and 111 rejected
+original names: operator^= is now visible. Output:
+target/api-audit/mat-aug-unlisted-import/report.json;
+/tmp/mwrap-mat-aug-unlisted-probe.log. This diagnostic does not turn unclassified
+rejections into accepted exclusions. DNN equality/legacy backend utility names,
+remaining entity classification, current native CI and final source/archive
+alignment still require work before the requested final readiness report.
