@@ -50,3 +50,7 @@ export namespace cv {
     using cv::triangleRasterizeDepth;
     using cv::warpFrame;
 }
+export namespace cv::detail {
+    using cv::detail::renderPointsNormals;
+    using cv::detail::renderPointsNormalsColors;
+}

@@ -154,6 +154,8 @@ def main() -> None:
                 line = line.split("#", 1)[0].strip()
                 if not line:
                     continue
+                if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*", line):
+                    raise ValueError(f"Invalid C++ export name in {curated}: {line}")
                 fq = "cv::" + line
                 parts = line.split("::")
                 claim(fq, "::".join(parts[:-1]), parts[-1])

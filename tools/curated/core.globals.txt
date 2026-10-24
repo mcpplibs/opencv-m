@@ -65,3 +65,11 @@ ushort
 # Public softfloat scalar conversions.
 cvRound64
 cvTrunc
+
+# Original preview C plugin ABI declarations; no plugin backend is implied.
+CvResult
+cvResult
+CV_ERROR_FAIL
+CV_ERROR_OK
+OpenCV_API_Header_t
+OpenCV_API_Header

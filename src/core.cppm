@@ -9,6 +9,7 @@ module;
 #include <cstdio>    // vsnprintf/fputs/FILE/stdout — cv::format / cv::print reimpls (core_fns.inc)
 #include <opencv2/core.hpp>
 #include <opencv2/core/hal/hal.hpp>
+#include <opencv2/core/llapi/llapi.h>
 #include <opencv2/core/affine.hpp>
 #include <opencv2/core/async.hpp>
 #include <opencv2/core/cuda.hpp>

@@ -12,6 +12,7 @@
 #include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/core/softfloat.hpp>
+#include <opencv2/core/llapi/llapi.h>
 #define OPENCV_M_NATIVE_REFERENCE 1
 #include "fixtures/utility_helpers_fixture.hpp"
 

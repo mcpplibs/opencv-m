@@ -1,6 +1,7 @@
 // Exercise the newly integrated main modules through the aggregate module.
 // Inputs are generated locally; no camera, model or image download is needed.
 #include <gtest/gtest.h>
+#include <limits>
 #include <vector>
 
 #if defined(MCPP_FEATURE_FEATURES)
@@ -29,6 +30,29 @@ import mcpplibs.mwrap.opencv.video;
 #endif
 import mcpplibs.mwrap.opencv;
 namespace types = mcpplibs::mwrap::opencv::macros;
+
+#if defined(MCPP_FEATURE_PTCLOUD)
+TEST(MainModules, PointCloudCpuRenderingAndInvalidPoints) {
+    cv::Mat points(1, 2, types::CV_32FC4, cv::Scalar(0, 0, 1, 0));
+    cv::Mat normals(1, 2, types::CV_32FC4, cv::Scalar(0, 0, -1, 0));
+    cv::Mat colors(1, 2, types::CV_32FC4, cv::Scalar(12, 34, 56, 0));
+    points.at<cv::Vec4f>(0, 1)[0] = std::numeric_limits<float>::quiet_NaN();
+    cv::Mat image;
+    cv::detail::renderPointsNormalsColors(points, normals, colors, image);
+    ASSERT_EQ(image.type(), types::CV_8UC4);
+    EXPECT_EQ(image.size(), points.size());
+    EXPECT_EQ(image.at<cv::Vec4b>(0, 0), cv::Vec4b(12, 34, 56, 0));
+    EXPECT_EQ(image.at<cv::Vec4b>(0, 1), cv::Vec4b(0, 32, 0, 0));
+    cv::detail::renderPointsNormals(points, normals, image, cv::Vec3f(0, 0, -1));
+    const auto shaded = image.at<cv::Vec4b>(0, 0);
+    EXPECT_GT(shaded[0], 200);
+    EXPECT_EQ(shaded[0], shaded[1]);
+    EXPECT_EQ(shaded[1], shaded[2]);
+    EXPECT_EQ(shaded[3], 0);
+    EXPECT_EQ(image.at<cv::Vec4b>(0, 1), cv::Vec4b(0, 32, 0, 0));
+    EXPECT_THROW(cv::detail::renderPointsNormals(points, cv::Mat(), image, cv::Vec3f()), cv::Exception);
+}
+#endif
 
 #if defined(MCPP_FEATURE_FEATURES)
 TEST(MainModules, FeaturesSiftDescriptors) {

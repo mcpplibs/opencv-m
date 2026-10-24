@@ -2,7 +2,25 @@
 
 The full objective remains the OpenCV 5/main C++ API and backend plan, ORT wrapper, executable -m templates, one checkpoint PR per repository, green relevant CI and ecosystem review. Nothing is merged or released by these checkpoints. mcpp engine code stays read-only; its existing documentation-only PR is not a prerequisite.
 
-## Verified current checkpoints
+## Latest review state
+
+The six companion source PR heads were rechecked through GitHub: ORT 576c780b
+(4 checks), llama.cpp 5028a1aa (8), FFmpeg 1e8bce6e (2), gRPC 0d11b223 (6),
+ImGui ffebf83b (4) and Godot 40f72d55 (3) all have successful checks. Their
+independent draft PRs remain open, with executable templates included.
+
+OpenCV's 16baa03 native matrix passed all five jobs. Newer portable API and
+notice checkpoints require their own native CI; the 3d02868 matrix was still
+queued at the last poll. The current local ABI/rendering additions pass all
+three compilers, as recorded at the end of this ledger. Index 2e54735 publishes
+the independently verified 019eaadb archive; site-check passed, validation and
+updater were queued, and OpenKAL was running. Final source/archive alignment
+and all relevant exact-head checks remain required. API/header and backend
+classification is still unfinished. No merge/release readiness is claimed.
+
+Sections below are chronological checkpoint evidence, not current PR status.
+
+## Historical verified checkpoints
 
 - OpenCV remote head 02fb836: native CI run 40026710108 passed all five jobs, including core, image codec behavior and the real default project template; Linux GCC additionally runs DNN/unifont. Root LICENSE/metadata/readme now consistently say Apache-2.0. The image example explicitly requests required features.
 - ORT head de3a0a9: native CI run 40022727603 passed Linux GCC/LLVM, macOS arm64 and Windows MSVC ABI. Each runs three module consumers plus the actual project template. LLVM audits the exact SDK declaration inventory. Supplemental official headers omitted from Windows SDK are source/hash pinned. The config-module internal-linkage adaptation and mixing limits are explicit.
@@ -286,3 +304,25 @@ source native matrix was still queued at the last authoritative poll; index
 2e54735 carries that verified archive. Final source/index alignment, native CI
 and the remaining portable-header/codec/backend inventory are still required
 before merge/release readiness can be claimed.
+
+## Preview plugin ABI and CPU point-cloud public API
+
+The facade now includes the original llapi/llapi.h preview ABI declarations and
+ptcloud/detail/kinfu_frame.hpp CPU rendering functions. Six original global
+ABI types/enumerators and two point-cloud functions are exported by using
+declarations; no copied ABI structures or backend implementations are created.
+The upstream preview/no-backward-compatibility status is retained. Consumer
+checks exercise typedef/tag identity, structure fields and size, enum values,
+colored/shaded rendering, invalid points and typed invalid-input exceptions.
+
+All 26 strict all-module programs pass LLVM23 (88.51s), GCC16 (72.49s) and LLVM22
+(26.66s). Independent SDK/module utility outputs match exactly at 400 bytes on
+all three. The compiler-derived audit resolves 3,465 listed root exports and all
+16 direct module surfaces; inventory is 3,653 entities, 199 absent from using
+lists (including adapters) and 113 headers not in facades, plus 14 implementation
+headers. Remaining headers require explicit classification; these counts are
+not a declaration of complete support. Logs: target/public-abi-rendering-all-compilers.log
+and target/public-abi-rendering-api-audit.log. The initial local curated-name
+spelling error was corrected; generation now rejects malformed C++ names early.
+The failed initial run is not acceptance evidence. The read-only export
+diagnostic regression still passes and no API was automatically pruned.

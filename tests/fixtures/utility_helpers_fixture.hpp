@@ -152,6 +152,15 @@ inline void emit(const char* consumer) {
             ::CV_FOURCC(char(0xff), 'A', 'B', char(0x7f)) == 0x7f4241ff,
             "legacy global fourcc byte packing");
     result << "fast math: classification,integer,address,fourcc\n";
+    OpenCV_API_Header header{sizeof(OpenCV_API_Header), 1, 2, 5, 0, 0, "", "mwrap fixture"};
+    OpenCV_API_Header_t* same_header = &header;
+    cvResult code = CV_ERROR_OK;
+    CvResult same_code = code;
+    require(same_header->valid_size == sizeof(OpenCV_API_Header_t) &&
+            same_header->min_api_version == 1 && same_header->api_version == 2 &&
+            same_header->opencv_version_major == 5 && same_code == 0 && CV_ERROR_FAIL == -1 &&
+            std::string(same_header->api_description) == "mwrap fixture", "original preview plugin ABI types");
+    result << "plugin ABI: " << sizeof(header) << ',' << sizeof(code) << ',' << CV_ERROR_FAIL << '\n';
     if (const char* directory = std::getenv("OPENCV_M_UTILITY_OUTPUT")) {
         std::ofstream file(std::filesystem::path(directory) / (std::string(consumer) + ".txt"), std::ios::binary);
         file << result.str();

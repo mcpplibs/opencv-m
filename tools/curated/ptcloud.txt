@@ -3,3 +3,7 @@
 OdometryAlgoType
 OdometryType
 VolumeType
+
+# Public CPU rendering functions declared in detail/kinfu_frame.hpp.
+detail::renderPointsNormals
+detail::renderPointsNormalsColors
