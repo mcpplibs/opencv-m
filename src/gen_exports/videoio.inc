@@ -388,6 +388,8 @@ export namespace cv {
     using cv::CAP_XIAPI;
     using cv::CAP_XINE;
     using cv::IStreamReader;
+    using cv::IVideoCapture;
+    using cv::IVideoWriter;
     using cv::VIDEOWRITER_PROP_COLOR_SPACE;
     using cv::VIDEOWRITER_PROP_DEPTH;
     using cv::VIDEOWRITER_PROP_DTS_DELAY;

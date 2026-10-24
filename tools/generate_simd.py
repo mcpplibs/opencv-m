@@ -72,6 +72,27 @@ def main():
         result += f"#if defined(__GNUC__) && !defined(__clang__) && !defined(MCPP_FEATURE_SIMD_EMULATED)\n::opencv_m_simd_up::{function}(dst, value);\n"
         result += f"#else\n::cv::{function}(dst, value);\n#endif\n}}\n"
     result += "} }\n"
+    # Literal static-inline primary templates in simd_utils.impl.hpp cannot be
+    # exported directly. Compile exact SDK specializations in the producer.
+    helper = (ROOT / "upstream/opencv/modules/core/include/opencv2/core/hal/simd_utils.impl.hpp").read_text()
+    scalars = re.findall(r"^CV_INTRIN_DEF_TYPE2VEC128_TRAITS\(([^,]+),", helper, re.M)
+    assert len(scalars) == len(set(scalars)) == 10, scalars
+    result += "namespace opencv_m_simd_broadcast {\n"
+    for scalar in scalars:
+        if scalar == "double":
+            result += "#if CV_SIMD128_64F\n"
+        for name in surface["broadcast-adapters"]:
+            helper_name = "fixed" if name == "v_setall" else "maximum"
+            result += f"auto {helper_name}(const {scalar}& value) {{ return ::cv::{name}<{scalar}>(value); }}\n"
+        if scalar == "double":
+            result += "#endif\n"
+    result += "}\nexport namespace cv { inline namespace opencv_m_simd_repl {\n"
+    for name in surface["broadcast-adapters"]:
+        helper_name = "fixed" if name == "v_setall" else "maximum"
+        result += "template<class T> requires pick<T> && requires { typename ::cv::Type2Vec128_Traits<T>::vec_type; }\n"
+        result += f"inline auto {name}(const T& value) -> decltype(::opencv_m_simd_broadcast::{helper_name}(value)) {{\n"
+        result += f"return ::opencv_m_simd_broadcast::{helper_name}(value);\n}}\n"
+    result += "} }\n"
     output = ROOT / "src/simd_exports.inc"
     if args.check:
         assert output.read_text() == result, "Run python3 tools/generate_simd.py"

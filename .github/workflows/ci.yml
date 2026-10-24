@@ -298,6 +298,10 @@ jobs:
         shell: bash
         run: python3 tools/check_matx_templates.py
 
+      - name: Original SDK versus qualified FP state and opaque videoio APIs
+        shell: bash
+        run: python3 tools/check_fp_state.py
+
       - name: Native SDK versus module baseline SIMD behavior
         shell: bash
         run: |

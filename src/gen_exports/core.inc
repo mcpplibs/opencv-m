@@ -603,6 +603,12 @@ export namespace cv::cuda {
     using cv::cuda::wrapStream;
 }
 export namespace cv::details {
+    using cv::details::FPDenormalsIgnoreHintScope;
+    using cv::details::FPDenormalsIgnoreHintScopeNOOP;
+    using cv::details::FPDenormalsModeState;
+    using cv::details::restoreFPDenormalsState;
+    using cv::details::saveFPDenormalsState;
+    using cv::details::setFPDenormalsIgnoreHint;
 }
 export namespace cv::hal {
     using cv::hal::Cholesky32f;

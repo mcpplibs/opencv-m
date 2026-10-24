@@ -1,5 +1,12 @@
 #pragma once
 namespace simd_legacy_fixture {
+struct EqualityBase {
+    int value;
+    friend bool operator==(const EqualityBase&,const EqualityBase&)=default;
+};
+struct DerivedIterator : EqualityBase {
+    explicit DerivedIterator(int value) : EqualityBase{value} {}
+};
 using V = cv::v_float32x4;
 inline void dump(std::ostringstream& out, const V& value) {
     std::array<unsigned,4> bits{};
@@ -14,7 +21,12 @@ template<class F> void compound(std::ostringstream& out, const V& a, const V& b,
     dump(out, copy);
 }
 inline void emit(const char* consumer) {
-    using namespace cv::hal;
+    using cv::hal::operator+;
+    // MSVC array iterators compare through a base class. Broadly importing
+    // legacy != selects its unconstrained vector template over that conversion.
+    const DerivedIterator first(0), last(1);
+    static_assert(std::is_same_v<decltype(first!=last),bool>);
+    if (!(first!=last)) throw std::runtime_error("derived iterator comparison");
     const V a = cv::v_setall_f32(6), b = cv::v_setall_f32(2);
     std::ostringstream out;
     dump(out, cv::hal::operator+(a,b));

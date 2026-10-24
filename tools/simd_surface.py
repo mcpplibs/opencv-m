@@ -18,6 +18,7 @@ def enabled_names(root, commands, compiler_flags):
     names = set(re.findall(r"\busing\s+::(cv(?:::[A-Za-z_]\w*)+)\s*;", parts[1]))
     surface = json.loads((root / "port/api/simd-surface.json").read_text())
     names.update("cv::" + name for name in surface["legacy-adapters"])
+    names.update("cv::" + name for name in surface["broadcast-adapters"])
     if "clang" not in Path(producer["arguments"][0]).name:
         names.update("cv::" + name for name in surface["gcc-memory-bridges"])
     assert len(names) >= 215, f"Unexpectedly small SIMD surface: {len(names)}"

@@ -52,6 +52,12 @@ SDK/import probes record the original instantiation failure. Concrete
 `v_reinterpret_as_u32` and the other width-specific SDK operations remain usable.
 
 Vector classes and ordinary inline functions refer to original SDK entities.
+The original `Type2Vec128_Traits<T>`, `v_setall<T>` and `vx_setall<T>` are also
+available. The ten SDK scalar specializations use producer-compiled forwards
+to the original static-inline broadcasts, preserving the SDK vector types,
+argument deduction and function-pointer signatures. Unsupported traits such as
+plain `char` remain rejected. These forwards add a call boundary; performance
+parity has not been measured.
 GCC memory-entry adapters call ordinary producer-compiled forwards: GCC 16
 miscompiled an unaligned load through the imported inline intrinsic body.
 The adapter retains unaligned input/output support. This introduces a call
@@ -66,6 +72,9 @@ explicitly import `mcpplibs.mwrap.opencv.core.simd.legacy` with `simd` enabled.
 It corresponds to manually including the original `intrin_legacy_ops.h` after
 the intrinsics header. All 21 original operator templates stay in `cv::hal`;
 use its operators as with the SDK, for example `using cv::hal::operator+;`.
+Keep these declarations scoped to vector expressions. The SDK's unconstrained
+comparison templates can override a derived iterator's base-class comparison,
+as observed with MSVC's std::array iterators when importing all of cv::hal.
 The base SIMD and root imports deliberately do not introduce these overloads.
 No additional feature or implementation library is required. The opt-in
 interface is built with the same native/software vector configuration.

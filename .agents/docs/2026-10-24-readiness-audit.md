@@ -140,13 +140,13 @@ The public repository listing proves repository creation/forking, not merge or r
 ## User resource and README constraints
 
 - All -m root READMEs use the same concise entry structure and normally stay within 100 lines per language. Detailed usage moves to docs/; prerequisites, candidate status and critical scope limits remain visible. The index's bilingual mwrap spec and package-authoring skill record the rule.
-- Local tests and subprocesses collectively stay below 80% of effective CPU/memory. This host currently has 32 logical CPUs and about 62 GiB RAM. The task-specific mwrap-tests.slice has CPUQuota=800%, MemoryHigh=28G, MemoryMax=32G and TasksMax=512; future local heavy checks use that shared slice with the stricter eight-core quota, MCPP_JOBS=2 and one heavy task at a time. These limits apply only to this task's processes, with unrelated user jobs untouched. Check current load/available memory before further heavy work.
+- Local tests and subprocesses collectively stay below 80% of effective CPU/memory. This host currently has 32 logical CPUs and about 62 GiB RAM. The task-specific mwrap-tests.slice has CPUQuota=400%, MemoryHigh=28G, MemoryMax=32G and TasksMax=512; future local heavy checks use that shared slice with the stricter four-core quota, MCPP_JOBS=1 and one heavy task at a time. These limits apply only to this task's processes, with unrelated user jobs untouched. Check current load/available memory before further heavy work.
 
-The current kernel cgroup limits are cpu.max=800000/100000, memory.high=28 GiB and memory.max=32 GiB. This user hierarchy does not delegate cpuset, so test commands additionally use taskset -c 0-7. Local heavy checks run as:
+The current kernel cgroup limits are cpu.max=400000/100000, memory.high=28 GiB and memory.max=32 GiB. This user hierarchy does not delegate cpuset, so test commands additionally use taskset -c 0-3. Local heavy checks run as:
 
 ```sh
 systemd-run --user --scope --slice=mwrap-tests.slice --quiet \
-  taskset -c 0-7 env MCPP_JOBS=2 <check-command>
+  taskset -c 0-3 env MCPP_JOBS=1 <check-command>
 ```
 
 README rewrites cover OpenCV (EN/ZH), ORT, llama.cpp, FFmpeg, gRPC (EN/ZH) and ImGui. Each entry is below 100 lines, with its detailed prior content retained in docs/usage*.md and local links checked.
@@ -601,3 +601,75 @@ controls, videoio opaque forward declarations and generic SIMD broadcast
 helpers. Source evidence and names are recorded in
  target/api-audit/unlisted-next-review.json. Existing aliases or using-list
 counts do not prove those original qualified APIs are visible or callable.
+
+## Qualified FP, opaque videoio and generic broadcast APIs
+
+Restored six original cv::details FP state/function/RAII names and the original
+IVideoCapture/IVideoWriter forward declarations. They use export-using with no
+new implementation or class copy. The SDK/import oracle checks exact signatures,
+64-byte state layout, direct save/set/restore, both RAII constructors, NOOP scope
+and per-thread restoration. Opaque pointers remain incomplete as in the public
+SDK header. All three compilers match 21 bytes (LLVM23 5.46s, GCC16 9.70s,
+LLVM22 5.61s); this does not claim GPU/device implementation behavior.
+
+Type2Vec128_Traits, v_setall and vx_setall now retain the original SDK type
+mapping and ten scalar specializations. The static-inline broadcasts call
+producer-compiled exact SDK specializations; unsupported plain-char traits are
+rejected in both SDK/import probes. All three compilers match native 1311-byte
+and software 1460-byte SIMD oracles; GCC software release passes too. Generic
+broadcast function-pointer checks also run in the full composition. Call-boundary
+performance parity is unmeasured. Legacy operator output remains 976 bytes.
+
+Before the iterator-scope correction below, all 34 programs and five independent
+SDK pairs passed on LLVM23 (75.31s), GCC16 (167.16s), LLVM22 (81.14s), alongside
+39 interface guards, makePtr contracts and 226 software SIMD names.
+Logs: /tmp/mwrap-fp-state-llvm23.log, /tmp/mwrap-fp-state-matrix.log,
+/tmp/mwrap-broadcast-matrix.log, /tmp/mwrap-qualified-api-composition.log.
+
+Native fb27853 Windows job 120871685646 then found two legacy fixture failures
+(30 other programs passed). A broad using namespace cv::hal made the SDK's
+unconstrained operator!= intercept MSVC array iterator comparison through its
+base class. The fixture now imports only operator+, qualifies the other operators
+and tests a derived/base equality iterator, reproducing the issue on Linux too.
+A raw SDK Linux probe fails with the broad namespace and passes with the scoped
+operator import: /tmp/mwrap-legacy-derived-iterator-repro.log. No SDK/operator
+body was changed or test removed. Actual Windows confirmation remains required.
+
+The corrected 34-program composition passes LLVM23 (24.13s). The following GCC
+segment was stopped by the whole-host guard at 83.14% CPU, with 76.10% available
+memory and 13.95 GiB free disk; it is not counted as a pass. Metrics are retained
+in /tmp/mwrap-qualified-api-final-composition.log.resources.json. Once host CPU
+returned to 4%, only GCC16/LLVM22 were restarted under a four-core quota and one
+build job at /tmp/mwrap-qualified-api-retry.log. Other processes were untouched.
+
+The first reduced-concurrency retry then found two zero-byte, non-executable
+link outputs left by the interrupted linker. They were task-owned bin artifacts;
+that run executed fourteen programs, left twenty unrun and is not accepted as
+complete. Before relinking, host disk fell to 7.8 GiB and preflight correctly
+refused further heavy work. Only the stopped task's GCC bin directory was
+removed (9.5 GiB); object files, BMI caches, source and logs were retained.
+The GCC verification now runs the same all-modules,simd-emulated configuration
+one binary at a time and discards each executable only after a successful run.
+All 34 unique filters and all five SDK output pairs are still required. This
+bounds executable storage rather than narrowing test scope; progress and final
+per-program results are recorded at /tmp/mwrap-qualified-batched-gcc.log and
+/tmp/mwrap-qualified-batched-results.json. LLVM22 remains a separate required
+post-correction run. Index 0861946's updater, OpenKAL and site checks pass;
+its complete workspace validation remains pending.
+
+GCC's bounded-storage run has now passed all 34 unique binaries (196.50s), with
+all five SDK pairs identical (1460/1302/342/21/976 bytes), 39 interface checks,
+makePtr contracts and 226 SIMD name probes. Its JSON result lists every program.
+Only completed executables were discarded; features and test contents stayed
+unchanged. LLVM22's final post-correction composition/inventory is running at
+/tmp/mwrap-qualified-llvm22-final.log. Latest source/index native CI and final
+immutable-archive alignment are still required before readiness.
+
+LLVM22's corrected final run passed all 34 programs (30.20s), all five byte pairs,
+39 interface guards, makePtr contracts and 226 SIMD names. The corresponding
+fresh audit resolves 3715 root names and sixteen direct modules; it inventories
+3953 entities, 247 not in using lists, 103 headers outside the active facade and
+fourteen private headers. The new qualified/broadcast names are now accounted
+for. Twenty partial/other-ISA header records and remaining entity classification
+stay open; these counts are not a full-support claim. This local checkpoint is
+ready for native CI, including the actual Windows fixture confirmation.

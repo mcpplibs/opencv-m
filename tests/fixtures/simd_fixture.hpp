@@ -7,12 +7,36 @@ template<class T, std::size_t N> void values(std::ostringstream& out, const std:
     for (const auto value : data) out << +value << ',';
     out << '\n';
 }
+template<class T> void broadcast(std::ostringstream& out, const T& value) {
+    using Vector = typename cv::Type2Vec128_Traits<T>::vec_type;
+    std::array<T,16/sizeof(T)> lanes{};
+    // Both the deduced and explicit forms belong to the SDK API.
+    Vector fixed = cv::v_setall<T>(value);
+    cv::v_store(lanes.data(),fixed);
+    for (const auto lane : lanes) require(lane==value,"fixed generic broadcast");
+    values(out,lanes);
+    cv::v_store(lanes.data(),cv::vx_setall(value));
+    for (const auto lane : lanes) require(lane==value,"maximum generic broadcast");
+    values(out,lanes);
+    using Broadcast = Vector (*)(const T&);
+    const auto fixed_function=static_cast<Broadcast>(&cv::v_setall<T>);
+    const auto maximum_function=static_cast<Broadcast>(&cv::vx_setall<T>);
+    cv::v_store(lanes.data(),fixed_function(value));
+    for (const auto lane : lanes) require(lane==value,"fixed broadcast function pointer");
+    cv::v_store(lanes.data(),maximum_function(value));
+    for (const auto lane : lanes) require(lane==value,"maximum broadcast function pointer");
+}
 inline void emit(const char* consumer) {
     static_assert(sizeof(cv::v_float32x4) == 16 && sizeof(cv::v_uint8x16) == 16);
     require(cv::VTraits<cv::v_float32>::vlanes() == 4, "baseline float lanes");
     require(cv::VTraits<cv::v_uint8>::vlanes() == 16, "baseline byte lanes");
     std::ostringstream out;
     out << std::setprecision(17);
+    broadcast(out,uchar(250)); broadcast(out,schar(-7));
+    broadcast(out,ushort(60000)); broadcast(out,short(-1000));
+    broadcast(out,unsigned(4000000000u)); broadcast(out,int(-123456));
+    broadcast(out,uint64(0xffffffffffffffffULL)); broadcast(out,int64(-9223372036854775807LL));
+    broadcast(out,float(1.25)); broadcast(out,double(-2.5));
     std::array<float, 5> input{99, 1.25f, -2.5f, 4.f, 9.f};
     std::array<float, 4> floats{};
     auto a = cv::v_load(input.data() + 1);

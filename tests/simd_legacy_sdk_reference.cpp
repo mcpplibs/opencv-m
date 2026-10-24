@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #if defined(MCPP_FEATURE_SIMD_EMULATED)
 #define CV_FORCE_SIMD128_CPP 1
 #endif

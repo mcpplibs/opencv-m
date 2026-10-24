@@ -2,6 +2,7 @@
   "upstream-version": "5.0.0",
   "source": "Clang pinned SDK inventories for native x86_64 and CV_FORCE_SIMD128_CPP; preserve original entities. No failure-driven pruning.",
   "common": [
+    "Type2Vec128_Traits",
     "VTraits",
     "V_RegTraits",
     "V_TypeTraits",
@@ -541,5 +542,9 @@
     "v_reinterpret_as_int",
     "v_reinterpret_as_uint",
     "v_rshr"
+  ],
+  "broadcast-adapters": [
+    "v_setall",
+    "vx_setall"
   ]
 }

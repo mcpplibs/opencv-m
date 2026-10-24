@@ -619,3 +619,11 @@ utils::dumpVectorOfInt
 utils::dumpVectorOfDouble
 utils::dumpVectorOfRect
 utils::fs::getCacheDirectoryForDownloads
+
+# Original per-thread floating-point state API and RAII types.
+details::FPDenormalsModeState
+details::FPDenormalsIgnoreHintScope
+details::FPDenormalsIgnoreHintScopeNOOP
+details::setFPDenormalsIgnoreHint
+details::saveFPDenormalsState
+details::restoreFPDenormalsState

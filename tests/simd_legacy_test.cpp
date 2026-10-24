@@ -7,6 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 import mcpplibs.mwrap.opencv.core.simd.legacy;
 #include "fixtures/simd_legacy_fixture.hpp"
 TEST(SimdLegacy, OriginalOperatorsReferencesAndSaturation) {
