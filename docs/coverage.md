@@ -35,17 +35,20 @@ features and their required dependency closure. Every module also depends on cor
 
 | Surface | Evidence | Remaining boundary |
 |---|---|---|
-| Root and sixteen direct modules | 3,217 export-list names compile in the latest local all-module Clang audit | Name lookup does not prove every overload/template/backend |
+| Root and sixteen direct modules | 3,454 export-list names compile in the latest local all-module Clang audit | Name lookup does not prove every overload/template/backend |
 | Public core types, filesystem, TLS, parallel backend, dual quaternions, async promise | Actual behavior tests; LLVM/GCC strict suites | Full core.hpp mixing on GCC has a declaration-merge limitation |
 | Scalar conversion adapters | Independent pinned SDK oracle, 169 type pairs; saturation/rounding boundaries | Platform rounding bridge needs current native matrix |
 | Generic min/max and makePtr | Reference/tie and image behavior; positive/negative custom-deleter compilation | GCC shared_ptr probes include the standard memory header |
 | FLANN and stitching detail | Direct-import algorithm and factory consumers | Other portable helper headers still require inventory review |
 | Macro constants and pure calculations | Generated `.macros` mapping and optional textual macro header; ROI behavior | Preprocessor flow controls remain textual; no fake exported preprocessor state |
 | DNN-dependent DISK | Conditional export and missing-model rejection; features-only build without DNN | Trained DISK inference is not verified |
-| Remaining API/header inventory | 3,395 facade-visible entities; 179 not in export lists; 119 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
+| Remaining API/header inventory | 3,645 facade-visible entities; 202 not in export lists; 115 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
 | DNN shape helpers | Twenty generated overloads retain pinned bodies; direct-import tensor/axis/formatting behavior passes LLVM/GCC | Static-inline bodies use a constrained named-module adapter |
 | Persistence helpers | 65 pinned SDK bodies plus typed forwards; native header/module XML/YAML/JSON and Base64 bytes match on GCC/LLVM | Private vector proxies stay internal; original FileStorage/WriteStructContext types retain their SDK identity |
 | Geometry optimizer extension | Public LevMarqBase/Backend imported; callback rejection/geodesic report contracts execute original SDK code | Device acceleration is separate |
+| Core/imgproc HAL | 172 core and 34 imgproc public names; saturating arithmetic/norms/exp and color conversions execute the SDK | SDK IGNORED legacy aliases and private filter classes stay outside this surface; ISA intrinsics remain separate |
+| Instrumentation external interface | Original NodeData/InstrNode types and SDK state functions; both setFlags overloads and NodeData equality | Instrumentation collection is disabled in the current build; tests verify original no-op behavior |
+| Tracking extension interfaces | Ten documented SDK classes/aliases; a user feature runs through TrackerFeatureSet, plus target-state and sampling behavior | Pinned sampler returns false while producing samples; the wrapper preserves this upstream behavior |
 
 ## Runtime capabilities
 

@@ -125,3 +125,12 @@ The readiness ledger under `.agents/docs` records checkpoint evidence and open
 gates. mcpp engine source stays read-only; its documentation PR is independent.
 
 [Coverage matrices / 覆盖矩阵](coverage.md)
+
+The core/imgproc HAL exports their public function/class declarations, preserving
+upstream `cv::hal` names and runtime dispatch. SDK `@cond IGNORED` compatibility
+aliases and private filter implementations are excluded. Instrumentation exports
+the external interface and original node types; collection remains disabled as
+in the selected SDK configuration. Its integer setFlags overload forwards to the
+original enum function. The video adapter additionally includes the documented
+tracking extension interfaces, tested with a user-derived feature and original
+SDK feature-set dispatch.

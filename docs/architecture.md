@@ -92,3 +92,9 @@ GCC 上完整 core.hpp 混用仍有声明合并限制。源码模块数量不能
 序列化适配保留固定 SDK 的 65 份 inline 函数体，内部调用显式限定到适配层，向量代理放入模块私有 namespace。基础函数仍调用原始 SDK，用户自定义序列化仍支持 ADL。枚举保留可选 void* 模板参数，同时避免向模块导出会触发 Clang 崩溃的 dependent enable_if 类型。独立的原始头文件程序和模块程序逐字节比较 XML/YAML/JSON 及 Base64 六种输出。
 
 Linux glibc 项目目标显式选择 toolchain-coupled C++ 运行时，与 ORT 模板一致。实际复现显示加载 SDK 时嵌入另一份静态异常运行时会导致 cv::Exception 捕获终止；改为共享运行时后，同一组测试通过。ORT 模板同时验证推理和异常捕获。
+
+core/imgproc HAL 的公共函数与类型保持 `cv::hal` 名称及上游运行时派发；
+`@cond IGNORED` 的旧兼容别名和私有滤波类不加入该接口。instrumentation 导出
+原始节点类型与外部接口，保持当前 SDK 未启用采集时的 no-op 行为；整数 setFlags
+转发给原始枚举函数。video 补上文档公开的 tracking 扩展接口，并以用户派生特征
+类验证上游 TrackerFeatureSet 的真实派发。

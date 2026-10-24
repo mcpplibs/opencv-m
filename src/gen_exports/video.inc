@@ -39,3 +39,15 @@ export namespace cv {
     using cv::readOpticalFlow;
     using cv::writeOpticalFlow;
 }
+export namespace cv::detail::tracking {
+    using cv::detail::tracking::ConfidenceMap;
+    using cv::detail::tracking::TrackerFeature;
+    using cv::detail::tracking::TrackerFeatureSet;
+    using cv::detail::tracking::TrackerModel;
+    using cv::detail::tracking::TrackerSampler;
+    using cv::detail::tracking::TrackerSamplerAlgorithm;
+    using cv::detail::tracking::TrackerSamplerCSC;
+    using cv::detail::tracking::TrackerStateEstimator;
+    using cv::detail::tracking::TrackerTargetState;
+    using cv::detail::tracking::Trajectory;
+}

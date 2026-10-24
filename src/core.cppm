@@ -7,6 +7,7 @@ module;
 #include <cstdarg>   // va_list/va_start/va_copy/va_end — cv::format printf reimpl (core_fns.inc)
 #include <cstdio>    // vsnprintf/fputs/FILE/stdout — cv::format / cv::print reimpls (core_fns.inc)
 #include <opencv2/core.hpp>
+#include <opencv2/core/hal/hal.hpp>
 #include <opencv2/core/affine.hpp>
 #include <opencv2/core/async.hpp>
 #include <opencv2/core/cuda.hpp>
@@ -20,6 +21,7 @@ module;
 #include <opencv2/core/utils/allocator_stats.hpp>
 #include <opencv2/core/utils/filesystem.hpp>
 #include <opencv2/core/utils/fp_control_utils.hpp>
+#include <opencv2/core/utils/instrumentation.hpp>
 #include <opencv2/core/utils/logger.hpp>
 #include <opencv2/core/utils/tls.hpp>
 #include <opencv2/core/version.hpp>
@@ -31,4 +33,5 @@ export module mcpplibs.mwrap.opencv.core;
 #include "matx_ops.inc"
 #include "core_fns.inc"
 #include "persistence_ops.inc"
+#include "instrumentation_ops.inc"
 #include "affine_ops.inc"
