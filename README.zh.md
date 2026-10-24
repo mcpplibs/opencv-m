@@ -2,13 +2,27 @@
 
 > 以 C++23 模块使用 OpenCV 5.0.0，保留上游 cv:: API。
 
-[English](README.md) · **简体中文** · 上游：[opencv/opencv](https://github.com/opencv/opencv) · [Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
+[English](README.md) · **简体中文** · [Upstream](https://github.com/opencv/opencv) · [Releases](https://github.com/mcpplibs/opencv-m/releases) · [mcpp](https://github.com/mcpp-community/mcpp) · [Index](https://github.com/mcpplibs/mcpp-index)
 
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://en.cppreference.com/w/cpp/23)
 [![License](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mcpplibs/opencv-m/actions/workflows/ci.yml)
 
 十六个主模块；原生窗口、编解码、视频和 ORT CPU 按需启用，上游源码与适配分层。
+
+## 模块
+
+可选模块需启用对应的 mcpp feature。
+
+- `import mcpplibs.mwrap.opencv;`: 已启用模块聚合
+- `import mcpplibs.mwrap.opencv.core;`: Mat、类型与基础运算
+- `import mcpplibs.mwrap.opencv.imgproc;`: 图像处理与绘制
+- `import mcpplibs.mwrap.opencv.imgcodecs;`: 图像读写
+- `import mcpplibs.mwrap.opencv.highgui;`: 窗口 API，需选择后端 feature
+- `import mcpplibs.mwrap.opencv.videoio;`: 视频输入输出
+- `import mcpplibs.mwrap.opencv.dnn;`: 神经网络推理
+
+> More Modules API -> [模块与 API](docs/usage.zh.md)
 
 ## 快速开始
 
@@ -28,11 +42,6 @@ import mcpplibs.mwrap.opencv;
 namespace macros = mcpplibs::mwrap::opencv::macros;
 int main() { return cv::Mat(8, 8, macros::CV_8UC3).empty(); }
 ```
-
-## 模块
-
-根模块聚合已启用模块，也可单独 import `.core`、`.imgproc`、`.dnn` 等。
-见[十六模块与 API 矩阵](docs/coverage.md)。
 
 ## 特性开关
 
