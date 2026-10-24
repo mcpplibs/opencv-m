@@ -161,3 +161,6 @@ mcpp new video-demo --template mcpplibs.mwrap.opencv@5.0.0.1:video
 cd video-demo
 mcpp run
 ```
+
+公共子模块也转导出 core 与必需模块依赖，头文件适配保存在独立内部模块单元。
+该布局及生成、验证流程见 [架构说明](docs/architecture.md)。

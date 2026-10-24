@@ -12,8 +12,9 @@ Two inputs merge into src/gen_exports/<module>.inc:
 
 Names are deduped across modules (first module wins, module order below), so
 each entity is exported by exactly one home module. Sub-namespace names
-(cv.ocl.X, cv.utils.X, …) group into nested namespace blocks; cv.detail and
-private surfaces are dropped.
+(cv.ocl.X, cv.utils.X, …) group into nested namespace blocks. The binding
+parser skips detail/private namespaces; curated lists explicitly restore public
+C++ surfaces such as stitching/detail, with Clang/consumer audits tracking gaps.
 
 Usage: gen_exports.py [opencv-root]      (default: the vendored
                                           upstream/opencv tree)

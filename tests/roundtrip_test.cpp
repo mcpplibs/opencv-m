@@ -19,6 +19,31 @@ cv::Mat make_test_image() {
 
 } // namespace
 
+TEST(Roundtrip, BuiltInBitmapAndPortablePixmapArePixelExact) {
+    const auto image = make_test_image();
+    for (const char* extension : {".bmp", ".ppm"}) {
+        SCOPED_TRACE(extension);
+        std::vector<unsigned char> encoded;
+        ASSERT_TRUE(cv::imencode(extension, image, encoded));
+        const auto decoded = cv::imdecode(encoded, cv::IMREAD_UNCHANGED);
+        ASSERT_FALSE(decoded.empty());
+        ASSERT_EQ(decoded.type(), image.type());
+        ASSERT_TRUE(decoded.size() == image.size());
+        EXPECT_DOUBLE_EQ(cv::norm(decoded, image, cv::NORM_INF), 0);
+    }
+}
+
+TEST(Roundtrip, PortableFloatMapPreservesFloatPixels) {
+    cv::Mat image(8, 12, mcpplibs::mwrap::opencv::macros::CV_32FC3, cv::Scalar(0.125, 0.5, 2.0));
+    std::vector<unsigned char> encoded;
+    ASSERT_TRUE(cv::imencode(".pfm", image, encoded));
+    const auto decoded = cv::imdecode(encoded, cv::IMREAD_UNCHANGED);
+    ASSERT_FALSE(decoded.empty());
+    ASSERT_EQ(decoded.type(), image.type());
+    ASSERT_TRUE(decoded.size() == image.size());
+    EXPECT_DOUBLE_EQ(cv::norm(decoded, image, cv::NORM_INF), 0);
+}
+
 #if defined(MCPP_FEATURE_IMGCODECS_PNG)
 TEST(Roundtrip, PngIsPixelExact) {
     cv::Mat img = make_test_image();

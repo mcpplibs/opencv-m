@@ -115,7 +115,9 @@ import mcpplibs.mwrap.opencv;
 // import mcpplibs.mwrap.opencv.imgproc;
 ```
 
-The root re-exports core, macros and the selected optional modules. The aggregate
+The root re-exports core, macros and the selected optional modules. Each public
+submodule also re-exports core and its required module dependencies, with its
+header adapter in a separate internal unit. The aggregate
 selection module is generated into the configuration-specific build directory
 before scanning, with direct imports. Optional modules are not exposed merely
 because their source exists in the checkout.

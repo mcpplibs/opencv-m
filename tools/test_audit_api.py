@@ -50,7 +50,7 @@ class InventoryTest(unittest.TestCase):
                 {"kind": "FunctionDecl", "name": "call", "type": {"qualType": "int (int)"}},
                 {"kind": "FunctionDecl", "name": "call", "type": {"qualType": "int (float)"}},
                 {"kind": "FunctionTemplateDecl", "name": "helper", "inner": [
-                    {"kind": "FunctionDecl", "storageClass": "static"}]},
+                    {"kind": "FunctionDecl", "storageClass": "static", "type": {"qualType": "T (T)"}}]},
                 {"kind": "EnumDecl", "name": "Mode", "inner": [
                     {"kind": "EnumConstantDecl", "name": "MODE_CPU"}]},
                 {"kind": "EnumDecl", "name": "Scoped", "scopedEnumTag": "class", "inner": [
@@ -63,6 +63,7 @@ class InventoryTest(unittest.TestCase):
             self.assertEqual(found["cv::dnn::dnn5_v20260605::Net"]["public-name"], "cv::dnn::Net")
             self.assertEqual(found["cv::dnn::dnn5_v20260605::call"]["signatures"], ["int (float)", "int (int)"])
             self.assertTrue(found["cv::dnn::dnn5_v20260605::helper"]["internal-linkage"])
+            self.assertEqual(found["cv::dnn::dnn5_v20260605::helper"]["signatures"], ["T (T)"])
             self.assertIn("cv::dnn::dnn5_v20260605::MODE_CPU", found)
             self.assertFalse(any(name.endswith(("HIDDEN", "forward")) for name in found))
 

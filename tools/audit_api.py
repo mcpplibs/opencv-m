@@ -145,6 +145,10 @@ def inventory(declarations, root):
                 item["modules"].add(match[1])
                 if decl.get("type", {}).get("qualType"):
                     item["signatures"].add(decl["type"]["qualType"])
+                if decl["kind"] in {"FunctionTemplateDecl", "TypeAliasTemplateDecl"}:
+                    for child in decl.get("inner", []):
+                        if child.get("kind") in {"FunctionDecl", "TypeAliasDecl"} and child.get("type", {}).get("qualType"):
+                            item["signatures"].add(child["type"]["qualType"])
                 item["internal-linkage"] |= decl.get("storageClass") == "static" or any(
                     child.get("storageClass") == "static" for child in decl.get("inner", [])
                     if child.get("kind") == "FunctionDecl")
@@ -194,7 +198,10 @@ def main():
     probe = work / "upstream.cpp"
     prefixes = []
     for module in (root / "port/config/modules.txt").read_text().split():
-        source = (root / "src" / (module + ".cppm")).read_text()
+        facade = root / "src/detail" / (module + ".cppm")
+        if not facade.exists():
+            facade = root / "src" / (module + ".cppm")
+        source = facade.read_text()
         prefixes.append(source.split("export module", 1)[0].replace("module;", ""))
     probe.write_text("\n".join(prefixes))
     ast_path, includes_path = work / "upstream.ast.json", work / "includes.log"
@@ -257,9 +264,24 @@ def main():
         (work / "export-consumer.log").write_text(result.stdout)
         if result.returncode:
             raise SystemExit(result.stdout)
+        verified_modules = []
+        for module in (root / "port/config/modules.txt").read_text().split():
+            module_names = set(re.findall(r"^\s*(?:export\s+)?using\s+(?:::)?([A-Za-z_][^;\s]*)\s*;",
+                                         (root / "src/gen_exports" / (module + ".inc")).read_text(), re.M))
+            probe.write_text("import mcpplibs.mwrap.opencv." + module + ";\n" +
+                             "void core_visibility() { cv::Mat image; cv::Point point; cv::Size size; }\n" +
+                             "\n".join(f"namespace export_probe_{number} {{ using ::{name}; }}"
+                                       for number, name in enumerate(sorted(module_names))) + "\n")
+            result = subprocess.run(command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            with (work / "export-consumer.log").open("a") as log:
+                log.write(f"\nDirect import {module}: {len(module_names)} own export names\n" + result.stdout)
+            if result.returncode:
+                raise SystemExit(f"Direct import failed: {module}\n" + result.stdout)
+            verified_modules.append(module)
         report["export-consumer"] = {"verified-names": len(using_names),
-                                     "scope": "Name lookup through the root import; not overload instantiation or behavior coverage"}
-        print(f"Import-only consumer resolved all {len(using_names)} listed export names")
+                                     "verified-direct-modules": verified_modules,
+                                     "scope": "Root/direct-module name lookup and core dependency visibility; not overload instantiation or behavior coverage"}
+        print(f"Import-only consumers resolved all {len(using_names)} listed root exports and {len(verified_modules)} direct module surfaces")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
     unlisted = sum(not item["listed-export"] for item in entities.values())
