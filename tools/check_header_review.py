@@ -8,7 +8,7 @@ import re
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-DECISIONS = {"cuda-sdk", "public-gap", "runtime-internal", "forwarder", "platform-sdk",
+DECISIONS = {"cuda-sdk", "public-gap", "partial-native", "runtime-internal", "forwarder", "platform-sdk",
              "parallel-sdk", "upstream-internal", "implementation", "textual-only",
              "binding-only", "implemented", "typed-mapped", "documentation"}
 
@@ -34,7 +34,7 @@ def main():
             assert path.is_file(), header
             records[header] = decision
             counts[decision] += 1
-            if decision == "public-gap":
+            if decision in {"public-gap", "partial-native"}:
                 gaps.append(header)
             if decision == "implemented":
                 assert inventory["headers"][header] == "loaded", f"Implemented facade header not loaded: {header}"
@@ -46,7 +46,7 @@ def main():
                      if status == "not-in-facade" and header not in records)
     assert not missing, f"Unreviewed headers: {missing}"
     print("Reviewed header decisions:", json.dumps(dict(sorted(counts.items()))))
-    print(f"Remaining public-gap records: {len(gaps)}; review coverage is not implementation coverage")
+    print(f"Unfinished public API acceptance records: {len(gaps)}; review coverage is not implementation coverage")
     if args.require_complete and gaps:
         raise SystemExit("Full-support acceptance still has public gaps:\n" + "\n".join(gaps))
 

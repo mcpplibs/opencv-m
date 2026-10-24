@@ -196,10 +196,15 @@ def inventory(declarations, root):
         if canonical != public and canonical.startswith(public + "::"):
             aliases.append((canonical, public))
     for name, item in entities.items():
-        public_names = [name]
-        for canonical, public in aliases:
-            if name.startswith(canonical + "::"):
-                public_names.append(public + name[len(canonical):])
+        public_names, pending = {name}, [name]
+        while pending:
+            candidate = pending.pop()
+            for canonical, public in aliases:
+                if candidate.startswith(canonical + "::"):
+                    alias = public + candidate[len(canonical):]
+                    if alias not in public_names:
+                        public_names.add(alias)
+                        pending.append(alias)
         item["public-name"] = min(public_names, key=lambda value: (value.count("::"), len(value)))
     return {name: {key: sorted(value) if isinstance(value, set) else value for key, value in item.items()}
             for name, item in sorted(entities.items())}
@@ -231,6 +236,11 @@ def main():
             facade = root / "src" / (module + ".cppm")
         source = facade.read_text()
         prefixes.append(source.split("export module", 1)[0].replace("module;", ""))
+    optional_facades = []
+    if any(Path(item["file"]).resolve() == root / "src/detail/simd.cppm" for item in commands):
+        source = (root / "src/detail/simd.cppm").read_text()
+        prefixes.append(source.split("export module", 1)[0].replace("module;", ""))
+        optional_facades.append("core.simd")
     probe.write_text("\n".join(prefixes))
     ast_path, includes_path = work / "upstream.ast.json", work / "includes.log"
     if not args.reuse_ast:
@@ -253,6 +263,9 @@ def main():
     using_names = set()
     for path in list((root / "src/gen_exports").glob("*.inc")) + list((root / "src").glob("*.cppm")):
         using_names.update(re.findall(r"^\s*(?:export\s+)?using\s+(?:::)?([A-Za-z_][^;\s]*)\s*;", path.read_text(), re.M))
+    if "core.simd" in optional_facades:
+        from simd_surface import enabled_names
+        using_names.update(enabled_names(root, commands, compiler_flags))
     for name, item in entities.items():
         item["listed-export"] = name in using_names or item["public-name"] in using_names
     loaded = set()
@@ -279,6 +292,7 @@ def main():
     report = {"opencv": "5.0.0", "profile": profile,
               "scope": "Declarations visible from current facades; not-in-facade headers still require review",
               "entities": entities, "headers": headers}
+    report["optional-facades"] = optional_facades
     if args.verify_exports:
         consumer = next((item for item in commands if item["file"].endswith("/tests/main_modules_test.cpp")), None)
         assert consumer is not None, "Run an all-modules Clang test first to capture the consumer compile command"

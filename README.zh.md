@@ -40,6 +40,7 @@ core 始终可用。`all-modules` 选择 16 个主模块，编解码与后端分
 - `highgui-native`：Linux x86_64 glibc 的 GTK3、Windows 的 Win32、macOS 的 Cocoa。
 - `videoio-native`：V4L2、Media Foundation 或 AVFoundation；`videoio-ffmpeg` 增加 FFmpeg。
 - `dnn-onnxruntime`：在 ORT CPU SDK 支持的目标上启用对应推理引擎。
+- `simd`：[原生 CPU intrinsics](docs/simd.md)，入口为 `mcpplibs.mwrap.opencv.core.simd`。
 
 另有 `:window`、`:video`、`:onnxruntime` 模板；窗口模板需要桌面会话。
 需要预处理宏时，在 import 前包含 `<mwrap/opencv/macros.hpp>`。

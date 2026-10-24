@@ -42,7 +42,7 @@ features and their required dependency closure. Every module also depends on cor
 | FLANN and stitching detail | Direct-import algorithm and factory consumers | Other portable helper headers still require inventory review |
 | Macro constants and pure calculations | Generated `.macros` mapping and optional textual macro header; ROI behavior | Preprocessor flow controls remain textual; no fake exported preprocessor state |
 | DNN-dependent DISK | Conditional export and missing-model rejection; features-only build without DNN | Trained DISK inference is not verified |
-| Remaining API/header inventory | 3,699 facade-visible entities; 229 not in export lists; 109 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
+| Remaining API/header inventory | 3,948 facade-visible entities with SIMD selected; 255 not in export lists; 102 not-in-facade headers | Includes manual adapters, private/legacy/device headers, plus real portable helper gaps; each needs classification |
 | DNN shape helpers | Twenty generated overloads retain pinned bodies; direct-import tensor/axis/formatting behavior passes LLVM/GCC | Static-inline bodies use a constrained named-module adapter |
 | Persistence helpers | 65 pinned SDK bodies plus typed forwards; native header/module XML/YAML/JSON and Base64 bytes match on GCC/LLVM | Private vector proxies stay internal; original FileStorage/WriteStructContext types retain their SDK identity |
 | Geometry optimizer extension | Public LevMarqBase/Backend imported; callback rejection/geodesic report contracts execute original SDK code | Device acceleration is separate |
@@ -100,3 +100,19 @@ public gaps. HAL record/value, public core dump utilities and legacy enum covera
 `tools/check_header_review.py` checks review coverage against the compiler
 inventory; `--require-complete` additionally rejects the 20 remaining public-gap
 records (universal intrinsics and their architecture implementations). Review coverage does not mean these APIs are implemented.
+
+## Native SIMD checkpoint
+
+The opt-in `simd` feature exposes `mcpplibs.mwrap.opencv.core.simd`, plus the
+selected root import, with 220 enabled baseline names on Linux x86_64. Original
+SDK vector types are retained. GCC uses producer-compiled memory forwards to
+preserve unaligned input/output semantics; Clang re-exports SDK inline entities.
+The 495-byte native SDK/module oracle passes GCC16, LLVM22 and LLVM23, alongside
+all 28 programs with `all-modules,simd`, 35 baseline interface checks and makePtr
+positive/negative contracts. GCC release-mode parity and export visibility pass.
+See [SIMD configuration](simd.md). Native ARM64/Windows CI remains required.
+
+Header review keeps eight native-family records partially accepted and twelve
+other mode/ISA records unimplemented. Full-support acceptance fails for both
+categories until their remaining scope is satisfied. SDK emulation, old vector
+operators and non-baseline ISA families are not certified by the native checks.

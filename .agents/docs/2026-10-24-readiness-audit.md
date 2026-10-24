@@ -425,3 +425,53 @@ only target/simd-native-probe-managed-final.log is runtime acceptance evidence.
 Prototype source/manifest path: /tmp/mwrap-simd-native-probe-0pbdluu1. The twenty
 SIMD family records remain public gaps until the full surface and target matrix
 are implemented and tested.
+
+## Native 128-bit SIMD module checkpoint
+
+The optional simd feature adds core.simd plus a separate detail.simd SDK adapter
+and selected root re-export. Original SDK vector types and 220 enabled names
+are available. The frozen SDK declaration inventory drives reviewed generation;
+SSE-specific and FP16 names keep their target guards. Fifteen typed SIMD
+capability macros describe the compiled library baseline. Target validation
+rejects unsupported architectures; no empty emulator or wider-ISA feature is
+registered. READMEs stay at 51 lines per language; detailed usage is docs/simd.md.
+
+An initial combined-GMF/import form reproduced GCC's SVD default-argument
+conflict; separate header adapter/public aggregation resolves it without SDK
+patches. A deliberately unaligned input then exposed GCC importing an intrinsic
+inline body with incorrect alignment behavior: native SDK passed, module code
+segfaulted at _mm_loadu_ps. Ordinary producer-compiled forwards for the memory
+entry overloads preserve original SDK operations and pass unaligned load/store.
+One uint/unsigned-int forward redeclaration is normalized as the same overload.
+No API was removed based on compiler failure; vector classes are not copied.
+Logs: target/simd-gcc-backtrace.log, target/simd-module-gcc-memory-dedup.log.
+
+Final native SDK/module outputs match exactly at 495 bytes on LLVM23/GCC16/LLVM22;
+220 names resolve through direct and aggregate imports on each compiler. Log:
+target/simd-native-oracles-verified.log. Full all-modules,simd composition passed
+28 programs on LLVM23 (319.17s), GCC16 (587.71s) and LLVM22 (354.02s), with SIMD
+and utility SDK outputs matching 495/1302 bytes, 35 baseline interfaces and
+makePtr positive/negative checks. Only completed own binaries were cleaned
+between compiler legs. Log: target/simd-all-modules-composition.log. GCC release
+parity and surface checks pass (94.26s), including deliberately unaligned memory;
+log: target/simd-release-gcc.log. All heavy checks were serial under the shared
+eight-core/32 GiB slice, two build jobs and whole-host pressure guard.
+
+The compiler inventory now includes enabled optional facades and transitive
+namespace imports. A regression checks nested hal_baseline/simd128_cpp lookup.
+All five inventory unit tests pass. With SIMD selected, import-only probes
+resolve 3701 root names plus sixteen direct algorithm modules, while the SIMD
+checker separately covers direct/root SIMD imports. The inventory has 3948
+entities, 255 not in using lists, 102 not-in-facade and fourteen implementation
+headers. Log: target/simd-composition-api-audit.log. Counts are not overload
+behavior proof. Header review retains eight partially accepted native records
+and twelve unimplemented mode/ISA records; full-support mode refuses both.
+
+Windows 6d60a93 failed image_helpers compilation in Clang23 MSVC ABI while
+resolving the ArUco threshold constant (all other 25 programs passed). A generated
+explicit float token now replaces the imported deduced-auto/private initializer
+chain, retaining the exact pinned SDK value and qualified name. The four image
+helper contracts pass LLVM23/GCC16/LLVM22 after this change (4.71s/8.67s/4.91s).
+Log: target/aruco-explicit-float-three-compilers.log. Actual Windows confirmation
+is still required; no test or export was disabled. Native CI and final source/
+archive/index alignment remain open; no merge/tag/release readiness is claimed.

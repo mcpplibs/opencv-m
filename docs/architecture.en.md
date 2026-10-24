@@ -63,8 +63,8 @@ SDKs stay explicit. `highgui-native` selects GTK3/Win32/Cocoa; `videoio-native`
 selects V4L2/MSMF/AVFoundation. Explicit backend names reject mismatched targets.
 `dnn-onnxruntime` implies dnn and the standalone ORT wrapper/official CPU SDK.
 
-The generated manifest declares runtime deployment of all fourteen retained
-wrapper/upstream license and copyright files, preserving their source paths.
+The generated manifest declares runtime deployment of fourteen named retained
+wrapper/upstream notices plus the embedded-source notice supplement, preserving their source paths.
 Static implementation objects cannot rely on a shared-library notice scan.
 
 Private ISA and pthread flags belong only to implementation TUs. Public and
@@ -72,6 +72,13 @@ internal wrapper BMIs must remain consumable by baseline consumers. The CI guard
 reads resolved compile commands for every interface, including internal units.
 Bundled zlib uses its upstream prefix; private codec symbols use hidden Unix
 visibility to avoid interposition with the GTK SDK's codecs.
+
+The opt-in `simd` utility exposes native 128-bit intrinsics through
+`mcpplibs.mwrap.opencv.core.simd`; [its contract](simd.md) separates the compiled
+library baseline from per-TU ISA selection. Vector types remain original SDK
+entities. GCC memory-entry forwards preserve unaligned semantics that its
+imported inline intrinsic body miscompiled. Native/platform acceptance and the
+remaining emulator/ISA families stay explicit in the coverage review.
 
 ## API verification and known boundaries
 

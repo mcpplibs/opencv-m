@@ -199,6 +199,8 @@ jobs:
         run: |
           python3 tools/generate_inline_helpers.py --check
           python3 tools/generate_cuda_helpers.py --check
+          python3 tools/generate_simd.py --check
+          python3 tools/generate_objdetect_constants.py --check
           python3 tools/generate_type_ops.py --check
           python3 tools/test_export_diagnostics.py
 
@@ -254,7 +256,7 @@ jobs:
       - name: All main modules and generated-input algorithm behavior
         shell: bash
         run: |
-          mcpp test --features all-modules --strict --timeout 120
+          mcpp test --features all-modules,simd --strict --timeout 120
           python3 tools/check_interface_flags.py
           python3 tools/check_cpp_contracts.py
 
@@ -290,6 +292,12 @@ jobs:
       - name: Native SDK versus module portable helper behavior
         shell: bash
         run: python3 tools/check_utility_helpers.py
+
+      - name: Native SDK versus module baseline SIMD behavior
+        shell: bash
+        run: |
+          python3 tools/check_simd.py
+          python3 tools/check_interface_flags.py
 
       - name: Features without the optional DNN surface
         if: matrix.name == 'linux-llvm-22'

@@ -4,6 +4,9 @@ module;
 #include <opencv2/core/version.hpp>
 #include <opencv2/features/hal/interface.h>
 #include <opencv2/imgproc/hal/interface.h>
+#if defined(MCPP_FEATURE_SIMD)
+#include <opencv2/core/simd_intrinsics.hpp>
+#endif
 
 export module mcpplibs.mwrap.opencv.macros;
 
@@ -152,6 +155,23 @@ inline constexpr auto k_CV_HAL_THRESH_OTSU = CV_HAL_THRESH_OTSU;
 inline constexpr auto k_CV_HAL_THRESH_TRIANGLE = CV_HAL_THRESH_TRIANGLE;
 inline constexpr auto k_CV_HAL_ADAPTIVE_THRESH_MEAN_C = CV_HAL_ADAPTIVE_THRESH_MEAN_C;
 inline constexpr auto k_CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C = CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C;
+#if defined(MCPP_FEATURE_SIMD)
+inline constexpr auto k_CV_SIMD = CV_SIMD;
+inline constexpr auto k_CV_SIMD_WIDTH = CV_SIMD_WIDTH;
+inline constexpr auto k_CV_SIMD_64F = CV_SIMD_64F;
+inline constexpr auto k_CV_SIMD_FP16 = CV_SIMD_FP16;
+inline constexpr auto k_CV_SIMD128 = CV_SIMD128;
+inline constexpr auto k_CV_SIMD128_CPP = CV_SIMD128_CPP;
+inline constexpr auto k_CV_SIMD128_64F = CV_SIMD128_64F;
+inline constexpr auto k_CV_SIMD128_FP16 = CV_SIMD128_FP16;
+inline constexpr auto k_CV_SIMD256 = CV_SIMD256;
+inline constexpr auto k_CV_SIMD256_64F = CV_SIMD256_64F;
+inline constexpr auto k_CV_SIMD256_FP16 = CV_SIMD256_FP16;
+inline constexpr auto k_CV_SIMD512 = CV_SIMD512;
+inline constexpr auto k_CV_SIMD512_64F = CV_SIMD512_64F;
+inline constexpr auto k_CV_SIMD512_FP16 = CV_SIMD512_FP16;
+inline constexpr auto k_CV_SIMD_SCALABLE = CV_SIMD_SCALABLE;
+#endif
 constexpr int k_CV_MAT_DEPTH(int value) { return CV_MAT_DEPTH(value); }
 constexpr int k_CV_IS_INT_TYPE(int value) { return CV_IS_INT_TYPE(value); }
 constexpr int k_CV_IS_FLOAT_TYPE(int value) { return CV_IS_FLOAT_TYPE(value); }
@@ -351,6 +371,23 @@ constexpr int k_CV_IS_SUBMAT(int flags) { return flags & CV_SUBMAT_FLAG; }
 #undef CV_MAKE_TYPE
 #undef CV_IS_SUBMAT
 #undef CV_FOURCC_MACRO
+#if defined(MCPP_FEATURE_SIMD)
+#undef CV_SIMD
+#undef CV_SIMD_WIDTH
+#undef CV_SIMD_64F
+#undef CV_SIMD_FP16
+#undef CV_SIMD128
+#undef CV_SIMD128_CPP
+#undef CV_SIMD128_64F
+#undef CV_SIMD128_FP16
+#undef CV_SIMD256
+#undef CV_SIMD256_64F
+#undef CV_SIMD256_FP16
+#undef CV_SIMD512
+#undef CV_SIMD512_64F
+#undef CV_SIMD512_FP16
+#undef CV_SIMD_SCALABLE
+#endif
 
 export namespace mcpplibs::mwrap::opencv::macros {
 inline constexpr auto CV_HAL_ERROR_OK = opencv_m_macro_detail::k_CV_HAL_ERROR_OK;
@@ -497,6 +534,23 @@ inline constexpr auto CV_HAL_THRESH_OTSU = opencv_m_macro_detail::k_CV_HAL_THRES
 inline constexpr auto CV_HAL_THRESH_TRIANGLE = opencv_m_macro_detail::k_CV_HAL_THRESH_TRIANGLE;
 inline constexpr auto CV_HAL_ADAPTIVE_THRESH_MEAN_C = opencv_m_macro_detail::k_CV_HAL_ADAPTIVE_THRESH_MEAN_C;
 inline constexpr auto CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C = opencv_m_macro_detail::k_CV_HAL_ADAPTIVE_THRESH_GAUSSIAN_C;
+#if defined(MCPP_FEATURE_SIMD)
+inline constexpr auto CV_SIMD = opencv_m_macro_detail::k_CV_SIMD;
+inline constexpr auto CV_SIMD_WIDTH = opencv_m_macro_detail::k_CV_SIMD_WIDTH;
+inline constexpr auto CV_SIMD_64F = opencv_m_macro_detail::k_CV_SIMD_64F;
+inline constexpr auto CV_SIMD_FP16 = opencv_m_macro_detail::k_CV_SIMD_FP16;
+inline constexpr auto CV_SIMD128 = opencv_m_macro_detail::k_CV_SIMD128;
+inline constexpr auto CV_SIMD128_CPP = opencv_m_macro_detail::k_CV_SIMD128_CPP;
+inline constexpr auto CV_SIMD128_64F = opencv_m_macro_detail::k_CV_SIMD128_64F;
+inline constexpr auto CV_SIMD128_FP16 = opencv_m_macro_detail::k_CV_SIMD128_FP16;
+inline constexpr auto CV_SIMD256 = opencv_m_macro_detail::k_CV_SIMD256;
+inline constexpr auto CV_SIMD256_64F = opencv_m_macro_detail::k_CV_SIMD256_64F;
+inline constexpr auto CV_SIMD256_FP16 = opencv_m_macro_detail::k_CV_SIMD256_FP16;
+inline constexpr auto CV_SIMD512 = opencv_m_macro_detail::k_CV_SIMD512;
+inline constexpr auto CV_SIMD512_64F = opencv_m_macro_detail::k_CV_SIMD512_64F;
+inline constexpr auto CV_SIMD512_FP16 = opencv_m_macro_detail::k_CV_SIMD512_FP16;
+inline constexpr auto CV_SIMD_SCALABLE = opencv_m_macro_detail::k_CV_SIMD_SCALABLE;
+#endif
 constexpr int CV_MAT_DEPTH(int value) { return opencv_m_macro_detail::k_CV_MAT_DEPTH(value); }
 constexpr int CV_IS_INT_TYPE(int value) { return opencv_m_macro_detail::k_CV_IS_INT_TYPE(value); }
 constexpr int CV_IS_FLOAT_TYPE(int value) { return opencv_m_macro_detail::k_CV_IS_FLOAT_TYPE(value); }

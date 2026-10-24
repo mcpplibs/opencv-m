@@ -41,29 +41,35 @@ headers = [
 ]
 
 [[groups]]
-decision = "public-gap"
-reason = "User-facing universal intrinsics and architecture implementations need a separate target-aware module surface and behavior tests. They are not yet module-covered."
+decision = "partial-native"
+reason = "The optional core.simd surface implements native 128-bit APIs with original types. Linux GCC16/LLVM22/LLVM23 SDK parity, all-main-module composition and GCC release tests pass. ARM64/Windows native CI and complete mode coverage remain required; this is not a completed family-wide acceptance record."
 headers = [
   "modules/core/include/opencv2/core/hal/intrin.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_forward.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_math.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_neon.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_sse.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_sse_em.hpp",
+  "modules/core/include/opencv2/core/hal/simd_utils.impl.hpp",
+  "modules/core/include/opencv2/core/simd_intrinsics.hpp",
+]
+
+[[groups]]
+decision = "public-gap"
+reason = "Software emulation, legacy operators and other architecture/ISA implementations still need explicit module integration and applicable verification. Native 128-bit support does not certify these modes."
+headers = [
   "modules/core/include/opencv2/core/hal/intrin_avx.hpp",
   "modules/core/include/opencv2/core/hal/intrin_avx512.hpp",
   "modules/core/include/opencv2/core/hal/intrin_cpp.hpp",
-  "modules/core/include/opencv2/core/hal/intrin_forward.hpp",
   "modules/core/include/opencv2/core/hal/intrin_lasx.hpp",
   "modules/core/include/opencv2/core/hal/intrin_legacy_ops.h",
   "modules/core/include/opencv2/core/hal/intrin_lsx.hpp",
-  "modules/core/include/opencv2/core/hal/intrin_math.hpp",
   "modules/core/include/opencv2/core/hal/intrin_msa.hpp",
-  "modules/core/include/opencv2/core/hal/intrin_neon.hpp",
   "modules/core/include/opencv2/core/hal/intrin_rvv071.hpp",
   "modules/core/include/opencv2/core/hal/intrin_rvv_scalable.hpp",
-  "modules/core/include/opencv2/core/hal/intrin_sse.hpp",
-  "modules/core/include/opencv2/core/hal/intrin_sse_em.hpp",
   "modules/core/include/opencv2/core/hal/intrin_vsx.hpp",
   "modules/core/include/opencv2/core/hal/intrin_wasm.hpp",
   "modules/core/include/opencv2/core/hal/msa_macros.h",
-  "modules/core/include/opencv2/core/hal/simd_utils.impl.hpp",
-  "modules/core/include/opencv2/core/simd_intrinsics.hpp",
 ]
 
 [[groups]]

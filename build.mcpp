@@ -255,6 +255,13 @@ int main() try {
 
     // 1. per-OS include dirs
     std::string os = mcpp::target_os()[0] ? mcpp::target_os() : "linux";
+    if (mcpp::has_feature("simd")) {
+        const std::string arch = mcpp::target_arch();
+        if (arch != "x86_64" && arch != "aarch64") {
+            std::printf("opencv-m: simd currently supports x86_64 SSE2 and aarch64 NEON baselines\n");
+            return 1;
+        }
+    }
     if (os == "macos") os = "macosx";  // generated/ keeps the descriptor-era dir name
     if (!mcpp::out_dir()[0]) {
         std::printf("opencv-m: MCPP_OUT_DIR is required\n");
@@ -311,6 +318,9 @@ int main() try {
     // GCC's mapper for cross-package self-tests otherwise mixes default and
     // explicit BMI paths for indirect internal imports (notably with ORT).
     imports << "export import mcpplibs.mwrap.opencv.core;\n";
+    if (mcpp::has_feature("simd"))
+        imports << "export import mcpplibs.mwrap.opencv.detail.simd;\n"
+                   "export import mcpplibs.mwrap.opencv.core.simd;\n";
     for (const auto& name : modules)
         if (name != "core") imports << "export import mcpplibs.mwrap.opencv.detail." << name << ";\n";
     for (const auto& name : modules)

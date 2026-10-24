@@ -674,6 +674,9 @@ defines = ["ENABLE_PLUGINS", "NDEBUG", "__OPENCV_BUILD=1", "_USE_MATH_DEFINES", 
 [features.all-modules]
 implies = ["calib", "dnn", "features", "flann", "geometry", "highgui", "imgcodecs", "imgproc", "objdetect", "photo", "ptcloud", "stereo", "stitching", "video", "videoio"]
 
+[features.simd]
+sources = ["src/core_simd.cppm", "src/detail/simd.cppm"]
+
 [features.imgcodecs-jpeg]
 implies = ["imgcodecs"]
 

@@ -40,6 +40,7 @@ backends are explicit features. Module availability does not imply complete API 
 - `highgui-native`: GTK3 on Linux x86_64 glibc, Win32 on Windows, Cocoa on macOS.
 - `videoio-native`: V4L2, Media Foundation or AVFoundation; `videoio-ffmpeg` adds FFmpeg.
 - `dnn-onnxruntime`: OpenCV DNN with the ORT CPU SDK on its supported targets.
+- `simd`: [native CPU intrinsics](docs/simd.md) through `mcpplibs.mwrap.opencv.core.simd`.
 
 Named templates: `:window`, `:video`, `:onnxruntime`. The window template needs a desktop session.
 For preprocessing macros, include `<mwrap/opencv/macros.hpp>` before imports.

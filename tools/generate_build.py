@@ -164,6 +164,9 @@ def generate():
         features[name] = {"implies": dependencies[name], "sources": [f"src/{name}.cppm", f"src/detail/{name}.cppm"],
                           "defines": ["HAVE_OPENCV_" + name.upper()]}
     features["all-modules"] = {"implies": [name for name in modules if name != "core"]}
+    # Public CPU intrinsics are an opt-in utility surface, separate from the
+    # sixteen upstream algorithm modules and from private implementation ISAs.
+    features["simd"] = {"sources": ["src/core_simd.cppm", "src/detail/simd.cppm"]}
     # Retain the upstream DNN-specific TU flags, but gate all sources through
     # the module feature and the per-target source catalogs.
     if "dnn" in features:

@@ -10,6 +10,19 @@ from audit_api import ast_declarations, inventory
 
 
 class InventoryTest(unittest.TestCase):
+    def test_transitive_simd_namespace_imports(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            header = str(root / "upstream/opencv/modules/core/include/opencv2/core/hal/intrin.hpp")
+            tree = {"id": "cv", "kind": "NamespaceDecl", "name": "cv", "loc": {"file": header}, "inner": [
+                {"id": "base", "kind": "NamespaceDecl", "name": "hal_baseline", "inner": [
+                    {"id": "width", "kind": "NamespaceDecl", "name": "simd128_cpp", "inner": [
+                        {"kind": "FunctionDecl", "name": "vx_load", "type": {"qualType": "vector (const float *)"}}]},
+                    {"kind": "UsingDirectiveDecl", "nominatedNamespace": {"id": "width", "name": "simd128_cpp"}}]},
+                {"kind": "UsingDirectiveDecl", "nominatedNamespace": {"id": "base", "name": "hal_baseline"}}]}
+            found = inventory(iter([tree]), root)
+            self.assertEqual(found["cv::hal_baseline::simd128_cpp::vx_load"]["public-name"], "cv::vx_load")
+
     def test_streams_translation_unit_children_and_rejects_truncation(self):
         tree = {"kind": "TranslationUnitDecl", "inner": [
             {"kind": "NamespaceDecl", "name": "cv", "inner": [
