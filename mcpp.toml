@@ -405,6 +405,64 @@ linkage = "static"
 [target."cfg(all(arch = \"x86_64\", any(os = \"linux\", os = \"windows\")))".feature-xlings.videoio-ffmpeg]
 "xim:nasm" = "3.02"
 
+[runtime]
+
+[[runtime.deploy]]
+from = "LICENSE"
+to = "licenses/opencv"
+
+[[runtime.deploy]]
+from = "upstream/opencv/3rdparty/dlpack/LICENSE"
+to = "licenses/opencv/upstream/opencv/3rdparty/dlpack"
+
+[[runtime.deploy]]
+from = "upstream/opencv/3rdparty/flatbuffers/LICENSE.txt"
+to = "licenses/opencv/upstream/opencv/3rdparty/flatbuffers"
+
+[[runtime.deploy]]
+from = "upstream/opencv/3rdparty/libjpeg-turbo/LICENSE.md"
+to = "licenses/opencv/upstream/opencv/3rdparty/libjpeg-turbo"
+
+[[runtime.deploy]]
+from = "upstream/opencv/3rdparty/libpng/LICENSE"
+to = "licenses/opencv/upstream/opencv/3rdparty/libpng"
+
+[[runtime.deploy]]
+from = "upstream/opencv/3rdparty/mlas/LICENSE"
+to = "licenses/opencv/upstream/opencv/3rdparty/mlas"
+
+[[runtime.deploy]]
+from = "upstream/opencv/3rdparty/protobuf/LICENSE"
+to = "licenses/opencv/upstream/opencv/3rdparty/protobuf"
+
+[[runtime.deploy]]
+from = "upstream/opencv/3rdparty/zlib/LICENSE"
+to = "licenses/opencv/upstream/opencv/3rdparty/zlib"
+
+[[runtime.deploy]]
+from = "upstream/opencv/COPYRIGHT"
+to = "licenses/opencv/upstream/opencv"
+
+[[runtime.deploy]]
+from = "upstream/opencv/LICENSE"
+to = "licenses/opencv/upstream/opencv"
+
+[[runtime.deploy]]
+from = "upstream/opencv/modules/core/3rdparty/SoftFloat/COPYING.txt"
+to = "licenses/opencv/upstream/opencv/modules/core/3rdparty/SoftFloat"
+
+[[runtime.deploy]]
+from = "upstream/opencv/modules/features/3rdparty/annoy/LICENSE"
+to = "licenses/opencv/upstream/opencv/modules/features/3rdparty/annoy"
+
+[[runtime.deploy]]
+from = "upstream/opencv/modules/features/3rdparty/mscr/chi_table_LICENSE.txt"
+to = "licenses/opencv/upstream/opencv/modules/features/3rdparty/mscr"
+
+[[runtime.deploy]]
+from = "upstream/opencv/modules/highgui/src/files_Qt/Material/LICENSE"
+to = "licenses/opencv/upstream/opencv/modules/highgui/src/files_Qt/Material"
+
 [dev-dependencies]
 
 [dev-dependencies.compat]

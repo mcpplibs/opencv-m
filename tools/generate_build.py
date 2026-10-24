@@ -216,12 +216,27 @@ def generate():
     # build.mcpp emits the selected interface with concrete imports after
     # feature resolution, before mcpp scans the generated module.
     build["sources"] = ["src/opencv.cppm", "src/core.cppm", "src/macros.cppm"]
+    notices = [ROOT / "LICENSE", *sorted(
+        path for path in (ROOT / "upstream/opencv").rglob("*")
+        if path.is_file() and any(word in path.name for word in
+                                 ("LICENSE", "COPYING", "COPYRIGHT", "NOTICE")))]
+    # Static implementation objects do not appear in a shared-library license
+    # scan. Preserve each retained notice explicitly, including its source path
+    # so unrelated LICENSE basenames cannot overwrite one another.
+    license_deploy = []
+    for path in notices:
+        relative = path.relative_to(ROOT)
+        destination = "licenses/opencv"
+        if relative.parent != Path("."):
+            destination += "/" + relative.parent.as_posix()
+        license_deploy.append({"from": relative.as_posix(), "to": destination})
     manifest = {
         "package": {"namespace": "mcpplibs.mwrap", "name": "opencv", "version": "5.0.0.1",
                     "description": "OpenCV 5.0.0 public C++ APIs through optional mwrap modules",
                     "license": "Apache-2.0", "repo": "https://github.com/mcpplibs/opencv-m",
                     "metadata": {"mwrap": {"upstream-version": "5.0.0", "wrapper-revision": 1}}},
         "build": build, "target": targets,
+        "runtime": {"deploy": license_deploy},
         "dev-dependencies": {"compat": {"gtest": "1.15.2"}},
         "features": features,
         "feature-deps": {"videoio-ffmpeg": {"compat": {"ffmpeg": "8.1.2"}},
