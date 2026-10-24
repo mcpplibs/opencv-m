@@ -602,6 +602,9 @@ export namespace cv::cuda {
     using cv::cuda::unregisterPageLocked;
     using cv::cuda::wrapStream;
 }
+export namespace cv::cudev {
+    using cv::cudev::GpuMat_;
+}
 export namespace cv::details {
     using cv::details::FPDenormalsIgnoreHintScope;
     using cv::details::FPDenormalsIgnoreHintScopeNOOP;

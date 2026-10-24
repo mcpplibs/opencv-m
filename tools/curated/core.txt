@@ -627,3 +627,5 @@ details::FPDenormalsIgnoreHintScopeNOOP
 details::setFPDenormalsIgnoreHint
 details::saveFPDenormalsState
 details::restoreFPDenormalsState
+# Original incomplete SDK declaration; exposing pointers needs no CUDA SDK.
+cudev::GpuMat_

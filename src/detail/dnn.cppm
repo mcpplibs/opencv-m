@@ -12,6 +12,7 @@ module;
 // visible to the `export using` list below.
 #include <opencv2/dnn/all_layers.hpp>
 #include <opencv2/dnn/shape_utils.hpp>
+#include <opencv2/dnn/utils/inference_engine.hpp>
 
 export module mcpplibs.mwrap.opencv.detail.dnn;
 
@@ -19,11 +20,14 @@ export module mcpplibs.mwrap.opencv.detail.dnn;
 
 export namespace cv::dnn {
 CV__DNN_INLINE_NS_BEGIN
+// Preserve both the public name and its original ABI namespace spelling.
+using ::cv::dnn::CV__DNN_INLINE_NS::operator==;
 inline namespace opencv_m_shape {
 template<class> inline constexpr bool shape_pick = true;
 #include "../dnn_shapes.inc"
 }
 CV__DNN_INLINE_NS_END
+using CV__DNN_INLINE_NS::operator==;
 using CV__DNN_INLINE_NS::opencv_m_shape::slice;
 using CV__DNN_INLINE_NS::opencv_m_shape::getPlane;
 using CV__DNN_INLINE_NS::opencv_m_shape::shape;

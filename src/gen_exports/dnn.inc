@@ -297,6 +297,9 @@ export namespace cv::dnn {
     using cv::dnn::getActivationFunc;
     using cv::dnn::getAvailableBackends;
     using cv::dnn::getAvailableTargets;
+    using cv::dnn::getInferenceEngineBackendType;
+    using cv::dnn::getInferenceEngineCPUType;
+    using cv::dnn::getInferenceEngineVPUType;
     using cv::dnn::imagesFromBlob;
     using cv::dnn::modelFormatToString;
     using cv::dnn::readNet;
@@ -305,6 +308,9 @@ export namespace cv::dnn {
     using cv::dnn::readNetFromTFLite;
     using cv::dnn::readNetFromTensorflow;
     using cv::dnn::readTensorFromONNX;
+    using cv::dnn::releaseHDDLPlugin;
+    using cv::dnn::resetMyriadDevice;
+    using cv::dnn::setInferenceEngineBackendType;
     using cv::dnn::softNMSBoxes;
     using cv::dnn::writeTextGraph;
 }

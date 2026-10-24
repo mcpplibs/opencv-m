@@ -14,6 +14,8 @@ inline void require(bool value) {
     if (!value) throw std::runtime_error("SDK floating-point state was not restored");
 }
 inline void emit(const char* consumer) {
+    cv::cudev::GpuMat_<unsigned char>* device_matrix = nullptr;
+    require(device_matrix == nullptr); // Declaration only, as in the core SDK.
     static_assert(sizeof(State)==64);
     static_assert(std::is_same_v<decltype(&cv::details::saveFPDenormalsState),int (*)(State&)>);
     static_assert(std::is_same_v<decltype(&cv::details::restoreFPDenormalsState),bool (*)(const State&)>);

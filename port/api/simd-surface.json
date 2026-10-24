@@ -546,5 +546,9 @@
   "broadcast-adapters": [
     "v_setall",
     "vx_setall"
+  ],
+  "emulated-enums": [
+    "simd128_width",
+    "simdmax_width"
   ]
 }

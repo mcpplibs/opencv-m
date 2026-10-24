@@ -739,3 +739,51 @@ target/api-audit/mat-aug-unlisted-import/report.json;
 rejections into accepted exclusions. DNN equality/legacy backend utility names,
 remaining entity classification, current native CI and final source/archive
 alignment still require work before the requested final readiness report.
+
+## Original DNN names and source-reviewed rejection inventory
+
+Restored the original Arg equality function in both cv::dnn and its original
+ABI namespace, plus six original Inference Engine utility declarations. No SDK
+class or implementation body is copied. An independent SDK/module fixture checks
+all six exact function signatures, equality/function-pointer identity, four
+StsNotImplemented results and two original no-op cleanup contracts. Explicit
+ABI-namespace lookup found that exporting only the public spelling was
+insufficient; both spellings now designate the same original function.
+The original incomplete cudev::GpuMat_ declaration is also exported and checked
+as an opaque pointer, without enabling a CUDA backend.
+
+With those changes, all 38 programs pass on LLVM23 (52.38s), LLVM22 (62.77s)
+and GCC16 (272.28s, bounded executable storage), matching seven SDK pairs:
+1460/1302/342/21/1049/92/976 bytes. Logs:
+/tmp/mwrap-dnn-qualified-composition.log and
+/tmp/mwrap-dnn-qualified-batched-results.json. The run retains 39 interface
+guards, makePtr contracts and the existing negative SIMD/trait probes.
+
+A final source review identified two software SIMD width enums as public,
+rather than private helper names. Their exact SDK entities are now exported in
+both public and original mode namespaces; selected-mode tests check values and
+enum type identity. The subsequent four-program SIMD/legacy suites pass on
+LLVM23 (8.29s), GCC16 (21.43s), LLVM22 (8.69s), with unchanged 1460/976-byte
+oracles and 230 enabled name spellings (two enum entities, four spellings added).
+Log: /tmp/mwrap-dnn-width-final.log. The 38-program timings above precede this
+two-enum extension; final exact-head native CI remains required.
+
+The final fresh Clang22 inventory resolves 3726 listed root names and sixteen
+direct modules. Of 3953 entities, 238 lack using-list entries: 137 resolve from
+imports, and 101 have exact source-reviewed exclusions (83 implementation/SDK
+compatibility helpers and 18 language-binding tests). Each entry in
+port/api/entity-review.toml has exact names, a reason, source SHA256 and literal
+source evidence. The validator rejects new unreviewed names, stale exclusions,
+changed source hashes and profile mismatches. Software-only helper entries are
+conditional on simd-emulated. No blanket namespace exclusion is introduced.
+Seven existing audit regression tests pass. This is review coverage, not a proof
+of all visible overloads or runtime backends.
+
+An additional independent ordinary-consumer probe then found a real overload
+problem: SDK Mat_<float> + Mat_<float> compiles, but module-only lookup fails
+because current Mat/MatExpr forwards constrain operands to exact base types.
+Raw SDK/module logs are retained in target/api-audit/typed-mat-lookup/; the
+observational probe reports sdk exit 0 and module exit 1. This is not counted as
+a passing acceptance test. Original parameter shapes/conversions and MatExpr
+assignment families require repair before full-support/merge/release readiness.
+Other-ISA header acceptance and exact final archive/index alignment remain open.

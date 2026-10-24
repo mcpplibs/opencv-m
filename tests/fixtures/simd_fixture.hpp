@@ -117,6 +117,9 @@ inline void emit(const char* consumer) {
     require(aligned[0] == 1.25f && aligned[3] == 9.f, "legacy aligned store forward");
     cv::vx_store(floats.data(), cv::vx_load(input.data() + 1)); values(out, floats);
 #if defined(MCPP_FEATURE_SIMD_EMULATED)
+    static_assert(cv::simd128_width == 16 && cv::simdmax_width == 16);
+    static_assert(std::is_same_v<decltype(cv::simd128_width), decltype(cv::hal_EMULATOR_CPP::simd128_width)>);
+    static_assert(cv::hal_EMULATOR_CPP::simdmax_width == cv::simdmax_width);
     // Keep the SDK's generic lane-count templates, beyond the 128-bit aliases.
     std::array<float, 8> lanes{1, 2, 3, 4, 5, 6, 7, 8};
     const cv::v_reg<float, 8> generic(lanes.data());

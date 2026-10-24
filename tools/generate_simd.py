@@ -28,7 +28,11 @@ def main():
     for group, condition in (("sse2", "CV_SSE2 && !defined(MCPP_FEATURE_SIMD_EMULATED)"), ("fp16", "CV_SIMD128_FP16"),
                              ("emulated", "defined(MCPP_FEATURE_SIMD_EMULATED)")):
         result += "#if " + condition + "\n"
-        result += "\n".join(f"using ::cv::{name};" for name in surface[group]) + "\n#endif\n"
+        names = surface[group] + (surface["emulated-enums"] if group == "emulated" else [])
+        result += "\n".join(f"using ::cv::{name};" for name in names) + "\n#endif\n"
+    result += "}\n#if defined(MCPP_FEATURE_SIMD_EMULATED)\nexport namespace cv { namespace hal_EMULATOR_CPP {\n"
+    result += "\n".join(f"using ::cv::hal_EMULATOR_CPP::{name};" for name in surface["emulated-enums"])
+    result += "\n} }\n#endif\nexport namespace cv {\n"
     result += "}\nexport namespace cv { namespace hal {\n"
     result += "\n".join(f"using ::cv::hal::{name};" for name in
                         ("StoreMode", "STORE_UNALIGNED", "STORE_ALIGNED", "STORE_ALIGNED_NOCACHE")) + "\n} }\n"

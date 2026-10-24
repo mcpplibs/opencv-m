@@ -280,7 +280,17 @@ using ::cv::v_reg;
 using ::cv::v_reinterpret_as_int;
 using ::cv::v_reinterpret_as_uint;
 using ::cv::v_rshr;
+using ::cv::simd128_width;
+using ::cv::simdmax_width;
 #endif
+}
+#if defined(MCPP_FEATURE_SIMD_EMULATED)
+export namespace cv { namespace hal_EMULATOR_CPP {
+using ::cv::hal_EMULATOR_CPP::simd128_width;
+using ::cv::hal_EMULATOR_CPP::simdmax_width;
+} }
+#endif
+export namespace cv {
 }
 export namespace cv { namespace hal {
 using ::cv::hal::StoreMode;

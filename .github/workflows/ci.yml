@@ -270,6 +270,7 @@ jobs:
           python3 tools/check_interface_flags.py
           python3 tools/audit_api.py --verify-exports
           python3 tools/probe_unlisted_api.py
+          python3 tools/check_entity_review.py --require-complete
           python3 tools/check_header_review.py
 
       - name: Preserve C++ inventory for review
@@ -307,6 +308,10 @@ jobs:
       - name: Original SDK versus Mat augmented assignment signatures and behavior
         shell: bash
         run: python3 tools/check_mat_aug.py
+
+      - name: Original SDK versus DNN equality and unavailable backend contracts
+        shell: bash
+        run: python3 tools/check_dnn_compat.py
 
       - name: Native SDK versus module baseline SIMD behavior
         shell: bash
