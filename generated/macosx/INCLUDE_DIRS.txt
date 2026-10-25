@@ -1,0 +1,14 @@
+generated/macosx
+generated/common
+generated/macosx/3rdparty/libjpeg-turbo
+generated/common/3rdparty/libjpeg-turbo
+generated/macosx/3rdparty/libjpeg-turbo/simd/arm
+generated/common/3rdparty/zlib
+generated/macosx/modules/core
+generated/common/modules/core
+generated/macosx/modules/imgproc
+generated/common/modules/imgproc
+generated/macosx/modules/dnn
+generated/common/modules/dnn
+generated/common/modules/highgui
+generated/common/synth

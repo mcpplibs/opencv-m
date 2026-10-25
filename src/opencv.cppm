@@ -1,6 +1,9 @@
-// opencv — library-root module (mcpp convention: src/<package>.cppm).
-// Everything lives in opencv.cv and the per-module interfaces; this root
-// simply forwards so `import opencv;` also works.
-export module opencv;
+export module mcpplibs.mwrap.opencv;
 
-export import opencv.cv;
+// Preload the internal producers before core: GCC's cross-package self-test
+// mapper otherwise falls back to bare BMI names while reading core's imports.
+export import mcpplibs.mwrap.opencv.detail.core;
+export import mcpplibs.mwrap.opencv.detail.matx;
+export import mcpplibs.mwrap.opencv.core;
+export import mcpplibs.mwrap.opencv.macros;
+export import mcpplibs.mwrap.opencv.detail.selected;

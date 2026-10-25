@@ -21,6 +21,7 @@ export namespace cv::dnn {
     using cv::dnn::AccumLayer;
     using cv::dnn::AcosLayer;
     using cv::dnn::AcoshLayer;
+    using cv::dnn::ActivationFunc;
     using cv::dnn::ActivationInt8Params;
     using cv::dnn::ActivationLayer;
     using cv::dnn::ActivationLayerInt8;
@@ -188,6 +189,7 @@ export namespace cv::dnn {
     using cv::dnn::MatMulInt8Layer;
     using cv::dnn::MatMulInt8Params;
     using cv::dnn::MatMulLayer;
+    using cv::dnn::MatType;
     using cv::dnn::MaxPoolLayer;
     using cv::dnn::MaxUnpoolLayer;
     using cv::dnn::MishLayer;
@@ -254,6 +256,7 @@ export namespace cv::dnn {
     using cv::dnn::SizeLayer;
     using cv::dnn::Slice2Layer;
     using cv::dnn::SliceLayer;
+    using cv::dnn::SoftNMSMethod;
     using cv::dnn::SoftmaxCrossEntropyLossLayer;
     using cv::dnn::SoftmaxLayer;
     using cv::dnn::SoftmaxLayerInt8;
@@ -284,14 +287,19 @@ export namespace cv::dnn {
     using cv::dnn::TriluLayer;
     using cv::dnn::UniqueLayer;
     using cv::dnn::UnsqueezeLayer;
+    using cv::dnn::_Range;
     using cv::dnn::argKindToString;
     using cv::dnn::blobFromImage;
     using cv::dnn::blobFromImageWithParams;
     using cv::dnn::blobFromImages;
     using cv::dnn::blobFromImagesWithParams;
     using cv::dnn::enableModelDiagnostics;
+    using cv::dnn::getActivationFunc;
     using cv::dnn::getAvailableBackends;
     using cv::dnn::getAvailableTargets;
+    using cv::dnn::getInferenceEngineBackendType;
+    using cv::dnn::getInferenceEngineCPUType;
+    using cv::dnn::getInferenceEngineVPUType;
     using cv::dnn::imagesFromBlob;
     using cv::dnn::modelFormatToString;
     using cv::dnn::readNet;
@@ -300,6 +308,9 @@ export namespace cv::dnn {
     using cv::dnn::readNetFromTFLite;
     using cv::dnn::readNetFromTensorflow;
     using cv::dnn::readTensorFromONNX;
+    using cv::dnn::releaseHDDLPlugin;
+    using cv::dnn::resetMyriadDevice;
+    using cv::dnn::setInferenceEngineBackendType;
     using cv::dnn::softNMSBoxes;
     using cv::dnn::writeTextGraph;
 }

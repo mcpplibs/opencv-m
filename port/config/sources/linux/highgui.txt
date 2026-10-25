@@ -1,0 +1,3 @@
+upstream/opencv/modules/highgui/src/backend.cpp
+upstream/opencv/modules/highgui/src/roiSelector.cpp
+upstream/opencv/modules/highgui/src/window.cpp

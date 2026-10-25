@@ -1,0 +1,20 @@
+{
+  "upstream": "https://github.com/opencv/opencv/tree/5.0.0",
+  "documents": [
+    {
+      "path": "upstream/opencv/README.md",
+      "source": "https://github.com/opencv/opencv/tree/5.0.0/README.md",
+      "sha256": "7e4047375a342b27a9b7ca689bad87619e94136db980070eaefa64a0adcbdf7b"
+    },
+    {
+      "path": "upstream/opencv/LICENSE",
+      "source": "https://github.com/opencv/opencv/tree/5.0.0/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "upstream/opencv/COPYRIGHT",
+      "source": "https://github.com/opencv/opencv/tree/5.0.0/COPYRIGHT",
+      "sha256": "5b8559278fabdb2d38e5251facf259e394f5dc2c604c5e91c1b3befb99ecbc11"
+    }
+  ]
+}

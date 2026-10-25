@@ -1,0 +1,3 @@
+[template]
+description = "Run a generated ONNX model through OpenCV's ONNX Runtime CPU engine"
+post_message = "Run `mcpp run` to verify OpenCV -> ONNX Runtime CPU inference."

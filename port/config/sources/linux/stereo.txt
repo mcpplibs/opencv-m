@@ -1,0 +1,4 @@
+upstream/opencv/modules/stereo/src/main.cpp
+upstream/opencv/modules/stereo/src/stereo_geom.cpp
+upstream/opencv/modules/stereo/src/stereobm.cpp
+upstream/opencv/modules/stereo/src/stereosgbm.cpp

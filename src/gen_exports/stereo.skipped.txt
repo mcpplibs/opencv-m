@@ -1,0 +1,4 @@
+odd-name: cv.<unnamed>
+odd-name: cv.StereoBM.<unnamed>
+odd-name: cv.StereoMatcher.<unnamed>
+odd-name: cv.StereoSGBM.<unnamed>

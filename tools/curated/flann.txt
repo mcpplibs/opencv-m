@@ -1,0 +1,22 @@
+
+# Additional public template API from flann.hpp (the Python parser omits it).
+flann::ChiSquareDistance
+flann::CvType
+flann::DNAmming2
+flann::DNAmmingLUT
+flann::GenericIndex
+flann::Hamming
+flann::Hamming2
+flann::HammingLUT
+flann::HellingerDistance
+flann::HistIntersectionDistance
+flann::Index_
+flann::KL_Divergence
+flann::L1
+flann::L2
+flann::L2_Simple
+flann::MaxDistance
+flann::MinkowskiDistance
+flann::get_param
+flann::hierarchicalClustering
+flann::print_params

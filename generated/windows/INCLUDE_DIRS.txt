@@ -1,0 +1,13 @@
+generated/windows
+generated/common
+generated/windows/3rdparty/libjpeg-turbo
+generated/common/3rdparty/libjpeg-turbo
+generated/common/3rdparty/zlib
+generated/windows/modules/core
+generated/common/modules/core
+generated/windows/modules/imgproc
+generated/common/modules/imgproc
+generated/windows/modules/dnn
+generated/common/modules/dnn
+generated/common/modules/highgui
+generated/common/synth

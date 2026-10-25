@@ -1,0 +1,4 @@
+odd-name: cv.<unnamed>
+odd-name: cv.GraphicalCodeDetector.operator=
+odd-name: cv.aruco.std.vector < std.vector < int > > getNearestMarkerCorners
+odd-name: cv.aruco.std.vector < std.vector < int > > getNearestMarkerIdx

@@ -1,0 +1,248 @@
+schema = 1
+upstream-version = "5.0.0"
+# Pinned-header review, not a claim of complete API support. public-gap stays open.
+
+[[groups]]
+decision = "cuda-sdk"
+reason = "CUDA device templates and stream accessors require CUDA SDK types/compiler. No device module is implemented or certified."
+headers = [
+  "modules/core/include/opencv2/core/cuda/block.hpp",
+  "modules/core/include/opencv2/core/cuda/border_interpolate.hpp",
+  "modules/core/include/opencv2/core/cuda/color.hpp",
+  "modules/core/include/opencv2/core/cuda/common.hpp",
+  "modules/core/include/opencv2/core/cuda/cuda_compat.hpp",
+  "modules/core/include/opencv2/core/cuda/datamov_utils.hpp",
+  "modules/core/include/opencv2/core/cuda/detail/color_detail.hpp",
+  "modules/core/include/opencv2/core/cuda/detail/reduce.hpp",
+  "modules/core/include/opencv2/core/cuda/detail/reduce_key_val.hpp",
+  "modules/core/include/opencv2/core/cuda/detail/transform_detail.hpp",
+  "modules/core/include/opencv2/core/cuda/detail/type_traits_detail.hpp",
+  "modules/core/include/opencv2/core/cuda/detail/vec_distance_detail.hpp",
+  "modules/core/include/opencv2/core/cuda/dynamic_smem.hpp",
+  "modules/core/include/opencv2/core/cuda/emulation.hpp",
+  "modules/core/include/opencv2/core/cuda/filters.hpp",
+  "modules/core/include/opencv2/core/cuda/funcattrib.hpp",
+  "modules/core/include/opencv2/core/cuda/functional.hpp",
+  "modules/core/include/opencv2/core/cuda/limits.hpp",
+  "modules/core/include/opencv2/core/cuda/reduce.hpp",
+  "modules/core/include/opencv2/core/cuda/saturate_cast.hpp",
+  "modules/core/include/opencv2/core/cuda/scan.hpp",
+  "modules/core/include/opencv2/core/cuda/simd_functions.hpp",
+  "modules/core/include/opencv2/core/cuda/transform.hpp",
+  "modules/core/include/opencv2/core/cuda/type_traits.hpp",
+  "modules/core/include/opencv2/core/cuda/utility.hpp",
+  "modules/core/include/opencv2/core/cuda/vec_distance.hpp",
+  "modules/core/include/opencv2/core/cuda/vec_math.hpp",
+  "modules/core/include/opencv2/core/cuda/vec_traits.hpp",
+  "modules/core/include/opencv2/core/cuda/warp.hpp",
+  "modules/core/include/opencv2/core/cuda/warp_reduce.hpp",
+  "modules/core/include/opencv2/core/cuda/warp_shuffle.hpp",
+  "modules/core/include/opencv2/core/cuda_stream_accessor.hpp",
+]
+
+[[groups]]
+decision = "partial-native"
+reason = "The optional core.simd surface implements native 128-bit APIs with original types. Linux GCC16/LLVM22/LLVM23 SDK parity, all-main-module composition and GCC release tests pass. ARM64/Windows native CI and complete mode coverage remain required; this is not a completed family-wide acceptance record."
+headers = [
+  "modules/core/include/opencv2/core/hal/intrin.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_forward.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_math.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_neon.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_sse.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_sse_em.hpp",
+  "modules/core/include/opencv2/core/hal/simd_utils.impl.hpp",
+  "modules/core/include/opencv2/core/simd_intrinsics.hpp",
+]
+
+[[groups]]
+decision = "partial"
+reason = "The optional simd-emulated mode imports original generic SDK templates with scoped namespace-function linkage adaptation. SDK/module parity and direct/root lookup pass on Linux GCC16/LLVM22/LLVM23. Current native CI and all-main-module composition remain required; the original reinterpret_uint instantiation failure is independently preserved."
+headers = [
+  "modules/core/include/opencv2/core/hal/intrin_cpp.hpp",
+]
+
+[[groups]]
+decision = "partial"
+reason = "The explicit core.simd.legacy module re-exports all 21 original cv::hal operator templates. Native/software SDK parity, reference identity, saturation and root/base opt-in boundaries pass GCC16/LLVM22/LLVM23; GCC release software parity passes too. Native platform CI and full composition remain required. The original software floating v_not link failure is preserved."
+headers = [
+  "modules/core/include/opencv2/core/hal/intrin_legacy_ops.h",
+]
+
+[[groups]]
+decision = "public-gap"
+reason = "Other architecture/ISA implementations still need explicit module integration and applicable verification. Native 128-bit, software mode and legacy operator support do not certify these modes."
+headers = [
+  "modules/core/include/opencv2/core/hal/intrin_avx.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_avx512.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_lasx.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_lsx.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_msa.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_rvv071.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_rvv_scalable.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_vsx.hpp",
+  "modules/core/include/opencv2/core/hal/intrin_wasm.hpp",
+  "modules/core/include/opencv2/core/hal/msa_macros.h",
+]
+
+[[groups]]
+decision = "runtime-internal"
+reason = "OpenCL runtime loaders/wrappers, build configuration macros and anonymous-namespace information dumping support the implementation. Public cv::ocl declarations are provided by core/ocl.hpp."
+headers = [
+  "modules/core/include/opencv2/core/ocl_genbase.hpp",
+  "modules/core/include/opencv2/core/opencl/ocl_defs.hpp",
+  "modules/core/include/opencv2/core/opencl/opencl_info.hpp",
+  "modules/core/include/opencv2/core/opencl/opencl_svm.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/autogenerated/opencl_clblas.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/autogenerated/opencl_clfft.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/autogenerated/opencl_core.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/autogenerated/opencl_core_wrappers.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/autogenerated/opencl_gl.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/autogenerated/opencl_gl_wrappers.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_clblas.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_clfft.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_core.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_core_wrappers.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_gl.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_gl_wrappers.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_svm_20.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_svm_definitions.hpp",
+  "modules/core/include/opencv2/core/opencl/runtime/opencl_svm_hsa_extension.hpp",
+]
+
+[[groups]]
+decision = "forwarder"
+reason = "Only include guards/build-use checks and includes remain after comments: these compatibility paths introduce no additional declarations. Current module imports provide the included modern APIs."
+headers = [
+  "modules/calib/include/opencv2/calib3d.hpp",
+  "modules/calib/include/opencv2/calib3d/calib3d.hpp",
+  "modules/core/include/opencv2/core/core.hpp",
+  "modules/features/include/opencv2/features/features.hpp",
+  "modules/features/include/opencv2/features2d.hpp",
+  "modules/flann/include/opencv2/flann/flann.hpp",
+  "modules/highgui/include/opencv2/highgui/highgui.hpp",
+  "modules/imgcodecs/include/opencv2/imgcodecs/imgcodecs.hpp",
+  "modules/imgproc/include/opencv2/imgproc/imgproc.hpp",
+  "modules/objdetect/include/opencv2/objdetect/objdetect.hpp",
+  "modules/photo/include/opencv2/photo/photo.hpp",
+  "modules/video/include/opencv2/video/video.hpp",
+  "modules/videoio/include/opencv2/videoio/videoio.hpp",
+]
+
+[[groups]]
+decision = "platform-sdk"
+reason = "Public SDK/platform-specific interoperation is not implemented: DirectX, Eigen, VA-API, WinRT/C++-CX or Objective-C Apple/UIKit types and execution environments must be integrated and tested explicitly."
+headers = [
+  "modules/core/include/opencv2/core/directx.hpp",
+  "modules/core/include/opencv2/core/eigen.hpp",
+  "modules/core/include/opencv2/core/va_intel.hpp",
+  "modules/highgui/include/opencv2/highgui/highgui_winrt.hpp",
+  "modules/imgcodecs/include/opencv2/imgcodecs/ios.h",
+  "modules/imgcodecs/include/opencv2/imgcodecs/macosx.h",
+  "modules/videoio/include/opencv2/videoio/cap_ios.h",
+  "modules/videoio/include/opencv2/videoio/cap_winrt.hpp",
+]
+
+[[groups]]
+decision = "parallel-sdk"
+reason = "Optional custom parallel backend implementations need OpenMP compiler/runtime or TBB SDK. The existing public ParallelForAPI interface is exported; these concrete backends are not enabled."
+headers = [
+  "modules/core/include/opencv2/core/parallel/backend/parallel_for.openmp.hpp",
+  "modules/core/include/opencv2/core/parallel/backend/parallel_for.tbb.hpp",
+]
+
+[[groups]]
+decision = "upstream-internal"
+reason = "Pinned headers mark their bodies @cond IGNORED: dispatch helper implementation, retired dummy, FLANN factory/simplex helpers and GCGraph implementation."
+headers = [
+  "modules/core/include/opencv2/core/detail/dispatch_helper.impl.hpp",
+  "modules/flann/include/opencv2/flann/dummy.h",
+  "modules/flann/include/opencv2/flann/object_factory.h",
+  "modules/flann/include/opencv2/flann/simplex_downhill.h",
+  "modules/geometry/include/opencv2/geometry/detail/gcgraph.hpp",
+]
+
+[[groups]]
+decision = "upstream-internal"
+reason = "Upstream explicitly says skipModelImport is internal and not intended for users."
+headers = [
+  "modules/dnn/include/opencv2/dnn/utils/debug_utils.hpp",
+]
+
+[[groups]]
+decision = "upstream-internal"
+reason = "PoseGraph explicitly says it is used internally in Large KinFu. Submap/SubmapManager are its scene-management implementation types; public point-cloud factories and rendering functions are separate exports."
+headers = [
+  "modules/ptcloud/include/opencv2/ptcloud/detail/pose_graph.hpp",
+  "modules/ptcloud/include/opencv2/ptcloud/detail/submap.hpp",
+]
+
+[[groups]]
+decision = "implementation"
+reason = "Concrete allocator counter implementation depends on build-specific counter configuration. The public AllocatorStatisticsInterface and accessor functions are exported from allocator_stats.hpp."
+headers = [
+  "modules/core/include/opencv2/core/utils/allocator_stats.impl.hpp",
+]
+
+[[groups]]
+decision = "textual-only"
+reason = "Build CPU dispatch selection macros have no standalone public declarations to import."
+headers = [
+  "modules/core/include/opencv2/core/cv_cpu_helper.h",
+]
+
+[[groups]]
+decision = "textual-only"
+reason = "Public trace region/argument macros are control-flow instrumentation. Supporting details are explicitly @cond IGNORED; callers need the textual trace header before imports."
+headers = [
+  "modules/core/include/opencv2/core/utils/trace.hpp",
+]
+
+[[groups]]
+decision = "textual-only"
+reason = "Layer registration declaration macros construct private registrars; callers can use the exported LayerFactory C++ API. Macro-based declarations require the upstream textual header and supported mixing order."
+headers = [
+  "modules/dnn/include/opencv2/dnn/layer.details.hpp",
+]
+
+[[groups]]
+decision = "binding-only"
+reason = "Header explicitly says functions are for bindings only and directs C++ callers to HoughLines/HoughCircles, which are exported."
+headers = [
+  "modules/imgproc/include/opencv2/imgproc/bindings.hpp",
+]
+
+[[groups]]
+decision = "implemented"
+reason = "Twelve public dump helpers use exact SDK forwards; eight external array/vector/cache helpers retain original declarations. Independent native/module consumers cover formatting and array diagnostics on all three Linux compilers. The ignored binding-test region is not exported."
+headers = [
+  "modules/core/include/opencv2/core/bindings_utils.hpp",
+]
+
+[[groups]]
+decision = "implemented"
+reason = "The original global InpaintingModes type and six global legacy constants are exported from photo/video with using declarations. Direct module tests compare their original values and modern C++ equivalents."
+headers = [
+  "modules/photo/include/opencv2/photo/legacy/constants_c.h",
+  "modules/video/include/opencv2/video/legacy/constants_c.h",
+]
+
+[[groups]]
+decision = "implemented"
+reason = "Original cvhalKeyPoint is included and re-exported from the features facade. HAL values are mapped in the macros module; native consumer coverage is required on the new checkpoint."
+headers = [
+  "modules/features/include/opencv2/features/hal/interface.h",
+]
+
+[[groups]]
+decision = "typed-mapped"
+reason = "Header contains pure CV_HAL_* macro constants only. The macros module and optional textual bridge include this header and map each value without enabling an image-processing backend."
+headers = [
+  "modules/imgproc/include/opencv2/imgproc/hal/interface.h",
+]
+
+[[groups]]
+decision = "documentation"
+reason = "Hardware-acceleration documentation contains documentation content, not an API header."
+headers = [
+  "modules/videoio/include/opencv2/videoio/doc/hwaccel.doc.hpp",
+]

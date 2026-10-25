@@ -1,0 +1,5 @@
+# Original global constants retained by the upstream compatibility header.
+CV_LKFLOW_PYR_A_READY
+CV_LKFLOW_PYR_B_READY
+CV_LKFLOW_INITIAL_GUESSES
+CV_LKFLOW_GET_MIN_EIGENVALS

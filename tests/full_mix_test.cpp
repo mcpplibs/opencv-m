@@ -16,7 +16,7 @@
 #include <opencv2/core/types.hpp>
 #include <opencv2/core/mat.hpp>
 
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
 TEST(FullMix, ValueTypeOperators) {
     cv::Size s1(128, 128), s2(128, 128);

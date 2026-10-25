@@ -1,35 +1,57 @@
 // API-surface smoke tests through the module layer ONLY (no textual OpenCV
 // headers in this TU): the imported names must expose the OpenCV C++ API
-// unchanged, and the constant macros must be reachable as cv:: constexpr.
+// unchanged, with macro constants in the wrapper's macros namespace.
 #include <gtest/gtest.h>
 
 #include <vector>
+#include <string>
 
-import opencv.cv;
+import mcpplibs.mwrap.opencv;
 
 TEST(ApiSurface, VersionMatchesPinnedRelease) {
     EXPECT_EQ(cv::getVersionString(), "5.0.0");
     EXPECT_EQ(cv::getVersionMajor(), 5);
 }
 
+TEST(ApiSurface, BuildInformationMatchesSelectedCodecs) {
+    const std::string info = cv::getBuildInformation();
+#if defined(MCPP_FEATURE_IMGCODECS_PNG)
+    EXPECT_NE(info.find("PNG: YES"), std::string::npos);
+#else
+    EXPECT_NE(info.find("PNG: NO"), std::string::npos);
+#endif
+#if defined(MCPP_FEATURE_IMGCODECS_JPEG)
+    EXPECT_NE(info.find("JPEG: YES"), std::string::npos);
+#else
+    EXPECT_NE(info.find("JPEG: NO"), std::string::npos);
+#endif
+#if defined(MCPP_FEATURE_IMGCODECS_WEBP)
+    EXPECT_NE(info.find("WEBP: YES"), std::string::npos);
+#else
+    EXPECT_NE(info.find("WEBP: NO"), std::string::npos);
+#endif
+}
+
 TEST(ApiSurface, CoreTypesAndConstants) {
-    static_assert(cv::CV_MAKETYPE(cv::CV_8U, 3) == cv::CV_8UC3);
-    cv::Mat m(4, 4, cv::CV_8UC3, cv::Scalar(1, 2, 3));
+    static_assert(mcpplibs::mwrap::opencv::macros::CV_MAKETYPE(mcpplibs::mwrap::opencv::macros::CV_8U, 3) == mcpplibs::mwrap::opencv::macros::CV_8UC3);
+    cv::Mat m(4, 4, mcpplibs::mwrap::opencv::macros::CV_8UC3, cv::Scalar(1, 2, 3));
     EXPECT_EQ(m.rows, 4);
-    EXPECT_EQ(m.type(), cv::CV_8UC3);
+    EXPECT_EQ(m.type(), mcpplibs::mwrap::opencv::macros::CV_8UC3);
     cv::Point2f p(1.f, 2.f);
     cv::Rect r(0, 0, 4, 4);
     EXPECT_TRUE(r.contains(cv::Point(1, 1)));
     EXPECT_FLOAT_EQ(p.x, 1.f);
 }
 
+#if defined(MCPP_FEATURE_IMGPROC)
 TEST(ApiSurface, ImgprocEnumsAndOps) {
-    cv::Mat src(8, 8, cv::CV_8UC3, cv::Scalar(10, 20, 30)), dst, gray;
+    cv::Mat src(8, 8, mcpplibs::mwrap::opencv::macros::CV_8UC3, cv::Scalar(10, 20, 30)), dst, gray;
     cv::resize(src, dst, {16, 16}, 0, 0, cv::INTER_CUBIC);
     cv::cvtColor(dst, gray, cv::COLOR_BGR2GRAY);
     EXPECT_TRUE(gray.size() == cv::Size(16, 16));  // see printer note below
     EXPECT_EQ(gray.channels(), 1);
 }
+#endif
 
 TEST(ApiSurface, ReplacementValueOps) {
     // upstream declares these operators `static inline` (TU-local) — the
@@ -51,9 +73,11 @@ TEST(ApiSurface, ReplacementValueOps) {
     EXPECT_EQ(cv::saturate_cast<short>(1e9f), 32767);
 }
 
+#if defined(MCPP_FEATURE_VIDEOIO)
 TEST(ApiSurface, VideoioRegistry) {
     EXPECT_FALSE(cv::videoio_registry::getBackends().empty());
 }
+#endif
 
 TEST(MatxOps, Algebra) {
     // R1 replacement surface: Matx/Vec namespace-scope operators.

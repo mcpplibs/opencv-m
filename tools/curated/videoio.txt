@@ -1,0 +1,3 @@
+# Opaque types declared by the original public videoio header.
+IVideoCapture
+IVideoWriter

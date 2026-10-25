@@ -1,4 +1,4 @@
-# names failing compile-verification — maintained by tools/prune_loop.py
+# Reviewed using-declaration exceptions; compilation never rewrites this list.
 BlockedRange   # 'BlockedRange' has not been declared in 'cv'
 Split   # 'Split' has not been declared in 'cv'
 allocSingletonBuffer   # 'allocSingletonBuffer' has not been declared in 'cv'
@@ -13,66 +13,15 @@ short   # expected unqualified-id before 'short'
 uchar   # 'uchar' has not been declared in 'cv'
 unsigned   # expected unqualified-id before 'unsigned'
 ushort   # 'ushort' has not been declared in 'cv'
-cuda::BufferPool   # 'BufferPool' has not been declared in 'cv::cuda'
-cuda::DYNAMIC_PARALLELISM   # 'DYNAMIC_PARALLELISM' has not been declared in 'cv::cuda'
-cuda::DeviceInfo   # 'DeviceInfo' has not been declared in 'cv::cuda'
 cuda::EventAccessor   # 'EventAccessor' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_10   # 'FEATURE_SET_COMPUTE_10' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_11   # 'FEATURE_SET_COMPUTE_11' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_12   # 'FEATURE_SET_COMPUTE_12' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_13   # 'FEATURE_SET_COMPUTE_13' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_20   # 'FEATURE_SET_COMPUTE_20' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_21   # 'FEATURE_SET_COMPUTE_21' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_30   # 'FEATURE_SET_COMPUTE_30' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_32   # 'FEATURE_SET_COMPUTE_32' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_35   # 'FEATURE_SET_COMPUTE_35' has not been declared in 'cv::cuda'
-cuda::FEATURE_SET_COMPUTE_50   # 'FEATURE_SET_COMPUTE_50' has not been declared in 'cv::cuda'
-cuda::FeatureSet   # 'FeatureSet' has not been declared in 'cv::cuda'
-cuda::GLOBAL_ATOMICS   # 'GLOBAL_ATOMICS' has not been declared in 'cv::cuda'
-cuda::GpuData   # 'GpuData' has not been declared in 'cv::cuda'
-cuda::NATIVE_DOUBLE   # 'NATIVE_DOUBLE' has not been declared in 'cv::cuda'
-cuda::SHARED_ATOMICS   # 'SHARED_ATOMICS' has not been declared in 'cv::cuda'
 cuda::StreamAccessor   # 'StreamAccessor' has not been declared in 'cv::cuda'
-cuda::TargetArchs   # 'TargetArchs' has not been declared in 'cv::cuda'
-cuda::WARP_SHUFFLE_FUNCTIONS   # 'WARP_SHUFFLE_FUNCTIONS' has not been declared in 'cv::cuda'
-cuda::createContinuous   # 'createContinuous' has not been declared in 'cv::cuda'
-cuda::createGpuMatFromCudaMemory   # 'createGpuMatFromCudaMemory' has not been declared in 'cv::cuda'
-cuda::deviceSupports   # 'deviceSupports' has not been declared in 'cv::cuda'
-cuda::ensureSizeIsEnough   # 'ensureSizeIsEnough' has not been declared in 'cv::cuda'
+cuda::createContinuous   # mixed TU-local/external overload set: exact SDK adapters in cuda_helpers.inc
+cuda::ensureSizeIsEnough   # mixed TU-local/external overload set: exact SDK adapters in cuda_helpers.inc
 cuda::getCudaDriverApiErrorMessage   # 'getCudaDriverApiErrorMessage' has not been declared in 'cv::cuda'
-cuda::getCudaEnabledDeviceCount   # 'getCudaEnabledDeviceCount' has not been declared in 'cv::cuda'
-cuda::getDevice   # 'getDevice' has not been declared in 'cv::cuda'
 cuda::getInputMat   # 'getInputMat' has not been declared in 'cv::cuda'
 cuda::getNppErrorMessage   # 'getNppErrorMessage' has not been declared in 'cv::cuda'
 cuda::getOutputMat   # 'getOutputMat' has not been declared in 'cv::cuda'
-cuda::printCudaDeviceInfo   # 'printCudaDeviceInfo' has not been declared in 'cv::cuda'
-cuda::printShortCudaDeviceInfo   # 'printShortCudaDeviceInfo' has not been declared in 'cv::cuda'
-cuda::registerPageLocked   # 'registerPageLocked' has not been declared in 'cv::cuda'
-cuda::resetDevice   # 'resetDevice' has not been declared in 'cv::cuda'
-cuda::setBufferPoolConfig   # 'setBufferPoolConfig' has not been declared in 'cv::cuda'
-cuda::setBufferPoolUsage   # 'setBufferPoolUsage' has not been declared in 'cv::cuda'
-cuda::setDevice   # 'setDevice' has not been declared in 'cv::cuda'
-cuda::setGlDevice   # 'setGlDevice' has not been declared in 'cv::cuda'
 cuda::syncOutput   # 'syncOutput' has not been declared in 'cv::cuda'
-cuda::unregisterPageLocked   # 'unregisterPageLocked' has not been declared in 'cv::cuda'
-cuda::wrapStream   # 'wrapStream' has not been declared in 'cv::cuda'
-ogl::LINES   # 'LINES' has not been declared in 'cv::ogl'
-ogl::LINE_LOOP   # 'LINE_LOOP' has not been declared in 'cv::ogl'
-ogl::LINE_STRIP   # 'LINE_STRIP' has not been declared in 'cv::ogl'
-ogl::POINTS   # 'POINTS' has not been declared in 'cv::ogl'
-ogl::POLYGON   # 'POLYGON' has not been declared in 'cv::ogl'
-ogl::QUADS   # 'QUADS' has not been declared in 'cv::ogl'
-ogl::QUAD_STRIP   # 'QUAD_STRIP' has not been declared in 'cv::ogl'
-ogl::RenderModes   # 'RenderModes' has not been declared in 'cv::ogl'
-ogl::TRIANGLES   # 'TRIANGLES' has not been declared in 'cv::ogl'
-ogl::TRIANGLE_FAN   # 'TRIANGLE_FAN' has not been declared in 'cv::ogl'
-ogl::TRIANGLE_STRIP   # 'TRIANGLE_STRIP' has not been declared in 'cv::ogl'
-ogl::convertFromGLTexture2D   # 'convertFromGLTexture2D' has not been declared in 'cv::ogl'
-ogl::convertToGLTexture2D   # 'convertToGLTexture2D' has not been declared in 'cv::ogl'
-ogl::mapGLBuffer   # 'mapGLBuffer' has not been declared in 'cv::ogl'
-ogl::render   # 'render' has not been declared in 'cv::ogl'
-ogl::unmapGLBuffer   # 'unmapGLBuffer' has not been declared in 'cv::ogl'
-ogl::ocl::initializeContextFromGL   # 'initializeContextFromGL' has not been declared in 'cv::ogl::ocl'
 
 # ── v0.0.6: static-inline / internal-linkage free functions (clang cannot
 #    `export using` an internal-linkage using-declaration). Replaced by the
@@ -94,13 +43,13 @@ norm   # static-inline Matx/Point overloads in the set → matx_ops.inc + core_f
 parallel_for_   # static-inline std::function overload in the set → core_fns.inc
 print   # static inline operations.hpp → core_fns.inc
 randu   # static-inline randu<_Tp>() in the set → core_fns.inc
-read   # FileStorage primitives forwarded in core_fns.inc; geometry-type convenience wrappers pruned (see below)
+read   # primitives in core_fns.inc; static-inline helpers in generated persistence_ops.inc
 roundUp   # static inline utility.hpp → core_fns.inc
 swap   # static-inline MatExpr overload in the set → core_fns.inc
 toLowerCase   # static inline cvstd.hpp → core_fns.inc
 toUpperCase   # static inline cvstd.hpp → core_fns.inc
 trace   # static-inline Matx overload in the set → matx_ops.inc + core_fns.inc
-write   # FileStorage primitives forwarded in core_fns.inc; geometry-type convenience wrappers pruned (see below)
+write   # primitives in core_fns.inc; static-inline helpers in generated persistence_ops.inc
 # internal helpers, NOT user API — dropped outright (no replacement):
 details::char_tolower   # internal cvstd.hpp helper behind toLowerCase
 details::char_toupper   # internal cvstd.hpp helper behind toUpperCase

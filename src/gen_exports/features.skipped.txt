@@ -1,0 +1,2 @@
+non-cv: struct
+odd-name: cv.FastFeatureDetector.<unnamed>

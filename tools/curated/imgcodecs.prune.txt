@@ -1,2 +1,2 @@
-# names failing compile-verification — maintained by tools/prune_loop.py
-imwritemulti   # static inline (internal linkage) — clang rejects export; use imwrite(vector) instead
+# Reviewed using-declaration exceptions; compilation never rewrites this list.
+imwritemulti   # SDK body adapted in generated imgcodecs_helpers.inc

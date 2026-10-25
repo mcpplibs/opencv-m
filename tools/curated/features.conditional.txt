@@ -1,0 +1,2 @@
+# features.hpp exposes DISK only when the optional DNN module is compiled.
+HAVE_OPENCV_DNN DISK

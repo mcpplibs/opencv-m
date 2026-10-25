@@ -1,0 +1,32 @@
+#include "model.hpp"
+import std;
+import mcpplibs.mwrap.onnxruntime;
+import mcpplibs.mwrap.opencv;
+
+int main() {
+    struct ModelFile {
+        std::filesystem::path path = std::filesystem::temp_directory_path() /
+            ("mwrap-opencv-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".onnx");
+        ~ModelFile() { std::error_code error; std::filesystem::remove(path, error); }
+    } model;
+    {
+        std::ofstream out(model.path, std::ios::binary);
+        out.write(reinterpret_cast<const char*>(opencv_ort_model), sizeof(opencv_ort_model));
+    }
+    auto net = cv::dnn::readNetFromONNX(model.path.string(), cv::dnn::ENGINE_ORT);
+    cv::Mat input(1, 3, mcpplibs::mwrap::opencv::macros::CV_32F);
+    for (int i = 0; i < 3; ++i) input.at<float>(0, i) = float(i + 1);
+    net.setInput(input, "x");
+    const auto output = net.forward("y");
+    if (output.total() != 3) return 1;
+    for (int i = 0; i < 3; ++i)
+        if (output.ptr<float>()[i] != float(2 * (i + 1))) return 2;
+    // Exercise the exception ABI as well as inference in the SDK process.
+    try {
+        cv::error(cv::Error::StsBadArg, "runtime contract", __func__, __FILE__, __LINE__);
+        return 3;
+    } catch (const cv::Exception& error) {
+        if (error.code != cv::Error::StsBadArg) return 4;
+    }
+    std::println("OpenCV {} -> ONNX Runtime {}: CPU Add inference passed", cv::getVersionString(), Ort::GetVersionString());
+}

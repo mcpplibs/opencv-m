@@ -1,0 +1,359 @@
+schema = 1
+upstream-version = "5.0.0"
+# Exact reviewed rejections from import-only lookup, not a blanket namespace exclusion.
+
+[[groups]]
+source = "modules/core/include/opencv2/core/base.hpp"
+source-sha256 = "9e2623e6114b66874e31d45acc6f58c313c45fab38dc9538ebaca435d5a8ebb8"
+decision = "upstream-internal"
+reason = "SDK-ignored OpenCV 3 compatibility aliases guarded by DISABLE_OPENCV_3_COMPATIBILITY; current useIPP_NotExact/setUseIPP_NotExact remain exported."
+evidence = ["@cond IGNORED", "DISABLE_OPENCV_3_COMPATIBILITY", "static inline bool useIPP_NE"]
+names = [
+  "cv::ipp::setUseIPP_NE",
+  "cv::ipp::useIPP_NE",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/bindings_utils.hpp"
+source-sha256 = "7438b1e6e13b0cdf73e4792fa1f7b5c2de6f0db621552c7b9dd13c538549f264"
+decision = "binding-only"
+reason = "These exact names lie in the SDK-ignored language-binding test region; ordinary public dump helpers before that region are separately restored and tested."
+evidence = ["@cond IGNORED", "testReservedKeywordConversion", "@endcond IGNORED"]
+names = [
+  "cv::utils::ClassWithKeywordProperties",
+  "cv::utils::FunctionParams",
+  "cv::utils::copyMatAndDumpNamedArguments",
+  "cv::utils::dumpVec2i",
+  "cv::utils::generateVectorOfInt",
+  "cv::utils::generateVectorOfMat",
+  "cv::utils::generateVectorOfRect",
+  "cv::utils::nested::OriginalClassName",
+  "cv::utils::nested::OriginalClassName_Params",
+  "cv::utils::nested::testEchoBooleanFunction",
+  "cv::utils::testAsyncArray",
+  "cv::utils::testAsyncException",
+  "cv::utils::testOverloadResolution",
+  "cv::utils::testOverwriteNativeMethod",
+  "cv::utils::testRaiseGeneralException",
+  "cv::utils::testReservedKeywordConversion",
+  "cv::utils::testRotatedRect",
+  "cv::utils::testRotatedRectVector",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/check.hpp"
+source-sha256 = "dd9eb5c2d14202e432a2455a5851721cbe70eeb176411bd07fd20ee034f4eaf3"
+decision = "upstream-internal"
+reason = "SDK-ignored check-context, operation enums and error-formatting dispatch used by textual CV_Check macros; public depthToString/typeToString remain exported."
+evidence = ["@cond IGNORED", "struct CheckContext", "enum TestOp"]
+names = [
+  "cv::detail::CV__LAST_TEST_OP",
+  "cv::detail::CheckContext",
+  "cv::detail::TEST_CUSTOM",
+  "cv::detail::TEST_EQ",
+  "cv::detail::TEST_GE",
+  "cv::detail::TEST_GT",
+  "cv::detail::TEST_LE",
+  "cv::detail::TEST_LT",
+  "cv::detail::TEST_NE",
+  "cv::detail::TestOp",
+  "cv::detail::check_failed_MatChannels",
+  "cv::detail::check_failed_MatDepth",
+  "cv::detail::check_failed_MatType",
+  "cv::detail::check_failed_auto",
+  "cv::detail::check_failed_false",
+  "cv::detail::check_failed_true",
+  "cv::detail::depthToString_",
+  "cv::detail::typeToString_",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/cvstd.hpp"
+source-sha256 = "96a1ddefb0539061389be0704b554e5ab30f20132944485f4c70644ceeb4a0d2"
+decision = "upstream-internal"
+reason = "Character-conversion implementation helpers behind exported toLowerCase/toUpperCase, not independent string APIs."
+evidence = ["namespace details", "char_tolower", "char_toupper"]
+names = [
+  "cv::details::char_tolower",
+  "cv::details::char_toupper",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/cvstd_wrapper.hpp"
+source-sha256 = "9f25758221966c94a202f173fe86c73abbdd9610be3708e820f71d91c7c9b653"
+decision = "upstream-internal"
+reason = "SFINAE detection implementation used by has_custom_delete/Ptr; public pointer construction and custom-deleter rejection have independent tests."
+evidence = ["namespace sfinae", "has_parenthesis_operator", "struct has_custom_delete"]
+names = [
+  "cv::sfinae::has_parenthesis_operator",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/dualquaternion.inl.hpp"
+source-sha256 = "1b6b478123cd15b7f24f2f3399d5c9199f7af979d9b57f0b0265a02cd4279484"
+decision = "upstream-internal"
+reason = "Private Jacobian helper inside the implementation header, called by original DualQuat exp/log member implementations; not a documented public extension interface."
+evidence = ["//Implementation", "namespace detail", "detail::jacob_exp(real)"]
+names = [
+  "cv::detail::jacob_exp",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/hal/hal.hpp"
+source-sha256 = "02698c7584bb7dbb0083c117c373f76482ea96483c4385c3013e432ef3ab67ce"
+decision = "upstream-internal"
+reason = "SDK-ignored binary-compatibility aliases for OpenCV 3.0; the current typed HAL entry points are exported and behavior-tested."
+evidence = ["for binary compatibility with 3.0", "@cond IGNORED", "CV_EXPORTS void invSqrt"]
+names = [
+  "cv::hal::Cholesky",
+  "cv::hal::LU",
+  "cv::hal::exp",
+  "cv::hal::fastAtan2",
+  "cv::hal::invSqrt",
+  "cv::hal::log",
+  "cv::hal::magnitude",
+  "cv::hal::sqrt",
+]
+
+[[groups]]
+features = ["simd-emulated"]
+source = "modules/core/include/opencv2/core/hal/intrin_cpp.hpp"
+source-sha256 = "570828789b15e0c51ca34134b38769e045ff56bb0f94530a2642144c155359be"
+decision = "upstream-internal"
+reason = "SDK-ignored _absdiff/_pack_b implementation helpers and the TU-local popcount lookup table; public vector functions and width enums are separately exported and tested."
+evidence = ["_absdiff", "_pack_b", "static const unsigned char popCountTable"]
+names = [
+  "cv::hal_EMULATOR_CPP::_absdiff",
+  "cv::hal_EMULATOR_CPP::_pack_b",
+  "cv::hal_EMULATOR_CPP::popCountTable",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/mat.inl.hpp"
+source-sha256 = "5307377114f21cf4a884ad26ae203ae695546e3411d5954dafcabe201a8c2d3c"
+decision = "upstream-internal"
+reason = "SDK-ignored raw element-type calculation used internally by raw InputArray constructors; public rawIn/rawOut/rawInOut adapters are tested separately."
+evidence = ["@cond IGNORED", "int rawType()", "_InputArray::FIXED_TYPE"]
+names = [
+  "cv::rawType",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/matx.inl.hpp"
+source-sha256 = "d0c6a03dd02395c20d3982cffd74e63f0188beebf7de04b1019c7c0bb5055c1a"
+decision = "upstream-internal"
+reason = "Internal determinant/conjugation implementation under cv::internal; public Matx/Vec reductions and operators are tested through the original public spellings."
+evidence = ["namespace internal", "Matx_DetOp", "conjugate"]
+names = [
+  "cv::internal::Matx_DetOp",
+  "cv::internal::conjugate",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/operations.hpp"
+source-sha256 = "43b94b3cfd74d1e3a38b8daa4b9f99ec6476b1e0420bfd33b74f3ce60c73b849"
+decision = "upstream-internal"
+reason = "Internal Matx inversion/solve dispatch functors; original public Matx::inv/solve members remain the SDK implementation."
+evidence = ["namespace internal", "Matx_FastInvOp", "Matx_FastSolveOp"]
+names = [
+  "cv::internal::Matx_FastInvOp",
+  "cv::internal::Matx_FastSolveOp",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/persistence.hpp"
+source-sha256 = "4416e51a1f49c85490a5633e3e1b0bd5aa726680594dcfa9c10819053ebc7b0b"
+decision = "upstream-internal"
+reason = "Private persistence reader/writer proxies and internal write-context helper; public FileStorage and generated read/write contracts are separately tested."
+evidence = ["namespace internal", "VecReaderProxy", "VecWriterProxy", "WriteStructContext"]
+names = [
+  "cv::internal::VecReaderProxy",
+  "cv::internal::VecWriterProxy",
+  "cv::internal::WriteStructContext",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/quaternion.inl.hpp"
+source-sha256 = "dff743f883e47035d84e52058cb9bca9fbf5d615e35bf3923097164263d6a164"
+decision = "upstream-internal"
+reason = "SDK-hidden Euler-angle implementation helpers used by original Quat member bodies; the public quaternion API remains exported."
+evidence = ["@cond IGNORE", "namespace detail", "detail::createFromAxisRot"]
+names = [
+  "cv::detail::createFromAxisRot",
+  "cv::detail::isIntAngleType",
+  "cv::detail::isTaitBryan",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/traits.hpp"
+source-sha256 = "73fdb2ffa02e290007c1235f8aecfbfba9559abf2f3d04c3e09bed67e481ffc5"
+decision = "upstream-internal"
+reason = "Macro-generated member-detection implementation in traits::internal; public Depth/Type trait declarations remain exported."
+evidence = ["namespace internal", "CV_CREATE_MEMBER_CHECK(fmt)", "CV_CREATE_MEMBER_CHECK(type)"]
+names = [
+  "cv::traits::internal::CheckMember_fmt",
+  "cv::traits::internal::CheckMember_type",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/utils/logger.hpp"
+source-sha256 = "de05bb88ce641de6e1fb8b21b61cc5c4e5f3652937273a9b4697878f10ad5827"
+decision = "upstream-internal"
+reason = "Logger dispatch callbacks and hook replacement machinery in the explicit internal namespace; public logging state/functions remain exported."
+evidence = ["namespace internal", "replaceWriteLogMessage", "WriteLogMessageFuncType"]
+names = [
+  "cv::utils::logging::internal::WriteLogMessageExFuncType",
+  "cv::utils::logging::internal::WriteLogMessageFuncType",
+  "cv::utils::logging::internal::getGlobalLogTag",
+  "cv::utils::logging::internal::replaceWriteLogMessage",
+  "cv::utils::logging::internal::replaceWriteLogMessageEx",
+  "cv::utils::logging::internal::writeLogMessage",
+  "cv::utils::logging::internal::writeLogMessageEx",
+]
+
+[[groups]]
+source = "modules/core/include/opencv2/core/utils/tls.hpp"
+source-sha256 = "3b3261c3900c2d1ab82496b6722979996cb899f3110492d7177651790b6f9aef"
+decision = "upstream-internal"
+reason = "Incomplete friend storage implementation owned by core/src/system.cpp, not the documented TLSData/TLSDataAccumulator interfaces."
+evidence = ["namespace details { class TlsStorage; }", "friend class cv::details::TlsStorage"]
+names = [
+  "cv::details::TlsStorage",
+]
+
+[[groups]]
+source = "modules/dnn/include/opencv2/dnn/dnn.hpp"
+source-sha256 = "30b8090f9dd644c9b737b8626b83b5cc8d370bdd80534a0a0f5bedbc5cb4e3cd"
+decision = "upstream-internal"
+reason = "Incomplete private friend accessor for Net implementation storage, distinct from the public Arg equality and legacy backend utilities now restored."
+evidence = ["namespace accessor", "DnnNetAccessor"]
+names = [
+  "cv::dnn::accessor::DnnNetAccessor",
+]
+
+[[groups]]
+source = "modules/flann/include/opencv2/flann/allocator.h"
+source-sha256 = "df11437b7c656f2b0d653eac5c49233ef5dd6a416086ba3896ac070be3994b46"
+decision = "upstream-internal"
+reason = "SDK-ignored raw FLANN allocator tuning constants used by PooledAllocator; auxiliary cvflann exports are not a promise to expose every raw implementation detail."
+evidence = ["@cond IGNORED", "WORDSIZE=16", "BLOCKSIZE=8192"]
+names = [
+  "cvflann::BLOCKSIZE",
+  "cvflann::WORDSIZE",
+]
+
+[[groups]]
+source = "modules/flann/include/opencv2/flann/any.h"
+source-sha256 = "3b15f77754d790637d2ee5efd5ead1de2671717b87ce8d9852b1d40529040e4a"
+decision = "upstream-internal"
+reason = "SDK-ignored raw FLANN type-erasure policies and stream helpers, not OpenCV flann public index/search interfaces. Existing exported aliases retain original SDK identities."
+evidence = ["@cond IGNORED", "namespace anyimpl", "base_any_policy"]
+names = [
+  "cvflann::anyimpl::SinglePolicy",
+  "cvflann::anyimpl::any",
+  "cvflann::anyimpl::bad_any_cast",
+  "cvflann::anyimpl::base_any_policy",
+  "cvflann::anyimpl::big_any_policy",
+  "cvflann::anyimpl::choose_policy",
+  "cvflann::anyimpl::empty_any",
+  "cvflann::anyimpl::operator<<",
+  "cvflann::anyimpl::small_any_policy",
+  "cvflann::anyimpl::typed_base_any_policy",
+  "cvflann::operator<<",
+]
+
+[[groups]]
+source = "modules/flann/include/opencv2/flann/lsh_table.h"
+source-sha256 = "a64c3744103ba09251d7198e0743a6a2d10abaaae895c2b24b4f5000a0354c96"
+decision = "upstream-internal"
+reason = "SDK-ignored raw FLANN LSH bucket/table implementation; OpenCV public LSH index parameters and searches remain separately exported."
+evidence = ["@cond IGNORED", "namespace lsh", "LshTable"]
+names = [
+  "cvflann::lsh::Bucket",
+  "cvflann::lsh::BucketKey",
+  "cvflann::lsh::FeatureIndex",
+  "cvflann::lsh::LshStats",
+  "cvflann::lsh::LshTable",
+  "cvflann::lsh::operator<<",
+]
+
+[[groups]]
+source = "modules/imgproc/include/opencv2/imgproc/hal/hal.hpp"
+source-sha256 = "efecd002537f5d66489e05401dadca222785c8bd4c69d7d70e1e131fd69a0097"
+decision = "upstream-internal"
+reason = "Deprecated SDK-ignored HAL filter implementation classes; the current public filter2D/sepFilter2D/morph entry points retain their SDK entities."
+evidence = ["@cond IGNORED", "CV_DEPRECATED", "struct CV_EXPORTS Morph"]
+names = [
+  "cv::hal::Filter2D",
+  "cv::hal::Morph",
+  "cv::hal::SepFilter2D",
+]
+
+[[groups]]
+source = "modules/stitching/include/opencv2/stitching/detail/util_inl.hpp"
+source-sha256 = "75ad5d758c607f78151db4e9485791d8ef5dda0d5e2b9e2b11d9675b81e97559"
+decision = "upstream-internal"
+reason = "SDK-ignored stitching auxiliary math behind Graph and algorithm implementations; public stitching classes/functions are separately exported."
+evidence = ["@cond IGNORED", "Some auxiliary math functions", "static inline int sqr"]
+names = [
+  "cv::detail::normL2",
+  "cv::detail::normL2sq",
+  "cv::detail::sqr",
+]
+
+[[groups]]
+source = "modules/videoio/include/opencv2/videoio.hpp"
+source-sha256 = "85c1224ce4beaf522e5c7dc0ebc12554f34d34d28a50e28c7a84144a494e03e4"
+decision = "upstream-internal"
+reason = "Incomplete private friend accessor for VideoCapture implementation storage, not a capture backend interface."
+evidence = ["namespace internal", "VideoCapturePrivateAccessor"]
+names = [
+  "cv::internal::VideoCapturePrivateAccessor",
+]
+
+[[groups]]
+features = ["simd"]
+without-features = ["simd-emulated"]
+when-header-loaded = true
+source = "modules/core/include/opencv2/core/hal/intrin_sse.hpp"
+source-sha256 = "9af7b4fdd7b587f2379b1bab854e596eef336b7f342568bd4ebda12d7a9d9396"
+decision = "upstream-internal"
+reason = "Implementation-only palignr and reinterpret templates inside the explicit hal_sse_internal namespace; public vector entry points retain the original SDK code."
+evidence = ["namespace hal_sse_internal", "v_sse_palignr_u8", "v_sse_reinterpret_as"]
+names = [
+  "cv::hal_baseline::hal_sse_internal::v_sse_palignr_u8",
+  "cv::hal_baseline::hal_sse_internal::v_sse_palignr_u8_class",
+  "cv::hal_baseline::hal_sse_internal::v_sse_reinterpret_as",
+]
+
+[[groups]]
+features = ["simd"]
+without-features = ["simd-emulated"]
+when-header-loaded = true
+source = "modules/core/include/opencv2/core/hal/intrin_sse_em.hpp"
+source-sha256 = "9a8369d287ff500756fae5577f528c360f011e04e5a4a44f5af1d697b1d1442a"
+decision = "upstream-internal"
+reason = "Private x86 SSE compatibility shims over __m128i used by the public universal intrinsics; underscore-prefixed helper names emulate newer instructions on the SSE2 baseline."
+evidence = ["#if !CV_SSE4_1", "_v128_blendv_epi8", "_v128_cvtepi8_epi32"]
+names = [
+  "cv::hal_baseline::_v128_blendv_epi8",
+  "cv::hal_baseline::_v128_comgt_epu32",
+  "cv::hal_baseline::_v128_cvtepi16_epi32",
+  "cv::hal_baseline::_v128_cvtepi16_epi32_high",
+  "cv::hal_baseline::_v128_cvtepi32_epi64",
+  "cv::hal_baseline::_v128_cvtepi32_epi64_high",
+  "cv::hal_baseline::_v128_cvtepi8_epi16",
+  "cv::hal_baseline::_v128_cvtepi8_epi16_high",
+  "cv::hal_baseline::_v128_cvtepi8_epi32",
+  "cv::hal_baseline::_v128_cvtepu16_epi32",
+  "cv::hal_baseline::_v128_cvtepu16_epi32_high",
+  "cv::hal_baseline::_v128_cvtepu32_epi64",
+  "cv::hal_baseline::_v128_cvtepu32_epi64_high",
+  "cv::hal_baseline::_v128_cvtepu8_epi16",
+  "cv::hal_baseline::_v128_cvtepu8_epi16_high",
+  "cv::hal_baseline::_v128_cvtepu8_epi32",
+  "cv::hal_baseline::_v128_extract_epi64",
+  "cv::hal_baseline::_v128_min_epu32",
+  "cv::hal_baseline::_v128_mullo_epi32",
+  "cv::hal_baseline::_v128_packs_epu32",
+]

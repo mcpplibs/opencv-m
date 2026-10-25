@@ -1,61 +1,62 @@
 #!/usr/bin/env python3
-"""prune_loop.py — compile-verify the export surface and prune failing names.
+"""Report export compile failures without deleting or rewriting public APIs.
 
-Runs `mcpp build`, parses gcc errors that point into src/gen_exports/*.inc,
-appends the offending names to tools/curated/<module>.prune.txt (with the
-reason as a comment), regenerates, and repeats until the build is green or an
-iteration makes no progress (then it prints the残 errors and exits 1).
-
-Usage: prune_loop.py [opencv-root]   (root forwarded to gen_exports.py)
+The historical filename is retained for existing tooling. This command now
+builds once and writes diagnostics; every missing export requires explicit
+review, an adapter or a justified exclusion. --log replays a captured build.
 """
+import argparse
+import json
+from pathlib import Path
 import re
 import subprocess
-import sys
-from collections import defaultdict
-from pathlib import Path
 
-REPO = Path(__file__).resolve().parent.parent
-INC_ERR = re.compile(r"gen_exports/(\w+)\.inc:(\d+):(?:\d+:)? error: (.*)")
+ROOT = Path(__file__).resolve().parents[1]
+INC_ERR = re.compile(r"gen_exports/(\w+)\.inc:(\d+):(?:\d+:)?\s*(?:fatal )?error:\s*(.*)")
+DECL = re.compile(r"^\s*\d+\s*\|\s*(?:export\s+)?using\s+([^;]+);")
 
-for iteration in range(1, 30):
-    r = subprocess.run(["mcpp", "build"], cwd=REPO, capture_output=True, text=True)
-    if r.returncode == 0:
-        print(f"iteration {iteration}: build GREEN")
-        sys.exit(0)
-    errs = defaultdict(dict)   # module -> {lineno: reason}
-    for line in (r.stderr + r.stdout).splitlines():
-        m = INC_ERR.search(line)
-        if m:
-            errs[m.group(1)].setdefault(int(m.group(2)), m.group(3).strip())
-    if not errs:
-        print(f"iteration {iteration}: build failed but no .inc errors — manual attention needed")
-        print("\n".join((r.stderr + r.stdout).splitlines()[-40:]))
-        sys.exit(1)
-    total = 0
-    for mod, lines in errs.items():
-        inc = (REPO / "src" / "gen_exports" / f"{mod}.inc").read_text().splitlines()
-        prune_path = REPO / "tools" / "curated" / f"{mod}.prune.txt"
-        old = prune_path.read_text() if prune_path.exists() else \
-            "# names failing compile-verification — maintained by tools/prune_loop.py\n"
-        add = []
-        for ln, reason in sorted(lines.items()):
-            src = inc[ln - 1].strip()
-            m = re.match(r"using (?:cv::)?([A-Za-z0-9_:]+?);", src)
-            if not m:
-                continue
-            name = m.group(1)
-            if re.search(rf"^{re.escape(name.split('::')[-1])}\b", old, re.M) and name in old:
-                continue
-            add.append(f"{name}   # {reason[:90]}")
-        if add:
-            prune_path.write_text(old + "\n".join(add) + "\n")
-            total += len(add)
-            print(f"iteration {iteration}: {mod}: pruned {len(add)}")
-    if total == 0:
-        print(f"iteration {iteration}: no new prunes derivable — manual attention needed")
-        print("\n".join((r.stderr + r.stdout).splitlines()[-40:]))
-        sys.exit(1)
-    subprocess.run([sys.executable, str(REPO / "tools" / "gen_exports.py"), *sys.argv[1:]],
-                   check=True, cwd=REPO)
-print("iteration limit reached")
-sys.exit(1)
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("opencv_root", nargs="?", type=Path, help="legacy argument; must match the pinned SDK")
+    parser.add_argument("--mcpp", default="mcpp")
+    parser.add_argument("--features", default="all-modules")
+    parser.add_argument("--toolchain")
+    parser.add_argument("--log", type=Path, help="analyze an existing log instead of building")
+    parser.add_argument("--report", type=Path, default=ROOT / "target/api-audit/export-diagnostics.json")
+    args = parser.parse_args()
+    if args.opencv_root and args.opencv_root.resolve() != ROOT / "upstream/opencv":
+        parser.error("this diagnostic builds the checkout's pinned upstream/opencv only")
+    if args.log:
+        output = args.log.read_text()
+        failed = bool(re.search(r"(?:fatal )?error:|build failed", output))
+    else:
+        command = [args.mcpp, "build", "--strict", "--no-color", "--features", args.features]
+        if args.toolchain:
+            command += ["--toolchain", args.toolchain]
+        result = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output, failed = result.stdout, result.returncode != 0
+    output = re.sub(r"\x1b\[[0-9;]*m", "", output)
+    lines, errors = output.splitlines(), []
+    for number, line in enumerate(lines):
+        match = INC_ERR.search(line)
+        if not match:
+            continue
+        # Use recorded context rather than today's possibly stale line number.
+        declaration = next((found[1] for context in lines[number + 1:number + 4]
+                            if (found := DECL.match(context))), None)
+        errors.append({"module": match[1], "line": int(match[2]), "declaration": declaration,
+                       "reason": match[3], "status": "requires-review"})
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    args.report.write_text(json.dumps({"build": "failed" if failed else "passed", "export-errors": errors,
+                                      "automatic-api-removals": 0}, indent=2) + "\n")
+    args.report.with_suffix(".log").write_text(output)
+    print(f"Build {'failed' if failed else 'passed'}; {len(errors)} export diagnostics; no API files changed.")
+    print("Review report:", args.report)
+    if failed and not errors:
+        print("\n".join(lines[-30:]))
+    raise SystemExit(1 if failed else 0)
+
+
+if __name__ == "__main__":
+    main()
