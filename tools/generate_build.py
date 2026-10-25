@@ -254,7 +254,7 @@ def generate():
         "feature-deps": {"videoio-ffmpeg": {"compat": {"ffmpeg": "8.1.2"}},
                          "imgcodecs-webp": {"compat": {"libwebp": {
                              "version": "1.5.0", "features": ["demux", "mux"]}}},
-                         "dnn-onnxruntime": {"mcpplibs.mwrap": {"onnxruntime": "1.25.1.1"}}},
+                         "dnn-onnxruntime": {"mcpplibs.mwrap": {"onnxruntime": "1.25.1"}}},
         "targets": {"opencv": {"kind": "lib"}},
     }
     write_if_changed(ROOT / "mcpp.toml",
