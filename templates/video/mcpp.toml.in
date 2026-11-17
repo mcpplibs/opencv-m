@@ -4,4 +4,4 @@ version = "0.1.0"
 description = "OpenCV video file quickstart"
 
 [dependencies]
-"{{self.name}}" = { version = "{{self.version}}", features = ["videoio-native", "videoio-ffmpeg"] }
+{{template.package.selector}} = { version = "{{template.package.version}}", features = ["videoio-native", "videoio-ffmpeg"] }

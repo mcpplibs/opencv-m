@@ -4,7 +4,7 @@ version     = "0.1.0"
 description = "OpenCV image pipeline ({{project.name}})"
 
 [dependencies]
-"{{self.name}}" = { version = "{{self.version}}", features = ["imgproc", "imgcodecs-png", "imgcodecs-jpeg"] }
+{{template.package.selector}} = { version = "{{template.package.version}}", features = ["imgproc", "imgcodecs-png", "imgcodecs-jpeg"] }
 
 [targets.{{project.name}}]
 kind = "bin"

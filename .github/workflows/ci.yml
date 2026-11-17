@@ -156,14 +156,14 @@ jobs:
         # this CI (a path-dep consumer cold-rebuilds all of OpenCV, ~40 min),
         # so two static checks stand in for the missing build:
         #   1. Placeholders: mcpp's renderer knows exactly {{project.name}} /
-        #      {{self.name}} / {{self.version}} — anything else ships literally.
+        #      {{template.package.selector}} / {{template.package.version}} — anything else ships literally.
         #   2. stdio-macro / import-std footgun: `import std;` does NOT export
         #      the C macros stderr/stdout/stdin (modules never export macros),
         #      so a template TU touching one must also `#include <cstdio>`.
         #      v0.0.7's template used std::println(stderr, …) under a bare
         #      `import std;` and scaffolded non-compiling code; this guards it.
         run: |
-          bad=$(grep -rno '{{[^}]*}}' templates/ | grep -v -E '\{\{(project\.name|self\.name|self\.version)\}\}' || true)
+          bad=$(grep -rno '{{[^}]*}}' templates/ | grep -v -E '\{\{(project\.name|template\.package\.selector|template\.package\.version)\}\}' || true)
           if [ -n "$bad" ]; then echo "unknown template placeholders:"; echo "$bad"; exit 1; fi
           fail=0
           while IFS= read -r tu; do

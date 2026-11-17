@@ -3,7 +3,7 @@
 [package]
 namespace = "mcpplibs.mwrap"
 name = "opencv"
-version = "5.0.0"
+version = "5.0.0.1"
 description = "OpenCV 5.0.0 public C++ APIs through optional mwrap modules"
 license = "Apache-2.0"
 authors = ["mcpp-community"]

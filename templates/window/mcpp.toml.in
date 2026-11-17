@@ -4,4 +4,4 @@ version = "0.1.0"
 description = "OpenCV native window quickstart"
 
 [dependencies]
-"{{self.name}}" = { version = "{{self.version}}", features = ["highgui-native", "imgcodecs-png"] }
+{{template.package.selector}} = { version = "{{template.package.version}}", features = ["highgui-native", "imgcodecs-png"] }

@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "OpenCV ONNX Runtime CPU inference"
 
 [dependencies]
-"{{self.name}}" = { version = "{{self.version}}", features = ["dnn-onnxruntime"] }
+{{template.package.selector}} = { version = "{{template.package.version}}", features = ["dnn-onnxruntime"] }
 
 [target.x86_64-linux-gnu]
 cxx_runtime = "toolchain-coupled"
