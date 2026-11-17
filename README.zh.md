@@ -28,14 +28,14 @@
 ## 快速开始
 
 ```sh
-mcpp new vision --template mcpplibs.mwrap.opencv@5.0.0
+mcpp new vision --template mcpplibs.mwrap.opencv@5.0.0.1
 cd vision
 mcpp run
 ```
 
 ```toml
 [dependencies]
-mcpplibs.mwrap.opencv = { version = "5.0.0", features = ["imgproc", "imgcodecs-png"] }
+mcpplibs.mwrap.opencv = { version = "5.0.0.1", features = ["imgproc", "imgcodecs-png"] }
 ```
 
 ```cpp
